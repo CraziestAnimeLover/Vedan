@@ -12,6 +12,8 @@ import JobDescription from './components/JobDescription'
 import ServicePage from './components/Pages/ServicePage'
 import NewsFeed from './components/Pages/NewsFeed'
 import StudentForm from './components/auth/StudentForm'
+import { LibrarySquareIcon } from 'lucide-react'
+import Libray from './components/Libray'
 
 
 
@@ -34,6 +36,9 @@ const approuter = createBrowserRouter([
    },
    { path: '/newsfeed', 
     element: <NewsFeed/>
+   },
+   { path: '/libray', 
+    element: <Libray/>
    },
    { path: '/jobs', 
     element: <Jobs/>

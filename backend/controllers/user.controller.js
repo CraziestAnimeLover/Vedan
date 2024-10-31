@@ -112,7 +112,7 @@ export const login = async (req, res) => {
         };
 
         return res.status(200).cookie("token", token, { maxAge: 86400000, httpOnly: true, sameSite: 'strict' }).json({
-            message: Welcome back ${user.fullname},
+            message: `Welcome back ${user.fullname}`,
             user,
             success: true
         });
