@@ -111,11 +111,17 @@ export const login = async (req, res) => {
             profile: user.profile
         };
 
-        return res.status(200).cookie("token", token, { maxAge: 86400000, httpsOnly: true, sameSite: 'strict' }).json({
-            message: `Welcome back ${user.fullname}`,
-            user,
-            success: true
-        });
+        return res.status(200).cookie("token", token, {
+    maxAge: 86400000,
+    httpOnly: true,
+    sameSite: 'none', // allow cross-origin requests
+    secure: true      // ensure HTTPS-only cookie transmission
+}).json({
+    message: `Welcome back ${user.fullname}`,
+    user,
+    success: true
+});
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error", success: false });
