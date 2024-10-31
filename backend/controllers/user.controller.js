@@ -8,7 +8,7 @@ import cloudinary from "../utils/cloudinary.js";
 export const register = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, role } = req.body;
-        console.log(fullname, email, phoneNumber, password, role);
+        // console.log(fullname, email, phoneNumber, password, role);
 
         // Check if all required fields are provided
         if (!fullname || !email || !phoneNumber || !password || !role) {
