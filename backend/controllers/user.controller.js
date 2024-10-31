@@ -89,6 +89,7 @@ export const login = async (req, res) => {
             });
         }
 
+        // Check if role matches
         if (role !== user.role) {
             return res.status(400).json({
                 message: "Account doesn't exist with current role.",
@@ -100,22 +101,19 @@ export const login = async (req, res) => {
         const tokenData = { userId: user._id };
         const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-        // Send cookie with secure settings
-        return res.status(200).cookie("token", token, {
-            maxAge: 86400000, // 1 day
-            httpOnly: true,
-            sameSite: 'none', // Cross-site cookie policy
-            secure: true      // Send over HTTPS only
-        }).json({
-            message: `Welcome back ${user.fullname}`,
-            user: {
-                _id: user._id,
-                fullname: user.fullname,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                role: user.role,
-                profile: user.profile
-            },
+        // Prepare user data
+        user = {
+            _id: user._id,
+            fullname: user.fullname,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+            profile: user.profile
+        };
+
+        return res.status(200).cookie("token", token, { maxAge: 86400000, httpOnly: true, sameSite: 'strict' }).json({
+            message: Welcome back ${user.fullname},
+            user,
             success: true
         });
     } catch (error) {
@@ -124,16 +122,10 @@ export const login = async (req, res) => {
     }
 };
 
-
 // Logout Function
 export const logout = async (req, res) => {
     try {
-        return res.status(200).cookie("token", "", {
-            maxAge: 0,
-            httpOnly: true,
-            sameSite: 'none',
-            secure: true
-        }).json({
+        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
             message: "Logged out successfully.",
             success: true
         });
@@ -142,7 +134,6 @@ export const logout = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
-
 
 // Update Profile Function
 export const updateProfile = async (req, res) => {
