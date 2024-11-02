@@ -34,7 +34,7 @@ const Navbar = () => {
         <div className="bg-white rounded-md shadow-xl sticky top-0 z-50">
             <div className="flex items-center justify-between mx-auto max-w-7xl h-16 p-4 md:p-0">
                 <div className="rounded-full hover:animate-bounce">
-                    <h1 className="text-2xl font-bold text-[#21165c]">Vedan</h1>
+                    <h1 className="text-2xl font-bold text-[#21165c]">Vedann</h1>
                 </div>
 
                 <div className="flex items-center gap-4 md:gap-12">
