@@ -14,6 +14,7 @@ import NewsFeed from './components/Pages/NewsFeed'
 import StudentForm from './components/auth/StudentForm'
 import { LibrarySquareIcon } from 'lucide-react'
 import Libray from './components/Libray'
+import Sunny from './components/sunny'
 
 
 
@@ -52,7 +53,9 @@ const approuter = createBrowserRouter([
    { path: '/profile', 
     element: <Profile/>
    },
-
+   { path: '/sunny', 
+    element: <Sunny/>
+   },
 
    { path: '/admin/companies', 
     element: <Companies/>
