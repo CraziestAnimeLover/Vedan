@@ -27,6 +27,8 @@ const corsOptions = {
         }
     },
     credentials: true, // Allow cookies and credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Explicitly define allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Explicitly define allowed headers
 };
 
 app.use(cors(corsOptions));
