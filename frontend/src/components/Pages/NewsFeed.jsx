@@ -3,9 +3,6 @@ import React from 'react';
 import Navbar from '../shared/Navbar';
 
 const newsArticles = [
-    [
-    [
-    [
     {
         "id": 1,
         "title": "New Placement Opportunities Available!",
@@ -62,12 +59,6 @@ const newsArticles = [
         "url": "https://example.com/news/education-conference",
         "image": "https://via.placeholder.com/400x200?text=Education+Conference"
     }
-]
-
-]
-
-]
-
 ];
 
 const NewsFeed = () => {
