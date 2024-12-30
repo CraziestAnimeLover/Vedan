@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import axios from 'axios';
+import { USER_API_END_POINT } from '../../utils/constant.js';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -43,7 +44,7 @@ const ResetPassword = () => {
 
         try {
             const res = await axios.post(
-                `http://localhost:8000/api/v1/user/reset-password`, 
+                `${USER_API_END_POINT}/reset-password`, 
                 { token, newPassword },
                 { headers: { 'Content-Type': 'application/json' } }
             );
