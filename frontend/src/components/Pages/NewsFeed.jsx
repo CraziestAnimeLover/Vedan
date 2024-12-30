@@ -4,39 +4,60 @@ import Navbar from '../shared/Navbar';
 
 const newsArticles = [
     {
-        id: 1,
-        title: 'New Placement Opportunities Available!',
-        description: 'Explore the latest job openings and career resources.',
-        url: 'https://example.com/news/placement-opportunities',
-        image: 'https://via.placeholder.com/400x200?text=Placement+Opportunities'
+        "id": 1,
+        "title": "New Placement Opportunities Available!",
+        "description": "Explore the latest job openings and career resources for graduates.",
+        "url": "https://example.com/news/placement-opportunities",
+        "image": "https://via.placeholder.com/400x200?text=Placement+Opportunities"
     },
     {
-        id: 2,
-        title: 'Student Resources Updated',
-        description: 'Check out the newly added resources for students.',
-        url: 'https://example.com/news/student-resources',
-        image: 'https://via.placeholder.com/400x200?text=Student+Resources'
+        "id": 2,
+        "title": "Student Resources Updated",
+        "description": "Check out the newly added resources and tools to help students succeed.",
+        "url": "https://example.com/news/student-resources",
+        "image": "https://via.placeholder.com/400x200?text=Student+Resources"
     },
     {
-        id: 3,
-        title: 'Collaboration with Local Companies',
-        description: 'Learn about our partnerships with leading companies in the industry.',
-        url: 'https://example.com/news/company-collaboration',
-        image: 'https://via.placeholder.com/400x200?text=Company+Collaboration'
+        "id": 3,
+        "title": "Collaboration with Local Companies",
+        "description": "Discover the new partnerships with industry leaders to boost career growth.",
+        "url": "https://example.com/news/company-collaboration",
+        "image": "https://via.placeholder.com/400x200?text=Company+Collaboration"
     },
     {
-        id: 4,
-        title: 'Institute Admissions Open',
-        description: 'Apply now for the upcoming academic year.',
-        url: 'https://example.com/news/admissions-open',
-        image: 'https://via.placeholder.com/400x200?text=Admissions+Open'
+        "id": 4,
+        "title": "Institute Admissions Open for 2024-25",
+        "description": "Apply now for the upcoming academic year and take the first step toward your future.",
+        "url": "https://example.com/news/admissions-open",
+        "image": "https://via.placeholder.com/400x200?text=Admissions+Open"
     },
     {
-        id: 5,
-        title: 'Blood Donation Drive Scheduled',
-        description: 'Join us for the upcoming blood donation drive and save lives.',
-        url: 'https://example.com/news/blood-donation',
-        image: 'https://via.placeholder.com/400x200?text=Blood+Donation'
+        "id": 5,
+        "title": "Blood Donation Drive Scheduled for January 2024",
+        "description": "Join us in saving lives at our upcoming blood donation drive next month.",
+        "url": "https://example.com/news/blood-donation",
+        "image": "https://via.placeholder.com/400x200?text=Blood+Donation"
+    },
+    {
+        "id": 6,
+        "title": "New Scholarship Program Launched",
+        "description": "We are excited to announce new scholarship opportunities for underrepresented students.",
+        "url": "https://example.com/news/scholarship-program",
+        "image": "https://via.placeholder.com/400x200?text=Scholarship+Program"
+    },
+    {
+        "id": 7,
+        "title": "Campus Health and Safety Guidelines Update",
+        "description": "Get the latest information on health and safety protocols for the campus community.",
+        "url": "https://example.com/news/health-safety-updates",
+        "image": "https://via.placeholder.com/400x200?text=Health+Safety"
+    },
+    {
+        "id": 8,
+        "title": "International Education Conference 2024",
+        "description": "Register now for the 2024 International Conference on Education and Innovation.",
+        "url": "https://example.com/news/education-conference",
+        "image": "https://via.placeholder.com/400x200?text=Education+Conference"
     }
 ];
 

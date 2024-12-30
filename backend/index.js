@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5173', 'https://www.vedann.com'];
+const allowedOrigins = ['http://localhost:5173', 'https://vedan-frontend1.onrender.com','https://www.vedann.com'];
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
@@ -27,6 +27,8 @@ const corsOptions = {
         }
     },
     credentials: true, // Allow cookies and credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Explicitly define allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Explicitly define allowed headers
 };
 
 app.use(cors(corsOptions));
