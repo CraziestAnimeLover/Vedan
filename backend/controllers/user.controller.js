@@ -163,7 +163,7 @@ export const forgotPassword = async (req, res) => {
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `www.vedann.com//reset-password/${resetToken}`;
+        const resetLink = `www.vedann.com/reset-password/${resetToken}`;
 
         // Send the reset email
         const mailOptions = {
