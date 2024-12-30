@@ -6,6 +6,7 @@ import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
 
 
+
 // Register Function
 export const register = async (req, res) => {
     try {
@@ -162,7 +163,7 @@ export const forgotPassword = async (req, res) => {
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+        const resetLink = `www.vedann.com//reset-password/${resetToken}`;
 
         // Send the reset email
         const mailOptions = {
