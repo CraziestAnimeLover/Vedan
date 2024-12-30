@@ -3,6 +3,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { USER_API_END_POINT } from '@/utils/constant';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const ResetPassword = () => {
@@ -43,7 +44,7 @@ const ResetPassword = () => {
 
         try {
             const res = await axios.post(
-                `http://localhost:8000/api/v1/user/reset-password`, 
+                `${ USER_API_END_POINT}/reset-password`, 
                 { token, newPassword },
                 { headers: { 'Content-Type': 'application/json' } }
             );
