@@ -32,7 +32,7 @@ const ForgotPassword = () => {
 
         try {
             const res = await axios.post(
-                `${USER_API_END_POINT}/forgot-password`,  // Ensure this is correct
+                `www.vedann.com/forgot-password`,  // Ensure this is correct
                 { email },
                 { headers: { 'Content-Type': "application/json" } }
             );
