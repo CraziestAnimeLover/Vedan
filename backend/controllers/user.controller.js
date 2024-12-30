@@ -2,7 +2,6 @@ import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
-import { USER_API_END_POINT } from '../../utils/constant.js';
 import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
 
@@ -164,7 +163,7 @@ export const forgotPassword = async (req, res) => {
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `${ USER_API_END_POINT }/reset-password/${resetToken}`;
+        const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
 
         // Send the reset email
         const mailOptions = {
