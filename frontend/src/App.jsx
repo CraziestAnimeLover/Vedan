@@ -13,8 +13,12 @@ import ServicePage from './components/Pages/ServicePage'
 import NewsFeed from './components/Pages/NewsFeed'
 import StudentForm from './components/auth/StudentForm'
 import { LibrarySquareIcon } from 'lucide-react'
-import Libray from './components/Libray'
 import Sunny from './components/sunny'
+import ForgotPassword from './components/auth/ForgotPassword'
+import ResetPassword from './components/auth/ResetPassword'
+import Library from './components/library/Library'
+import LostItem from './components/lostnfound/LostItem'
+
 
 
 
@@ -25,6 +29,12 @@ const approuter = createBrowserRouter([
    },
   { path: '/login', 
     element: <Login/>
+  },
+  { path: '/forgot-password', 
+    element: <ForgotPassword/>
+  },
+  { path: '/reset-password/:token', 
+    element: <ResetPassword/> 
   },
   { path: '/register', 
     element: <Signup/>
@@ -38,8 +48,8 @@ const approuter = createBrowserRouter([
    { path: '/newsfeed', 
     element: <NewsFeed/>
    },
-   { path: '/libray', 
-    element: <Libray/>
+   { path: '/library', 
+    element: <Library/>
    },
    { path: '/jobs', 
     element: <Jobs/>
@@ -55,6 +65,9 @@ const approuter = createBrowserRouter([
    },
    { path: '/sunny', 
     element: <Sunny/>
+   },
+   { path: '/lostnfound', 
+    element: <LostItem/>
    },
 
    { path: '/admin/companies', 

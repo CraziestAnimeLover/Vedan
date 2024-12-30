@@ -10,7 +10,7 @@ import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '@/redux/authSlice';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -18,33 +18,62 @@ const Signup = () => {
     email: '',
     phoneNumber: '',
     password: '',
+    confirmPassword: '',
     role: '',
     file: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [filePreview, setFilePreview] = useState(null); // Image preview
 
   const { loading, user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const phoneRegex = /^\d{10}$/;
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
-  
+
   const changeFileHandler = (e) => {
-    setInput({ ...input, file: e.target.files?.[0] });
+    const file = e.target.files?.[0];
+    setInput({ ...input, file });
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setFilePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('fullname', input.fullname);
-    formData.append('email', input.email);
-    formData.append('phoneNumber', input.phoneNumber);
-    formData.append('password', input.password);
-    formData.append('role', input.role);
-    if (input.file) {
-      formData.append('file', input.file);
+
+    if (!phoneRegex.test(input.phoneNumber)) {
+      toast.error('Phone number must be exactly 10 digits.');
+      return;
     }
+
+    if (!passwordRegex.test(input.password)) {
+      toast.error(
+        'Password must include at least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character.'
+      );
+      return;
+    }
+
+    if (input.password !== input.confirmPassword) {
+      toast.error('Password and Confirm Password do not match.');
+      return;
+    }
+
+    const formData = new FormData();
+    Object.keys(input).forEach((key) => {
+      if (input[key]) formData.append(key, input[key]);
+    });
 
     try {
       dispatch(setLoading(true));
@@ -52,13 +81,14 @@ const Signup = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       });
+
       if (res.data.success) {
         navigate('/login');
         toast.success(res.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || 'Something went wrong.');
     } finally {
       dispatch(setLoading(false));
     }
@@ -73,111 +103,142 @@ const Signup = () => {
   return (
     <div>
       <Navbar />
-      <div className='flex items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <form
           onSubmit={submitHandler}
-          className='w-full max-w-lg bg-white border border-gray-200 rounded-md p-4 my-10 shadow-lg'
+          className="w-full max-w-lg bg-white border border-gray-200 rounded-md p-4 shadow-lg"
         >
-          <h1 className='font-bold text-xl sm:text-2xl mb-5 text-center'>Sign Up</h1>
-          
-          <div className='my-3'>
+          <h1 className="font-bold text-xl sm:text-2xl mb-5 text-center">Sign Up</h1>
+
+          <div className="my-3">
             <Label>Full Name</Label>
             <Input
-              type='text'
+              type="text"
               value={input.fullname}
-              name='fullname'
+              name="fullname"
               onChange={changeEventHandler}
-              placeholder='Onlyjobs'
-              className='w-full'
+              placeholder="Onlyjobs"
+              className="w-full"
             />
           </div>
-          
-          <div className='my-3'>
+
+          <div className="my-3">
             <Label>Email</Label>
             <Input
-              type='email'
+              type="email"
               value={input.email}
-              name='email'
+              name="email"
               onChange={changeEventHandler}
-              placeholder='onlyjobs@gmail.com'
-              className='w-full'
+              placeholder="onlyjobs@gmail.com"
+              className="w-full"
             />
           </div>
-          
-          <div className='my-3'>
+
+          <div className="my-3">
             <Label>Phone Number</Label>
             <Input
-              type='text'
+              type="text"
               value={input.phoneNumber}
-              name='phoneNumber'
+              name="phoneNumber"
               onChange={changeEventHandler}
-              placeholder='1010101010'
-              className='w-full'
+              placeholder="1010101010"
+              className="w-full"
             />
           </div>
-          
-          <div className='my-3'>
+
+          <div className="my-3 relative">
             <Label>Password</Label>
             <Input
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               value={input.password}
-              name='password'
+              name="password"
               onChange={changeEventHandler}
-              placeholder='password'
-              className='w-full'
+              placeholder="Password"
+              className="w-full"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-12 right-3 flex items-center text-gray-500"
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </button>
           </div>
-          
-          <div className='flex flex-col sm:flex-row justify-between items-center gap-4 mt-4'>
-            <RadioGroup className='flex items-center gap-4'>
-              <div className='flex items-center space-x-2'>
+
+          <div className="my-3 relative">
+            <Label>Confirm Password</Label>
+            <Input
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={input.confirmPassword}
+              name="confirmPassword"
+              onChange={changeEventHandler}
+              placeholder="Confirm Password"
+              className="w-full"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-12 right-3 flex items-center text-gray-500 "
+            >
+              {showConfirmPassword ? <EyeOff /> : <Eye />}
+            </button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
+            <RadioGroup className="flex items-center gap-4">
+              <div className="flex items-center space-x-2">
                 <Input
-                  type='radio'
-                  name='role'
-                  value='student'
+                  type="radio"
+                  name="role"
+                  value="student"
                   checked={input.role === 'student'}
                   onChange={changeEventHandler}
-                  className='cursor-pointer'
                 />
-                <Label htmlFor='r1'>Student</Label>
+                <Label htmlFor="r1">Student</Label>
               </div>
-              <div className='flex items-center space-x-2'>
+              <div className="flex items-center space-x-2">
                 <Input
-                  type='radio'
-                  name='role'
-                  value='recruiter'
+                  type="radio"
+                  name="role"
+                  value="recruiter"
                   checked={input.role === 'recruiter'}
                   onChange={changeEventHandler}
-                  className='cursor-pointer'
                 />
-                <Label htmlFor='r2'>Recruiter</Label>
+                <Label htmlFor="r2">Recruiter</Label>
               </div>
             </RadioGroup>
-            
-            <div className='flex items-center gap-2'>
+
+            <div className="flex flex-col items-center gap-2">
               <Label>Profile</Label>
               <Input
-                accept='image/*'
-                type='file'
+                accept="image/*"
+                type="file"
                 onChange={changeFileHandler}
-                className='cursor-pointer'
+                className="cursor-pointer"
               />
+              {filePreview && (
+                <img
+                  src={filePreview}
+                  alt="Profile Preview"
+                  className="h-20 w-20 rounded-full border mt-2"
+                />
+              )}
             </div>
           </div>
-          
+
           {loading ? (
-            <Button className='w-full my-4'>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait
+            <Button className="w-full my-4">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </Button>
           ) : (
-            <Button type='submit' className='w-full my-4'>
+            <Button type="submit" className="w-full my-4">
               Signup
             </Button>
           )}
-          
-          <span className='text-sm text-center block'>
+
+          <span className="text-sm text-center block">
             Already have an account?{' '}
-            <Link to='/login' className='text-blue-600'>
+            <Link to="/login" className="text-blue-600">
               Login
             </Link>
           </span>

@@ -46,9 +46,9 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <li className='hover:text-[#743eb3]'><Link to="/">Home</Link></li>
+                                {/* <li className='hover:text-[#743eb3]'><Link to="/">Home</Link></li>
                                 <li className='hover:text-[#c03131]'><Link to="/jobs">Jobs</Link></li>
-                                <li className='hover:text-[#c03131]'><Link to="/newsfeed">NewsFeed</Link></li>
+                                <li className='hover:text-[#c03131]'><Link to="/newsfeed">NewsFeed</Link></li> */}
                             </>
                         )}
                     </ul>
@@ -109,7 +109,7 @@ const Navbar = () => {
                         {user && user.role === 'recruiter' ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
-                                <li><Link to="/admin/jobs">Jobs</Link></li>
+                                <li><Link to="/admin/sotre">store</Link></li>
                             </>
                         ) : (
                             <>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../shared/Navbar'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-// import CompaniesTable from './CompaniesTable'
+import CompaniesTable from './CompaniesTable'
 import { useNavigate } from 'react-router-dom'
 // import useGetAllCompanies from '@/hooks/useGetAllCompanies'
 import { useDispatch } from 'react-redux'
@@ -29,7 +29,7 @@ const Companies = () => {
                     />
                     <Button onClick={() => navigate("/admin/companies/create")}>New Company</Button>
                 </div>
-                {/* <CompaniesTable/> */}
+                <CompaniesTable/>
             </div>
         </div>
     )
