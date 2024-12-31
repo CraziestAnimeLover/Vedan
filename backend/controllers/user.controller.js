@@ -163,7 +163,7 @@ export const forgotPassword = async (req, res) => {
 
 
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+        const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
 
 
         // Send the reset email
