@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import axios from 'axios';
+import { USER_API_END_POINT } from '../../utils/constant';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -9,9 +10,10 @@ const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");  // Validation error state
+    const [error, setError] = useState("");
+    const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
     const navigate = useNavigate();
-    const { token } = useParams(); // Token will be passed via the URL
+    const { token } = useParams();
 
     useEffect(() => {
         if (!token) {
@@ -20,34 +22,33 @@ const ResetPassword = () => {
         }
     }, [token, navigate]);
 
-    const validatePassword = (password) => {
-        // Simple password validation (length > 6)
-        return password.length >= 6;
-    };
+    const validatePassword = (password) => password.length >= 6;
+
+    const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(""); // Reset previous error messages
-
+        setError("");
+    
         if (!validatePassword(newPassword)) {
             setError("Password must be at least 6 characters.");
             return;
         }
-
+    
         if (newPassword !== confirmPassword) {
             setError("Passwords do not match.");
             return;
         }
-
+    
         setLoading(true);
-
+    
         try {
             const res = await axios.post(
-                `http://localhost:8000/api/v1/user/reset-password`, 
-                { token, newPassword },
-                { headers: { 'Content-Type': 'application/json' } }
+                `${USER_API_END_POINT}/reset-password/${encodeURIComponent(token)}`,
+                { newPassword },
+                { headers: { 'Content-Type': 'application/json' } } // Ensure proper headers
             );
-
+    
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/login");
@@ -61,29 +62,41 @@ const ResetPassword = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="flex items-center justify-center max-w-7xl mx-auto">
             <form onSubmit={handleSubmit} className="w-1/2 border border-gray-200 rounded-md p-4 my-10">
                 <h1 className="font-bold text-2xl mb-5">Reset Password</h1>
 
-                {/* Display validation error if any */}
                 {error && <div className="text-red-500 mb-2">{error}</div>}
 
                 <div className="my-2">
-                    <label>New Password</label>
-                    <Input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Enter new password"
-                    />
+                    <label htmlFor="new-password">New Password</label>
+                    <div className="relative">
+                        <Input
+                            id="new-password"
+                            type={passwordVisible ? "text" : "password"}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Enter new password"
+                        />
+                        <button
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="absolute inset-y-0 right-0 px-3"
+                            aria-label={passwordVisible ? "Hide password" : "Show password"}
+                        >
+                            {passwordVisible ? "Hide" : "Show"}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="my-2">
-                    <label>Confirm Password</label>
+                    <label htmlFor="confirm-password">Confirm Password</label>
                     <Input
-                        type="password"
+                        id="confirm-password"
+                        type={passwordVisible ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Confirm new password"

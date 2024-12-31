@@ -33,9 +33,11 @@ const approuter = createBrowserRouter([
   { path: '/forgot-password', 
     element: <ForgotPassword/>
   },
-  { path: '/reset-password/:token', 
-    element: <ResetPassword/> 
-  },
+  { 
+    path: '/reset-password/:token',
+     element: <ResetPassword/> 
+    },
+
   { path: '/register', 
     element: <Signup/>
    },
@@ -73,6 +75,7 @@ const approuter = createBrowserRouter([
    { path: '/admin/companies', 
     element: <Companies/>
    },
+   
    
   ])
 

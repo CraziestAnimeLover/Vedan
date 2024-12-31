@@ -6,6 +6,8 @@ import LatestJobs from './LatestJobs'
 import Footer from './Footer'
 import Advertisement from './shared/Advertisement'
 import Signup from '.././components/auth/Signup'
+import Quotes from './quotes/Quotes'
+
 
 
 const Home = () => {
@@ -17,7 +19,8 @@ const Home = () => {
         <HeroSection/>
         <CategoryCarousel/> */}
         <Signup/>
-        <LatestJobs/>
+       <Quotes/>
+        {/* <LatestJobs/> */}
         <Footer/>
        
       </div>

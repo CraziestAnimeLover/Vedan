@@ -4,6 +4,9 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
+import allowedOrigins from '../index.js';
+
+
 
 
 // Register Function
@@ -161,8 +164,11 @@ export const forgotPassword = async (req, res) => {
         // Generate a password reset token
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
+
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+        const resetLink = `${allowedOrigins}/reset-password/${resetToken}`;
+        
+
 
         // Send the reset email
         const mailOptions = {
@@ -200,55 +206,84 @@ export const forgotPassword = async (req, res) => {
 
 // Reset Password Function
 
+// Reset Password Function
+
+
+
 export const resetPassword = async (req, res) => {
-    try {
-        const { token, newPassword } = req.body;
+  try {
+    const { token, newPassword } = req.body;
 
-        // Validate the new password
-        if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({
-                message: "Password must be at least 6 characters long.",
-                success: false,
-            });
-        }
-
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-
-        if (!decoded) {
-            return res.status(400).json({
-                message: "Invalid or expired reset token.",
-                success: false,
-            });
-        }
-
-        // Find the user by ID
-        const user = await User.findById(decoded.userId);
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
-                success: false,
-            });
-        }
-
-        // Hash the new password and update the user's password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        await user.save();
-
-        return res.status(200).json({
-            message: "Password reset successfully.",
-            success: true,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server error",
-            success: false,
-        });
+    // Validate new password
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long.",
+        success: false,
+      });
     }
+
+    // Log the token for debugging
+    console.log("Received Token:", token);
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Token is required.",
+        success: false,
+      });
+    }
+
+    // Verify the token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.SECRET_KEY); // Ensure the secret key matches during signing
+    } catch (err) {
+      console.error("Error verifying token:", err);
+
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          message: "Token has expired. Please request a new password reset link.",
+          success: false,
+        });
+      }
+      return res.status(401).json({
+        message: "Invalid token.",
+        success: false,
+      });
+    }
+
+    // Token is valid, proceed with fetching the user
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+
+    // Hash the new password and update the user record
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password reset successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return res.status(500).json({
+      message: "Internal server error.",
+      success: false,
+    });
+  }
 };
+
+  
+
+
+
+
+
 
 
 

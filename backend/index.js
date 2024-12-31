@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5173', 'https://vedan-frontend1.onrender.com','https://www.vedann.com'];
+const allowedOrigins = ['http://localhost:5173' ];
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
@@ -44,6 +44,14 @@ app.get("/home", (req, res) => {
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
+app.post('/api/v1/user/reset-password/:token', async (req, res) => {
+    console.log("Token:", req.params.token);
+    console.log("Request Body:", req.body);
+
+    // Validate token and password here...
+});
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -53,7 +61,7 @@ app.use((err, req, res, next) => {
         success: false,
     });
 });
-
+export default allowedOrigins;
 const PORT = process.env.PORT || 8000;
 
 // Connect to database and start server
