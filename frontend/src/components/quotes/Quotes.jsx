@@ -5,8 +5,10 @@ const Quotes = () => {
   // Array of quotes and authors
   const quotes = [
     {
-      quote: "The only way to do great work is to love what you do.",
-      author: "Steve Jobs",
+      quote: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।
+
+मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥.",
+      author: "----- Krishn ji ",
     },
     {
       quote: "Life is what happens when you're busy making other plans.",
