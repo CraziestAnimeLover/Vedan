@@ -166,8 +166,12 @@ export const forgotPassword = async (req, res) => {
 
 
         // Create the password reset URL (you can change this URL to your frontend reset link)
+<<<<<<< HEAD
         const resetLink = `${allowedOrigins}/reset-password/${resetToken}`;
         
+=======
+        const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
+>>>>>>> 6f5bcdf9ffa27fc05b6f86860141fd361c75a23b
 
 
         // Send the reset email
@@ -211,6 +215,7 @@ export const forgotPassword = async (req, res) => {
 
 
 export const resetPassword = async (req, res) => {
+<<<<<<< HEAD
   try {
     const { token, newPassword } = req.body;
 
@@ -220,6 +225,35 @@ export const resetPassword = async (req, res) => {
         message: "Password must be at least 6 characters long.",
         success: false,
       });
+=======
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    console.log("Token received:", token);
+
+    if (!token) {
+        return res.status(400).json({ success: false, message: "Token is required." });
+    }
+
+    try {
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Decoded token:", decoded);
+
+        // Find the user and reset password
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password has been reset successfully." });
+    } catch (error) {
+        console.error("Error verifying token:", error.message);
+        return res.status(400).json({ success: false, message: "Invalid or expired token." });
+>>>>>>> 6f5bcdf9ffa27fc05b6f86860141fd361c75a23b
     }
 
     // Log the token for debugging
@@ -279,6 +313,7 @@ export const resetPassword = async (req, res) => {
 };
 
   
+
 
 
 

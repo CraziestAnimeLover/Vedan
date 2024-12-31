@@ -28,7 +28,8 @@ const ResetPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
+        setError(""); // Reset previous error messages
+
     
         if (!validatePassword(newPassword)) {
             setError("Password must be at least 6 characters.");
@@ -43,24 +44,20 @@ const ResetPassword = () => {
         setLoading(true);
     
         try {
-            const res = await axios.post(
-                `${USER_API_END_POINT}/reset-password/${encodeURIComponent(token)}`,
-                { newPassword },
-                { headers: { 'Content-Type': 'application/json' } } // Ensure proper headers
-            );
-    
+
+            const res = await axios.post(`${USER_API_END_POINT}/reset-password/${token}`, { newPassword });
+
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/login");
             } else {
-                toast.error(res.data.message);
+                toast.error(res.data.message); // Backend error message
             }
         } catch (error) {
             const errorMessage = error?.response?.data?.message || "Something went wrong. Please try again.";
             toast.error(errorMessage);
-        } finally {
-            setLoading(false);
         }
+        
     };
     
 

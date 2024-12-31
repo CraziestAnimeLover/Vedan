@@ -17,7 +17,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5173' ];
+
+
+const allowedOrigins = ['http://localhost:5173','https://www.vedann.com'];
+
+
+
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
