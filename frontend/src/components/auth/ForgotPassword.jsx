@@ -22,7 +22,7 @@ const ForgotPassword = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");  // Reset any previous error r
+        setError("");  // Reset any previous error
         setSuccess(""); // Reset previous success message
         if (!validateEmail(email)) {
             setError("Please enter a valid email address.");
