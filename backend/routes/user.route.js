@@ -13,13 +13,9 @@ router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile)
 // In your user.routes.js (or equivalent)
 
 router.route("/forgot-password").post(forgotPassword);
-<<<<<<< HEAD
-router.route("/reset-password/:token").post(resetPassword);
 
-   // Reset password
-=======
 router.route("/reset-password/:token").post(resetPassword);   // Reset password
->>>>>>> 6f5bcdf9ffa27fc05b6f86860141fd361c75a23b
+
 // router.post("/forgot-password", (req, res, next) => {
 //     console.log("Received forgot-password request");
 //     next();

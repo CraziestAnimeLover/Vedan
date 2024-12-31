@@ -4,18 +4,12 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
-import allowedOrigins from '../index.js';
-
-
-
 
 // Register Function
 export const register = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, role } = req.body;
-        // console.log(fullname, email, phoneNumber, password, role);
 
-        // Check if all required fields are provided
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
                 message: "Something is missing",
@@ -23,7 +17,6 @@ export const register = async (req, res) => {
             });
         }
 
-        // Handle file upload and URI conversion
         const file = req.file;
         if (!file) {
             return res.status(400).json({
@@ -115,8 +108,13 @@ export const login = async (req, res) => {
             role: user.role,
             profile: user.profile
         };
-   console.log(user)
-        return res.status(200).cookie("token", token, { maxAge: 86400000, httpOnly: true, sameSite: 'strict',secure: true }).json({
+
+        return res.status(200).cookie("token", token, { 
+            maxAge: 86400000, 
+            httpOnly: true, 
+            sameSite: 'strict', 
+            secure: process.env.NODE_ENV === 'production' // Ensure cookies are only secure in production
+        }).json({
             message: `Welcome back ${user.fullname}`,
             user,
             success: true
@@ -140,7 +138,7 @@ export const logout = async (req, res) => {
     }
 };
 
-
+// Forgot Password Function
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -152,7 +150,6 @@ export const forgotPassword = async (req, res) => {
             });
         }
 
-        // Check if the user exists with this email
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({
@@ -161,20 +158,10 @@ export const forgotPassword = async (req, res) => {
             });
         }
 
-        // Generate a password reset token
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-
-        // Create the password reset URL (you can change this URL to your frontend reset link)
-<<<<<<< HEAD
-        const resetLink = `${allowedOrigins}/reset-password/${resetToken}`;
-        
-=======
         const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
->>>>>>> 6f5bcdf9ffa27fc05b6f86860141fd361c75a23b
 
-
-        // Send the reset email
         const mailOptions = {
             from: process.env.EMAIL,
             to: user.email,
@@ -182,16 +169,14 @@ export const forgotPassword = async (req, res) => {
             text: `Hello ${user.fullname},\n\nYou have requested to reset your password. Please click the following link to reset it:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
         };
 
-        // Send the email
         const transporter = nodemailer.createTransport({
-            service: 'gmail', // or any email service you use
+            service: 'gmail', 
             auth: {
-                user: process.env.EMAIL, // Your email address from where emails are sent
-                pass: process.env.EMAIL_PASSWORD, // Your email password or an app-specific password
+                user: process.env.EMAIL, 
+                pass: process.env.EMAIL_PASSWORD, 
             }
         });
 
-        // This was missing in your code
         await transporter.sendMail(mailOptions);
 
         return res.status(200).json({
@@ -207,121 +192,42 @@ export const forgotPassword = async (req, res) => {
     }
 };
 
-
 // Reset Password Function
-
-// Reset Password Function
-
-
-
 export const resetPassword = async (req, res) => {
-<<<<<<< HEAD
-  try {
-    const { token, newPassword } = req.body;
-
-    // Validate new password
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({
-        message: "Password must be at least 6 characters long.",
-        success: false,
-      });
-=======
     const { token } = req.params;
     const { newPassword } = req.body;
-
-    console.log("Token received:", token);
 
     if (!token) {
         return res.status(400).json({ success: false, message: "Token is required." });
     }
 
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("Decoded token:", decoded);
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const user = await User.findById(decoded.userId);
 
-        // Find the user and reset password
-        const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found." });
         }
 
-        user.password = newPassword;
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
         await user.save();
 
         res.status(200).json({ success: true, message: "Password has been reset successfully." });
     } catch (error) {
         console.error("Error verifying token:", error.message);
-        return res.status(400).json({ success: false, message: "Invalid or expired token." });
->>>>>>> 6f5bcdf9ffa27fc05b6f86860141fd361c75a23b
-    }
-
-    // Log the token for debugging
-    console.log("Received Token:", token);
-
-    if (!token) {
-      return res.status(400).json({
-        message: "Token is required.",
-        success: false,
-      });
-    }
-
-    // Verify the token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.SECRET_KEY); // Ensure the secret key matches during signing
-    } catch (err) {
-      console.error("Error verifying token:", err);
-
-      if (err.name === 'TokenExpiredError') {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                message: "Token has expired. Please request a new password reset link.",
+                success: false,
+            });
+        }
         return res.status(401).json({
-          message: "Token has expired. Please request a new password reset link.",
-          success: false,
+            message: "Invalid token.",
+            success: false,
         });
-      }
-      return res.status(401).json({
-        message: "Invalid token.",
-        success: false,
-      });
     }
-
-    // Token is valid, proceed with fetching the user
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found.",
-        success: false,
-      });
-    }
-
-    // Hash the new password and update the user record
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
-
-    return res.status(200).json({
-      message: "Password reset successfully.",
-      success: true,
-    });
-  } catch (error) {
-    console.error("Error resetting password:", error);
-    return res.status(500).json({
-      message: "Internal server error.",
-      success: false,
-    });
-  }
 };
-
-  
-
-
-
-
-
-
-
-
-
 
 // Update Profile Function
 export const updateProfile = async (req, res) => {
@@ -344,15 +250,27 @@ export const updateProfile = async (req, res) => {
             });
         }
 
-        // Update user data
         if (fullname) user.fullname = fullname;
         if (email) user.email = email;
         if (phoneNumber) user.phoneNumber = phoneNumber;
         if (bio) user.profile.bio = bio;
         if (skills) user.profile.skills = skillsArray;
 
-        // Upload file if present
         if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png'];
+            if (!allowedTypes.includes(file.mimetype)) {
+                return res.status(400).json({
+                    message: "Only JPEG and PNG images are allowed.",
+                    success: false
+                });
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                return res.status(400).json({
+                    message: "File size should not exceed 5MB.",
+                    success: false
+                });
+            }
+
             const fileUri = getDataUri(file);
             const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
             if (cloudResponse) {
