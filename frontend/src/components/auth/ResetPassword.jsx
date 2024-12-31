@@ -44,7 +44,7 @@ const ResetPassword = () => {
 
         try {
             const res = await axios.post(
-                `${USER_API_END_POINT}/reset-password`, 
+                `${USER_API_END_POINT}/reset-password/${token}`, // Use token in URL 
                 { token, newPassword },
                 { headers: { 'Content-Type': 'application/json' } }
             );
