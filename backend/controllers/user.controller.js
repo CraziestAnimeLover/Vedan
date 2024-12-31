@@ -6,7 +6,6 @@ import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
 
 
-
 // Register Function
 export const register = async (req, res) => {
     try {
@@ -162,8 +161,10 @@ export const forgotPassword = async (req, res) => {
         // Generate a password reset token
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
+
         // Create the password reset URL (you can change this URL to your frontend reset link)
-        const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
+        const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+
 
         // Send the reset email
         const mailOptions = {
@@ -202,54 +203,36 @@ export const forgotPassword = async (req, res) => {
 // Reset Password Function
 
 export const resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    console.log("Token received:", token);
+
+    if (!token) {
+        return res.status(400).json({ success: false, message: "Token is required." });
+    }
+
     try {
-        const { token, newPassword } = req.body;
-
-        // Validate the new password
-        if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({
-                message: "Password must be at least 6 characters long.",
-                success: false,
-            });
-        }
-
         // Verify the token
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Decoded token:", decoded);
 
-        if (!decoded) {
-            return res.status(400).json({
-                message: "Invalid or expired reset token.",
-                success: false,
-            });
-        }
-
-        // Find the user by ID
-        const user = await User.findById(decoded.userId);
-
+        // Find the user and reset password
+        const user = await User.findById(decoded.id);
         if (!user) {
-            return res.status(404).json({
-                message: "User not found.",
-                success: false,
-            });
+            return res.status(404).json({ success: false, message: "User not found." });
         }
 
-        // Hash the new password and update the user's password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
+        user.password = newPassword;
         await user.save();
 
-        return res.status(200).json({
-            message: "Password reset successfully.",
-            success: true,
-        });
+        res.status(200).json({ success: true, message: "Password has been reset successfully." });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Server error",
-            success: false,
-        });
+        console.error("Error verifying token:", error.message);
+        return res.status(400).json({ success: false, message: "Invalid or expired token." });
     }
 };
+
 
 
 
