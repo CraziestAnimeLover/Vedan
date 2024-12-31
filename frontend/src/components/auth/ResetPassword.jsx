@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import axios from 'axios';
-import { USER_API_END_POINT } from '../../utils/constant.js';
+import { USER_API_END_POINT } from '../../utils/constant';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -29,39 +29,34 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(""); // Reset previous error messages
-
+    
         if (!validatePassword(newPassword)) {
             setError("Password must be at least 6 characters.");
             return;
         }
-
+    
         if (newPassword !== confirmPassword) {
             setError("Passwords do not match.");
             return;
         }
-
+    
         setLoading(true);
-
+    
         try {
-            const res = await axios.post(
-                `${USER_API_END_POINT}/reset-password/${token}`, // Use token in URL 
-                { token, newPassword },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-
+            const res = await axios.post(`${USER_API_END_POINT}/reset-password/${token}`, { newPassword });
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/login");
             } else {
-                toast.error(res.data.message);
+                toast.error(res.data.message); // Backend error message
             }
         } catch (error) {
             const errorMessage = error?.response?.data?.message || "Something went wrong. Please try again.";
             toast.error(errorMessage);
-        } finally {
-            setLoading(false);
         }
+        
     };
+    
 
     return (
         <div className="flex items-center justify-center max-w-7xl mx-auto">
