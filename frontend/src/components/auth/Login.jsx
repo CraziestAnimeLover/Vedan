@@ -123,7 +123,7 @@ const Login = () => {
                     )
                 }
                 
-                <span className='text-sm'>Already have an account? <Link to="/register" className='text-blue-600'>Signup</Link></span>
+                <span className='text-sm'>Already have an account?kl <Link to="/register" className='text-blue-600'>Signup</Link></span>
                 
                 {/* Forgot password link */}
                 <div className="mt-4 text-center">
