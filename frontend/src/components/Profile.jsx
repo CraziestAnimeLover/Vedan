@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './shared/Navbar';
-import { Avatar, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarImage } from './ui/avatar'; // Import Avatar and AvatarImage
 import { Button } from './ui/button';
 import { Contact, Mail, Pen } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -68,6 +68,7 @@ const Profile = () => {
         <div className="flex justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-24 w-24 relative">
+              {/* Using AvatarImage for displaying profile image */}
               <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
             </Avatar>
 
@@ -87,16 +88,6 @@ const Profile = () => {
           </div>
           <Button onClick={() => setOpen(true)} className="text-right" variant="outline"><Pen /></Button>
         </div>
-
-        {/* Profile Information in Column */}
-        {/* <div className="my-5">
-          <div className="flex flex-col gap-2">
-            <span className="text-sm text-gray-500">Full Name: {user?.fullname}</span>
-            <span className="text-sm text-gray-500">Profile Number: {currentProfileNumber}</span>
-            <span className="text-sm text-gray-500">Rating: {currentRating}</span>
-            <span className="text-sm text-gray-500">Handler Name: {currentHandlerName || 'Not Provided'}</span>
-          </div>
-        </div> */}
 
         {/* Contact Information */}
         <div className="my-5">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../shared/Navbar';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { RadioGroup } from '../ui/radio-group';
 import { Button } from '../ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,13 +18,10 @@ const Signup = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    role: '',
-    file: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [filePreview, setFilePreview] = useState(null); // Image preview
 
   const { loading, user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
@@ -37,17 +33,6 @@ const Signup = () => {
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
-  };
-
-  const changeFileHandler = (e) => {
-    const file = e.target.files?.[0];
-    setInput({ ...input, file });
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setFilePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
   };
 
   const submitHandler = async (e) => {
@@ -182,48 +167,6 @@ const Signup = () => {
             >
               {showConfirmPassword ? <EyeOff /> : <Eye />}
             </button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
-            <RadioGroup className="flex items-center gap-4">
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="role"
-                  value="student"
-                  checked={input.role === 'student'}
-                  onChange={changeEventHandler}
-                />
-                <Label htmlFor="r1">Student</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="role"
-                  value="recruiter"
-                  checked={input.role === 'recruiter'}
-                  onChange={changeEventHandler}
-                />
-                <Label htmlFor="r2">Recruiter</Label>
-              </div>
-            </RadioGroup>
-
-            <div className="flex flex-col items-center gap-2">
-              <Label>Profile</Label>
-              <Input
-                accept="image/*"
-                type="file"
-                onChange={changeFileHandler}
-                className="cursor-pointer"
-              />
-              {filePreview && (
-                <img
-                  src={filePreview}
-                  alt="Profile Preview"
-                  className="h-20 w-20 rounded-full border mt-2"
-                />
-              )}
-            </div>
           </div>
 
           {loading ? (
