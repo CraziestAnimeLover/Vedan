@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../shared/Navbar'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
-import { RadioGroup } from '../ui/radio-group'
 import { Button } from '../ui/button'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -18,7 +17,6 @@ const Login = () => {
     const [input, setInput] = useState({
         email: "",
         password: "",
-        role: "",
     });
     
     const {loading,user} = useSelector(store => store.auth);
@@ -86,33 +84,6 @@ const Login = () => {
                     />
                 </div>
 
-                <div className='flex items-center justify-between'>
-                    <RadioGroup className="flex items-center gap-4 my-5">
-                        <div className="flex items-center space-x-2">
-                            <Input
-                                type="radio"
-                                name="role"
-                                value="student"
-                                checked={input.role === 'student'}
-                                onChange={changeEventHandler}
-                                className="cursor-pointer"
-                            />
-                            <Label htmlFor="r1">Student</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Input
-                                type="radio"
-                                name="role"
-                                value="recruiter"
-                                checked={input.role === 'recruiter'}
-                                onChange={changeEventHandler}
-                                className="cursor-pointer"
-                            />
-                            <Label htmlFor="r2">Recruiter</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
-
                 {
                     loading ? (
                         <Button className="w-full my-4"> 
@@ -123,7 +94,7 @@ const Login = () => {
                     )
                 }
                 
-                <span className='text-sm'>Already have an account?kl <Link to="/register" className='text-blue-600'>Signup</Link></span>
+                <span className='text-sm'>Already have an account? <Link to="/register" className='text-blue-600'>Signup</Link></span>
                 
                 {/* Forgot password link */}
                 <div className="mt-4 text-center">
