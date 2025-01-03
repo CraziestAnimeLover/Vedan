@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Assuming Popover components are in ui/popover
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; 
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage } from '../ui/avatar';
 import { LogOut, User2 } from 'lucide-react';
@@ -33,23 +33,24 @@ const Navbar = () => {
 
     return (
         <div className="bg-white rounded-md shadow-xl sticky top-0 z-50">
-            <div className="flex items-center justify-between mx-auto max-w-7xl h-20 p-4 md:p-0">
+            <div className="flex items-center justify-between mx-auto max-w-7xl h-20 p-4 md:p-0 relative">
                 {/* Center Section (Logo and Vedann) */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-          <img
-            src={Logo}
-            alt="Vedann Logo"
-            className="h-20 w-18 cursor-pointer"
-            onClick={() => navigate("/")}
-          />
-          <h1 className="text-7xl my-[-1] font-semibold text-gray-800 cursor-pointer">
-            Vedann
-          </h1>
-        </div>
+                <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+                    <img
+                        src={Logo}
+                        alt="Vedann Logo"
+                        className="h-16 w-16 sm:h-20 sm:w-20 cursor-pointer" // Adjust logo size for smaller screens
+                        onClick={() => navigate("/")}
+                    />
+                    <h1 className="text-3xl sm:text-4xl md:text-7xl font-semibold text-gray-800 cursor-pointer">
+                        Vedann
+                    </h1>
+                </div>
 
+                {/* Right Side (Menu and Avatar) */}
                 <div className="ml-auto flex items-center gap-4">
                     <ul className="hidden md:flex font-medium items-center gap-5">
-                        {user && user.role === 'recruiter' ? (
+                        {user  ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
                                 <li><Link to="/admin/jobs">Jobs</Link></li>
@@ -57,6 +58,7 @@ const Navbar = () => {
                         ) : null}
                     </ul>
 
+                    {/* Mobile Menu Toggle Button */}
                     <div className="md:hidden">
                         <Button
                             className="bg-[#6A38C2] hover:bg-[#5b30a6]"
@@ -66,6 +68,7 @@ const Navbar = () => {
                         </Button>
                     </div>
 
+                    {/* User or Login Button */}
                     {!user ? (
                         <div className='flex items-center gap-2'>
                             <Link to="/login">
@@ -90,7 +93,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col my-2 text-gray-600'>
-                                    {user &&  (
+                                    {user && (
                                         <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                             <User2 />
                                             <Button variant="link">
@@ -109,13 +112,14 @@ const Navbar = () => {
                 </div>
             </div>
 
+            {/* Mobile Menu */}
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-white shadow-lg p-4">
                     <ul className="flex flex-col items-center font-medium gap-4">
-                        {user && user.role === 'recruiter' ? (
+                        {user ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
-                                <li><Link to="/admin/sotre">Store</Link></li>
+                                <li><Link to="/admin/store">Store</Link></li>
                             </>
                         ) : (
                             <>
