@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';  // Import X icon for close button
 import { Input } from './ui/input';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -67,14 +67,20 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
     return (
         <div>
-            <Dialog open={open}>
+            <Dialog open={open} onInteractOutside={() => setOpen(false)}>
                 <DialogContent
                     className="sm:max-w-[425px]"
-                    onInteractOutside={() => setOpen(false)}
                     aria-describedby="update-profile-description"
                 >
                     <DialogHeader>
                         <DialogTitle>Update Profile</DialogTitle>
+                        <button
+                            type="button"
+                            className="absolute top-0 right-0 p-2 text-gray-500 hover:text-gray-700"
+                            onClick={() => setOpen(false)}  // Close the dialog on click
+                        >
+                            <X className="h-6 w-6" />
+                        </button>
                         <div id="update-profile-description" className="text-sm">
                             Fill in the fields below to update your profile information.
                         </div>
