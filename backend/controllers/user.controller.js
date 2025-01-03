@@ -1,31 +1,19 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import getDataUri from "../utils/datauri.js";
-import cloudinary from "../utils/cloudinary.js";
 import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
 
 // Register Function
 export const register = async (req, res) => {
     try {
-        const { fullname, email, phoneNumber, password, role } = req.body;
+        const { fullname, email, phoneNumber, password } = req.body;
 
-        if (!fullname || !email || !phoneNumber || !password || !role) {
+        if (!fullname || !email || !phoneNumber || !password) {
             return res.status(400).json({
                 message: "Something is missing",
                 success: false
             });
         }
-
-        const file = req.file;
-        if (!file) {
-            return res.status(400).json({
-                message: "Profile photo is required",
-                success: false
-            });
-        }
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -43,9 +31,8 @@ export const register = async (req, res) => {
             email,
             phoneNumber,
             password: hashedPassword,
-            role,
             profile: {
-                profilePhoto: cloudResponse.secure_url,
+                // No profile photo here
             }
         });
 
@@ -62,9 +49,9 @@ export const register = async (req, res) => {
 // Login Function
 export const login = async (req, res) => {
     try {
-        const { email, password, role } = req.body;
+        const { email, password } = req.body;
 
-        if (!email || !password || !role) {
+        if (!email || !password) {
             return res.status(400).json({
                 message: "Something is missing",
                 success: false
@@ -87,14 +74,6 @@ export const login = async (req, res) => {
             });
         }
 
-        // Check if role matches
-        if (role !== user.role) {
-            return res.status(400).json({
-                message: "Account doesn't exist with current role.",
-                success: false
-            });
-        }
-
         // Generate JWT token
         const tokenData = { userId: user._id };
         const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
@@ -105,7 +84,6 @@ export const login = async (req, res) => {
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            role: user.role,
             profile: user.profile
         };
 
@@ -233,7 +211,6 @@ export const resetPassword = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
-        const file = req.file;
 
         let skillsArray;
         if (skills) {
@@ -256,29 +233,6 @@ export const updateProfile = async (req, res) => {
         if (bio) user.profile.bio = bio;
         if (skills) user.profile.skills = skillsArray;
 
-        if (file) {
-            const allowedTypes = ['image/jpeg', 'image/png'];
-            if (!allowedTypes.includes(file.mimetype)) {
-                return res.status(400).json({
-                    message: "Only JPEG and PNG images are allowed.",
-                    success: false
-                });
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                return res.status(400).json({
-                    message: "File size should not exceed 5MB.",
-                    success: false
-                });
-            }
-
-            const fileUri = getDataUri(file);
-            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-            if (cloudResponse) {
-                user.profile.resume = cloudResponse.secure_url;
-                user.profile.resumeOriginalName = file.originalname;
-            }
-        }
-
         await user.save();
 
         user = {
@@ -286,7 +240,6 @@ export const updateProfile = async (req, res) => {
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            role: user.role,
             profile: user.profile
         };
 
