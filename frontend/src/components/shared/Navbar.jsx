@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Assuming Popover components are in ui/popover
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage } from '../ui/avatar';
 import { LogOut, User2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { USER_API_END_POINT } from '../../utils/constant.js';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import Logo from "../../assets/Vedann.png";
 import { setAuthUser } from '../../redux/authSlice.js';
 import { toast } from 'sonner';
 
@@ -32,25 +33,28 @@ const Navbar = () => {
 
     return (
         <div className="bg-white rounded-md shadow-xl sticky top-0 z-50">
-            <div className="flex items-center justify-between mx-auto max-w-7xl h-16 p-4 md:p-0">
-                <div className="rounded-full hover:animate-bounce">
-                    <h1 className="text-2xl font-bold text-[#21165c]"><Link to="/">Vedann</Link></h1>
-                </div>
+            <div className="flex items-center justify-between mx-auto max-w-7xl h-20 p-4 md:p-0">
+                {/* Center Section (Logo and Vedann) */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+          <img
+            src={Logo}
+            alt="Vedann Logo"
+            className="h-20 w-18 cursor-pointer"
+            onClick={() => navigate("/")}
+          />
+          <h1 className="text-7xl my-[-1] font-semibold text-gray-800 cursor-pointer">
+            Vedann
+          </h1>
+        </div>
 
-                <div className="flex items-center gap-4 md:gap-12">
+                <div className="ml-auto flex items-center gap-4">
                     <ul className="hidden md:flex font-medium items-center gap-5">
                         {user && user.role === 'recruiter' ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
                                 <li><Link to="/admin/jobs">Jobs</Link></li>
                             </>
-                        ) : (
-                            <>
-                                {/* <li className='hover:text-[#743eb3]'><Link to="/">Home</Link></li>
-                                <li className='hover:text-[#c03131]'><Link to="/jobs">Jobs</Link></li>
-                                <li className='hover:text-[#c03131]'><Link to="/newsfeed">NewsFeed</Link></li> */}
-                            </>
-                        )}
+                        ) : null}
                     </ul>
 
                     <div className="md:hidden">
@@ -86,10 +90,12 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col my-2 text-gray-600'>
-                                    {user && user.role === 'student' && (
+                                    {user &&  (
                                         <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                             <User2 />
-                                            <Button variant="link"><Link to="/profile">View Profile</Link></Button>
+                                            <Button variant="link">
+                                                <Link to="/profile">View Profile</Link>
+                                            </Button>
                                         </div>
                                     )}
                                     <div className='flex w-fit items-center gap-2 cursor-pointer'>
@@ -109,7 +115,7 @@ const Navbar = () => {
                         {user && user.role === 'recruiter' ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
-                                <li><Link to="/admin/sotre">store</Link></li>
+                                <li><Link to="/admin/sotre">Store</Link></li>
                             </>
                         ) : (
                             <>
