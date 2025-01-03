@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; 
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import { Button } from '../ui/button';
 import { Avatar, AvatarImage } from '../ui/avatar';
 import { LogOut, User2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { USER_API_END_POINT } from '../../utils/constant.js';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -15,7 +15,7 @@ const Navbar = () => {
     const { user } = useSelector(store => store.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const location = useLocation(); // Get the current location
 
     const logoutHandler = async () => {
         try {
@@ -35,11 +35,11 @@ const Navbar = () => {
         <div className="bg-white rounded-md shadow-xl sticky top-0 z-50">
             <div className="flex items-center justify-between mx-auto max-w-7xl h-20 p-4 md:p-0 relative">
                 {/* Center Section (Logo and Vedann) */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+                <div className="absolute left-0 transform-none md:left-1/2 md:transform -translate-x-1/2 flex items-center gap-2">
                     <img
                         src={Logo}
                         alt="Vedann Logo"
-                        className="h-16 w-16 sm:h-20 sm:w-20 cursor-pointer" // Adjust logo size for smaller screens
+                        className="h-16 w-16 sm:h-20 sm:w-20 cursor-pointer"
                         onClick={() => navigate("/")}
                     />
                     <h1 className="text-3xl sm:text-4xl md:text-7xl font-semibold text-gray-800 cursor-pointer">
@@ -47,10 +47,10 @@ const Navbar = () => {
                     </h1>
                 </div>
 
-                {/* Right Side (Menu and Avatar) */}
+                {/* Right Side (User Avatar and Login/Signup Button) */}
                 <div className="ml-auto flex items-center gap-4">
                     <ul className="hidden md:flex font-medium items-center gap-5">
-                        {user  ? (
+                        {user && user.role === 'recruiter' ? (
                             <>
                                 <li><Link to="/admin/companies">Companies</Link></li>
                                 <li><Link to="/admin/jobs">Jobs</Link></li>
@@ -58,23 +58,21 @@ const Navbar = () => {
                         ) : null}
                     </ul>
 
-                    {/* Mobile Menu Toggle Button */}
-                    <div className="md:hidden">
-                        <Button
-                            className="bg-[#6A38C2] hover:bg-[#5b30a6]"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            Menu
-                        </Button>
-                    </div>
-
-                    {/* User or Login Button */}
+                    {/* Conditionally render Login or Signup button */}
                     {!user ? (
-                        <div className='flex items-center gap-2'>
-                            <Link to="/login">
-                                <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button>
-                            </Link>
-                        </div>
+                        location.pathname === '/login' ? (
+                            <div className='flex items-center gap-2'>
+                                <Link to="/register">
+                                    <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Sign Up</Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className='flex items-center gap-2'>
+                                <Link to="/login">
+                                    <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button>
+                                </Link>
+                            </div>
+                        )
                     ) : (
                         <Popover>
                             <PopoverTrigger asChild>
@@ -111,37 +109,6 @@ const Navbar = () => {
                     )}
                 </div>
             </div>
-
-            {/* Mobile Menu */}
-            {isMobileMenuOpen && (
-                <div className="md:hidden bg-white shadow-lg p-4">
-                    <ul className="flex flex-col items-center font-medium gap-4">
-                        {user ? (
-                            <>
-                                <li><Link to="/admin/companies">Companies</Link></li>
-                                <li><Link to="/admin/store">Store</Link></li>
-                            </>
-                        ) : (
-                            <>
-                                <li><Link to="/">Home</Link></li>
-                                <li><Link to="/jobs">Jobs</Link></li>
-                                <li><Link to="/newsfeed">NewsFeed</Link></li>
-                            </>
-                        )}
-                        {!user ? (
-                            <li>
-                                <Link to="/login">
-                                    <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button>
-                                </Link>
-                            </li>
-                        ) : (
-                            <li>
-                                <Button onClick={logoutHandler} variant="link">Logout</Button>
-                            </li>
-                        )}
-                    </ul>
-                </div>
-            )}
         </div>
     );
 };
