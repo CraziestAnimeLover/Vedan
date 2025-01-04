@@ -12,12 +12,17 @@ import JobDescription from './components/JobDescription'
 import ServicePage from './components/Pages/ServicePage'
 import NewsFeed from './components/Pages/NewsFeed'
 import StudentForm from './components/auth/StudentForm'
-import { LibrarySquareIcon } from 'lucide-react'
+
 import Sunny from './components/sunny'
 import ForgotPassword from './components/auth/ForgotPassword'
 import ResetPassword from './components/auth/ResetPassword'
 import Library from './components/library/Library'
 import LostItem from './components/lostnfound/LostItem'
+import ResumePreview from './components/auth/resume/ResumePreview'
+import PreviewPage from './components/auth/resume/PreviewPage'
+
+
+
 
 
 
@@ -47,6 +52,10 @@ const approuter = createBrowserRouter([
    { path: '/service/student', 
     element: <StudentForm/>
    },
+   { path: '/service/student/preview', 
+    element: <PreviewPage/>
+   },
+   
    { path: '/newsfeed', 
     element: <NewsFeed/>
    },

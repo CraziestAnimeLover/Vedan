@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Navbar from '../shared/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const ResumeInput = () => {
+  const navigate = useNavigate();
   // Initial state with static entries for education, skills, and experience
   const [input, setInput] = useState({
     name: '',
@@ -12,9 +14,9 @@ const ResumeInput = () => {
     skills: [{ skill: '' }],
     experience: [{ role: '', company: '', year: '' }],
     education: [
-      { university: '', percentage: '', type: '10th' },
-      { university: '', percentage: '', type: '12th' },
-      { university: '', percentage: '', type: 'Graduation' },
+      { university: '', percentage: '', year: '', type: '10th' },
+      { university: '', percentage: '', year: '', type: '12th' },
+      { university: '', percentage: '', year: '', type: 'Graduation' },
     ],
     certificate: '',
   });
@@ -59,7 +61,7 @@ const ResumeInput = () => {
       ...input,
       education: [
         ...input.education,
-        { university: '', percentage: '', type: `Education ${input.education.length + 1}` },
+        { university: '', percentage: '', year: '', type: `Education ${input.education.length + 1}` },
       ],
     });
   };
@@ -116,6 +118,11 @@ const ResumeInput = () => {
     }
   };
 
+  const handleNavigate = () => {
+    navigate('/service/student/preview', { state: { input } });
+  };
+  
+
   return (
     <div>
       <Navbar />
@@ -168,6 +175,18 @@ const ResumeInput = () => {
                               value={edu.percentage}
                               onChange={changeEventHandler}
                               placeholder="Enter percentage"
+                              className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                            />
+                          </div>
+                          <div className="w-1/3">
+                            <label className="block text-sm font-medium text-gray-700">Year</label>
+                            <input
+                              type="text"
+                              name={`education-${index}`}
+                              data-field="year"
+                              value={edu.year}
+                              onChange={changeEventHandler}
+                              placeholder="Enter year"
                               className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                             />
                           </div>
@@ -348,7 +367,36 @@ const ResumeInput = () => {
               </div>
             </div>
 
-            {/* Display Education Table */}
+            {/* Display Skills */}
+            <h3 className="font-semibold text-xl mt-4">Skills</h3>
+            <ul className="list-disc ml-6">
+              {input.skills.map((skill, index) => (
+                <li key={index}>{skill.skill || 'No skill entered'}</li>
+              ))}
+            </ul>
+
+            {/* Display Experience */}
+            <h3 className="font-semibold text-xl mt-4">Experience</h3>
+            <table className="min-w-full mt-2 table-auto">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 border">Role</th>
+                  <th className="px-4 py-2 border">Company</th>
+                  <th className="px-4 py-2 border">Year</th>
+                </tr>
+              </thead>
+              <tbody>
+                {input.experience.map((exp, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-2 border">{exp.role || 'No role entered'}</td>
+                    <td className="px-4 py-2 border">{exp.company || 'No company entered'}</td>
+                    <td className="px-4 py-2 border">{exp.year || 'No year entered'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Display Education */}
             <h3 className="font-semibold text-xl mt-4">Education</h3>
             <table className="min-w-full mt-2 table-auto">
               <thead>
@@ -356,39 +404,34 @@ const ResumeInput = () => {
                   <th className="px-4 py-2 border">Type</th>
                   <th className="px-4 py-2 border">University</th>
                   <th className="px-4 py-2 border">Percentage</th>
+                  <th className="px-4 py-2 border">Year</th>
                 </tr>
               </thead>
               <tbody>
                 {input.education.map((edu, index) => (
                   <tr key={index}>
                     <td className="px-4 py-2 border">{edu.type}</td>
-                    <td className="px-4 py-2 border ">{edu.university || 'Ex. School Name'}</td>
-                    <td className="px-4 py-2 border">{edu.percentage || 'Ex. Percentage'}</td>
+                    <td className="px-4 py-2 border">{edu.university || 'No university entered'}</td>
+                    <td className="px-4 py-2 border">{edu.percentage || 'No percentage entered'}</td>
+                    <td className="px-4 py-2 border">{edu.year || 'No year entered'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
-            {/* Display Skills */}
-            <h3 className="font-semibold text-xl mt-4">Skills</h3>
-            <ul className="list-disc pl-6">
-              {input.skills.map((skill, index) => (
-                <li key={index}>{skill.skill || 'No skill'}</li>
-              ))}
-            </ul>
-
-            {/* Display Experience */}
-            <h3 className="font-semibold text-xl mt-4">Experience</h3>
-            <ul className="pl-6">
-              {input.experience.map((exp, index) => (
-                <li key={index}>
-                  {exp.role || 'No role'} at {exp.company || 'No company'} ({exp.year || 'No year'})
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
+        
       </div>
+      {/* New Navigate Button */}
+      <div className="flex justify-center mt-4">
+            <button
+              type="button"
+              onClick={handleNavigate }
+              className="w-1/2 bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Navigate to Preview
+            </button>
+          </div>
     </div>
   );
 };
