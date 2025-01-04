@@ -20,6 +20,7 @@ import Library from './components/library/Library'
 import LostItem from './components/lostnfound/LostItem'
 import ResumePreview from './components/auth/resume/ResumePreview'
 import PreviewPage from './components/auth/resume/PreviewPage'
+import PreviewPageAts from './components/auth/resume/PreviewPageATS'
 
 
 
@@ -55,6 +56,10 @@ const approuter = createBrowserRouter([
    { path: '/service/student/preview', 
     element: <PreviewPage/>
    },
+   { path: '/service/student/previewats', 
+    element: <PreviewPageAts/>
+   },
+   
    
    { path: '/newsfeed', 
     element: <NewsFeed/>
