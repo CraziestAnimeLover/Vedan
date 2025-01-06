@@ -1,4 +1,8 @@
 import React, { useRef } from 'react';
+import ATSCheckerCalculator from './ATSCheckerCalculator';
+
+
+
 import jsPDF from 'jspdf';
 
 const ResumePreviewAts = ({ input }) => {
@@ -144,6 +148,7 @@ const ResumePreviewAts = ({ input }) => {
       >
         Download PDF
       </button>
+      <ATSCheckerCalculator input={input} />
     </div>
   );
 };

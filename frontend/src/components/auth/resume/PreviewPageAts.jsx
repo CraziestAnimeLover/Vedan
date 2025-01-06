@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-import ResumePreview from './ResumePreview';
+
 import ResumePreviewAts from './ResumePreviewAts';
 
 const PreviewPageAts = () => {
