@@ -18,7 +18,7 @@ import ResetPassword from './components/auth/ResetPassword'
 import Library from './components/library/Library'
 import LostItem from './components/lostnfound/LostItem'
 import PreviewPage from './components/auth/resume/PreviewPage'
-import PreviewPageAts from './components/auth/resume/PreviewPageATS'
+import PreviewPageAts from './components/auth/resume/PreviewPageAts'
 
 
 
