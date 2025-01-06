@@ -139,7 +139,7 @@ export const forgotPassword = async (req, res) => {
 
         const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-        const resetLink = `https://www.vedann.com/reset-password/${resetToken}`;
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         const mailOptions = {
             from: process.env.EMAIL,
