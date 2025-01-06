@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 import Navbar from '../shared/Navbar'
 import { Label } from '../ui/label'
@@ -20,7 +19,7 @@ const Login = () => {
         password: "",
     });
     
-    const {loading,user} = useSelector(store => store.auth);
+    const {loading, user} = useSelector(store => store.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
@@ -30,6 +29,18 @@ const Login = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
+
+        // Validate inputs
+        if (!input.email || !input.password) {
+            toast.error("Email and password are required.");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(input.email)) {
+            toast.error("Please enter a valid email address.");
+            return;
+        }
     
         try {
             dispatch(setLoading(true));
@@ -44,7 +55,7 @@ const Login = () => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "An error occurred.");
         } finally {
             dispatch(setLoading(false));
         }
@@ -108,4 +119,3 @@ const Login = () => {
 }
 
 export default Login
-

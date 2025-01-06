@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LibraryProfile from '../profile/LibraryProfile';
 
 const Libraryadmin = ({ availability, updateAvailability }) => {
   const toggleSlotAvailability = (index) => {
@@ -9,7 +10,12 @@ const Libraryadmin = ({ availability, updateAvailability }) => {
   };
 
   return (
+    <div>
+  <div className=''>
+  <LibraryProfile/>
+  </div>
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+      
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin - Manage Slots</h2>
       <ul>
         {availability.map((slot, index) => (
@@ -29,6 +35,7 @@ const Libraryadmin = ({ availability, updateAvailability }) => {
           </li>
         ))}
       </ul>
+    </div>
     </div>
   );
 };

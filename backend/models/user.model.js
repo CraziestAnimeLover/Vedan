@@ -27,7 +27,14 @@ const userSchema = new mongoose.Schema({
         profilePhoto: {
             type: String,
         },
+        profileNumber: {
+            type: String,  // You can change the type based on your requirements
+        },
+        handlerName: {
+            type: String,
+        },
     },
 });
 
+// Export User model
 export const User = mongoose.model('User', userSchema);

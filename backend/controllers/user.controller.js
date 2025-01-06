@@ -211,7 +211,7 @@ export const resetPassword = async (req, res) => {
 // Update Profile Function
 export const updateProfile = async (req, res) => {
     try {
-        const { fullname, email, phoneNumber, bio, skills } = req.body;
+        const { fullname, email, phoneNumber, bio, skills, profileNumber, handlerName } = req.body;
 
         let skillsArray;
         if (skills) {
@@ -228,11 +228,14 @@ export const updateProfile = async (req, res) => {
             });
         }
 
+        // Update fields as needed
         if (fullname) user.fullname = fullname;
         if (email) user.email = email;
         if (phoneNumber) user.phoneNumber = phoneNumber;
         if (bio) user.profile.bio = bio;
         if (skills) user.profile.skills = skillsArray;
+        if (profileNumber) user.profileNumber = profileNumber;  // Add this line to handle profileNumber
+        if (handlerName) user.handlerName = handlerName;  // Add this line to handle handlerName
 
         await user.save();
 
@@ -241,7 +244,9 @@ export const updateProfile = async (req, res) => {
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            profile: user.profile
+            profile: user.profile,
+            profileNumber: user.profileNumber,  // Include this in the response
+            handlerName: user.handlerName,  // Include this in the response
         };
 
         return res.status(200).json({
@@ -254,4 +259,5 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
 

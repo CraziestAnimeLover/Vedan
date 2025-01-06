@@ -12,8 +12,9 @@ const HandlerType = ({ fullName, initialProfileNumber, initialRating, onProfileN
         <div className="flex flex-col gap-3">
           {/* Handler Name */}
           <div className="text-lg font-semibold text-gray-800">
-            <span>Handler Name: {handlerName || 'Not Provided'}</span>
-          </div>
+  <span ><span className='text-blue-500 text-base font-sans'>व</span>{handlerName || 'Not Provided'}</span>
+</div>
+
           {/* Rating */} 
           <div className="mt-3 flex flex-row gap-3">
             <span className="text-lg font-semibold text-gray-800">Rating:</span>
