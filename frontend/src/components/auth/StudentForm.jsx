@@ -100,7 +100,7 @@ const ResumeInput = () => {
                 return (
                   <>
                     {input[key].map((edu, index) => (
-                      <div key={index}>
+                      <div key={`education-${index}`}> {/* Added unique key */}
                         <h2 className="font-semibold text-2xl mt-4">{edu.type} Education</h2>
                         <div className="flex space-x-6 mt-3">
                           <div className="w-1/3">
@@ -179,7 +179,7 @@ const ResumeInput = () => {
                 return (
                   <>
                     {input[key].map((skill, index) => (
-                      <div key={index} className="flex space-x-6 mt-6">
+                      <div key={`skills-${index}`} className="flex space-x-6 mt-6"> {/* Added unique key */}
                         <div className="w-2/3">
                           <label className="block text-sm font-medium text-gray-700">Skill</label>
                           <input
@@ -221,7 +221,7 @@ const ResumeInput = () => {
                 return (
                   <>
                     {input[key].map((exp, index) => (
-                      <div key={index} className="mt-6">
+                      <div key={`experience-${index}`} className="mt-6"> {/* Added unique key */}
                         <h2 className="font-semibold text-2xl">{`Experience ${index + 1}`}</h2>
                         <div className="flex space-x-6 mt-3">
                           <div className="w-1/3">
@@ -285,7 +285,7 @@ const ResumeInput = () => {
               }
 
               return (
-                <div key={key} className="mt-6">
+                <div key={key} className="mt-6"> {/* Key for other input fields */}
                   <label className="block text-sm font-medium text-gray-700 capitalize">{key}</label>
                   <input
                     type="text"
