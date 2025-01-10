@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'; // Assuming you are using lucide-react for icons
+import { Facebook, Twitter, Linkedin, Instagram, Youtube } from 'lucide-react'; // Assuming you are using lucide-react for icons
 
 const Footer = () => {
   return (
@@ -22,7 +22,7 @@ const Footer = () => {
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
                 <Facebook className="w-6 h-6" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
+              <a href="https://x.com/vedann4" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
                 <Twitter className="w-6 h-6" />
               </a>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
@@ -30,6 +30,9 @@ const Footer = () => {
               </a>
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
                 <Instagram className="w-6 h-6" />
+              </a>
+              <a href="https://www.youtube.com/@Vedann4" target="_blank" rel="noopener noreferrer" className="hover:text-[#c03131] transition-colors">
+                <Youtube className="w-8 h-12" />
               </a>
             </div>
 
@@ -71,7 +74,7 @@ const Footer = () => {
             <Link to="/about" className="hover:text-white transition-colors">
               About Us
             </Link>
-            <Link to="/contact" className="hover:text-white transition-colors">
+            <Link to="/contactus" className="hover:text-white transition-colors">
               Contact
             </Link>
           </div>

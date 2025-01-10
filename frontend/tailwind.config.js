@@ -66,10 +66,31 @@ module.exports = {
           '0%': { transform: 'translateX(100%)', opacity: 0 },
           '100%': { transform: 'translateX(0)', opacity: 1 },
         },
+        glowEffect: {
+          '0%': {
+            textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
+          },
+          '50%': {
+            textShadow: '0 0 20px rgba(255, 255, 255, 1)',
+          },
+          '100%': {
+            textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
+          },
+        },
+        shine: {
+          '0%': {
+            backgroundPosition: '-200% 0', // Start from far left
+          },
+          '100%': {
+            backgroundPosition: '200% 0', // Move to far right
+          },
+        },
       },
       animation: {
         "slide-in-left": "slide-in-left 1s ease-out",
         "slide-in-right": "slide-in-right 1s ease-out",
+        glow: "glowEffect 1.5s ease-in-out infinite", // Glow effect animation
+        shine: "shine 3s linear infinite", // Shine effect animation
       },
     },
   },

@@ -19,6 +19,17 @@ import Library from './components/library/Library'
 import LostItem from './components/lostnfound/LostItem'
 import PreviewPage from './components/auth/resume/PreviewPage'
 import PreviewPageAts from './components/auth/resume/PreviewPageAts'
+import Select from './components/auth/Select'
+
+import AddLibraryForm from './components/auth/AddLibraryForm'
+import MgtLibServicePage from './components/Pages/MgtLibServicePage'
+import MgtSidebarLayout from './components/library/libraryadmin/MgtSidebarLayout'
+import Billing from './components/library/billing/Billing'
+import SeatChart from './components/library/seat/SeatChart'
+import Attendance from './components/library/attendence/Attendance'
+import Selects from './components/auth/Selects'
+import ContactUs from './components/ContactUs'
+import SocialServicePage from './components/Pages/SocialServicePage'
 
 
 
@@ -45,9 +56,32 @@ const approuter = createBrowserRouter([
   { path: '/register', 
     element: <Signup/>
    },
-   { path: '/service', 
-    element: <ServicePage/>
+   { path: '/select', 
+    element: <Select/>
    },
+   { path: '/mgtservice', 
+    element: <MgtLibServicePage/>
+  },
+  { path: '/mgtservice/selects', 
+    element: <Selects/>
+  },
+ 
+  { path: '/mgtservice/mgtlibrary', 
+    element: <MgtSidebarLayout/>
+  },
+  { path: '/mgtservice/mgtlibrary/billing', 
+    element: <Billing/>
+  },
+  { path: '/mgtservice/mgtlibrary/seat', 
+    element: <SeatChart/>
+  },
+  { path: '/mgtservice/mgtlibrary/attendence', 
+    element: <Attendance/>
+  },
+  
+  { path: '/service', 
+   element: <ServicePage/>
+  },
    { path: '/service/student', 
     element: <StudentForm/>
    },
@@ -65,6 +99,9 @@ const approuter = createBrowserRouter([
    { path: '/library', 
     element: <Library/>
    },
+   { path: '/library/dashboard', 
+    element: <AddLibraryForm/>
+   },
    { path: '/jobs', 
     element: <Jobs/>
    },
@@ -77,8 +114,14 @@ const approuter = createBrowserRouter([
    { path: '/profile', 
     element: <Profile/>
    },
+   { path: '/contactus', 
+    element: <ContactUs/>
+   },
    { path: '/sunny', 
     element: <Sunny/>
+   },
+   { path: '/social', 
+    element: <SocialServicePage/>
    },
    { path: '/lostnfound', 
     element: <LostItem/>

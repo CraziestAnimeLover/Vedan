@@ -1,6 +1,7 @@
 import express from "express";
 import { login,  logout,  register, updateProfile,forgotPassword ,resetPassword} from "../controllers/user.controller.js";
-import isAuthenticated from "../middlewares/isAuthenticated.js";
+import { isAuthenticated, isLibrarian, isStudent } from '../middlewares/isAuthenticated.js';
+
 import { singleUpload } from "../middlewares/mutler.js";
  
 const router = express.Router();
@@ -12,15 +13,18 @@ router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile)
 router.put('/profile/update', isAuthenticated, updateProfile);
 // Forgot Password & Reset Password routes
 // In your user.routes.js (or equivalent)
+router.post('/library', isAuthenticated, isLibrarian);  // Example route
+router.get('/libraries', isAuthenticated, isStudent); // Another example route
 
 router.route("/forgot-password").post(forgotPassword);
 
-router.route("/reset-password/:token").post(resetPassword);   // Reset password
+router.route("/reset-password/:token").post(resetPassword);
+router.route("/reset-password/:token").post((req, res, next) => {
+    console.log("Reset Password Route Hit:", req.params.token);
+    next();
+}, resetPassword);  // Reset password
 
-// router.post("/forgot-password", (req, res, next) => {
-//     console.log("Received forgot-password request");
-//     next();
-// }, forgotPassword);
+
 
 
 export default router;

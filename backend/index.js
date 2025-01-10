@@ -6,6 +6,10 @@ import connectDB from './utils/db.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
+import { isAuthenticated, isLibrarian, isStudent } from './middlewares/isAuthenticated.js';
+
+
+// import libraryRoute from './routes/library.routes.js';
 
 dotenv.config();
 
@@ -49,13 +53,18 @@ app.get("/home", (req, res) => {
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
+// app.use("/api/v1/library", libraryRoute);
 app.post('/api/v1/user/reset-password/:token', async (req, res) => {
     console.log("Token:", req.params.token);
     console.log("Request Body:", req.body);
 
     // Validate token and password here...
 });
+// Example: Route for adding a library (only for librarians)
+app.post('/library', isAuthenticated, isLibrarian);
 
+// Example: Route for students to view libraries
+app.get('/libraries', isAuthenticated, isStudent);
 
 
 // Error handling middleware

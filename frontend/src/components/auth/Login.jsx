@@ -63,7 +63,7 @@ const Login = () => {
 
     useEffect(() => {
         if (user) {
-            navigate("/service");
+            navigate("/select");
         }
     }, [user, navigate])
 
