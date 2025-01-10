@@ -4,14 +4,11 @@ import BackgroundImage from "../assets/tech.jpg";
 function ContactUs() {
   return (
     <div className="relative min-h-screen flex items-center justify-center p-6">
-      {/* Background Image */}
+      {/* Background Image with animation */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform transition-transform duration-500 hover:scale-110"
         style={{
           backgroundImage: `url(${BackgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
         }}
       ></div>
 
@@ -24,13 +21,13 @@ function ContactUs() {
           We'd love to hear from you! Reach out to us through social media.
         </p>
 
-        {/* Social Media Icons */}
+        {/* Social Media Icons with Animations */}
         <div className="mt-8 flex justify-center space-x-6 text-gray-800">
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-600"
+            className="transition-transform transform hover:scale-125 hover:text-blue-600"
           >
             <Facebook size={32} />
           </a>
@@ -38,7 +35,7 @@ function ContactUs() {
             href="https://twitter.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400"
+            className="transition-transform transform hover:scale-125 hover:text-blue-400"
           >
             <Twitter size={32} />
           </a>
@@ -46,7 +43,7 @@ function ContactUs() {
             href="https://linkedin.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-700"
+            className="transition-transform transform hover:scale-125 hover:text-blue-700"
           >
             <Linkedin size={32} />
           </a>
@@ -54,7 +51,7 @@ function ContactUs() {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-pink-500"
+            className="transition-transform transform hover:scale-125 hover:text-pink-500"
           >
             <Instagram size={32} />
           </a>
@@ -62,7 +59,7 @@ function ContactUs() {
             href="https://youtube.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-red-500"
+            className="transition-transform transform hover:scale-125 hover:text-red-500"
           >
             <Youtube size={32} />
           </a>
