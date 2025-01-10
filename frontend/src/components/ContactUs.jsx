@@ -24,7 +24,7 @@ function ContactUs() {
         {/* Social Media Icons with Animations */}
         <div className="mt-8 flex justify-center space-x-6 text-gray-800">
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/profile.php?id=61571468146618"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-transform transform hover:scale-125 hover:text-blue-600"
