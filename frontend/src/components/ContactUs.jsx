@@ -48,7 +48,7 @@ function ContactUs() {
             <Linkedin size={32} />
           </a>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/vedann4?utm_source=qr&igsh=MW1oN2x2ajkyb3E3"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-transform transform hover:scale-125 hover:text-pink-500"
