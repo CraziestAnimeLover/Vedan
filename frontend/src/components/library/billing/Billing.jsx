@@ -19,10 +19,10 @@ const Billing = () => {
     {/* <FeeStructure/> */}
 </div>
 {/* <ServiceTypeSelection/> */}
-<InputForm/>
+{/* <InputForm/> */}
 <div>
   <LibraryFeeStructure/>
-  <Account/>
+  
 </div>
 
     </div>

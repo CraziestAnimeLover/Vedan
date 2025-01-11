@@ -14,6 +14,7 @@ const MgtSidebarLayout = () => {
     { name: "Seat", icon: <FaCog />, path: "/mgtservice/mgtlibrary/seat" },
     { name: "Account", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/account" },
     { name: "Attendence", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/attendence" },
+    { name: "Books", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/bookshell" },
     { name: "Help", icon: <FaQuestionCircle />, path: "/help" },
     { name: "Logout", icon: <FaSignOutAlt />, path: "/logout" },
   ];

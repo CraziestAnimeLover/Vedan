@@ -30,6 +30,11 @@ import Attendance from './components/library/attendence/Attendance'
 import Selects from './components/auth/Selects'
 import ContactUs from './components/ContactUs'
 import SocialServicePage from './components/Pages/SocialServicePage'
+import Account from './components/library/account/Account'
+import Libshell from './components/library/bookshell/Libshell'
+import BookList from './components/library/bookshell/books/BookList'
+
+
 
 
 
@@ -77,6 +82,16 @@ const approuter = createBrowserRouter([
   },
   { path: '/mgtservice/mgtlibrary/attendence', 
     element: <Attendance/>
+  },
+  { path: '/mgtservice/mgtlibrary/account', 
+    element: <Account/>
+  },
+  { path: '/mgtservice/mgtlibrary/bookshell', 
+    element: <Libshell/>
+  },
+  {
+    path: "/mgtservice/mgtlibrary/bookshell/books",
+    element: <BookList books={[]} />, // Pass filteredBooks as state or use context here
   },
   
   { path: '/service', 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../shared/Navbar";
 
 import SidebarLayout from "./librarycards/SidebarLayout";
+import BooksCards from "./bookshell/books/BooksCards";
 
 
 const Library = () => {
@@ -10,6 +11,7 @@ const Library = () => {
       <div>
         <Navbar />
         <SidebarLayout />
+        <BooksCards/>
       </div>
     </>
   );
