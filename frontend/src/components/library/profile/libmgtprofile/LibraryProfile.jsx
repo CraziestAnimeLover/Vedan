@@ -1,6 +1,6 @@
 import React from 'react';
 import ProfileCard from './ProfileCard'; // Import the ProfileCard componen
-import Attendance from '../attendence/Attendance';
+import Attendance from '../../attendence/Attendance';
 
 const LibraryProfile = () => {
     const profile = {
