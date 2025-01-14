@@ -1,5 +1,5 @@
 import React from 'react'
-import MembershipPlan from './membership/MembershipPlan'
+import MembershipPlan from './Feestruct/MembershipPlan'
 import FeeStructure from './Feestruct/FeeStructure'
 import Navbar from '../../shared/Navbar'
 import ServiceTypeSelection from './ServiceTypeSelection'

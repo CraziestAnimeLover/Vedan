@@ -27,9 +27,13 @@ function Select() {
           >
             Vikreta (Seller)
           </button>
+          
         </div>
 
+
+
         {/* Contact Button */}
+        
         <button
           onClick={() => navigate('/contactus')}
           className="w-full max-w-md px-8 py-4 text-lg font-semibold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-all duration-500 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-opacity-50"
@@ -66,7 +70,7 @@ function Select() {
           onClick={() => navigate("/contactus")}
           className="px-8 py-3 text-lg font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 transition-all duration-500 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-opacity-50"
         >
-          Contact
+         Game
         </button>
       </div>
     </div>

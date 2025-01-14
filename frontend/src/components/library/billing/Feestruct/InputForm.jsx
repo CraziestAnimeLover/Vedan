@@ -56,11 +56,11 @@ const InputForm = ({ onAddPlan, onAddService, onAddDiscount }) => {
 
   return (
     <section className="mb-8 p-4 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Add New Data</h2>
+      {/* <h2 className="text-2xl font-semibold mb-4">Membership Plan</h2> */}
 
       {/* Add Membership Plan */}
       <div className="mb-4">
-        <h3 className="text-xl font-semibold mb-2">Add Membership Plan</h3>
+        <h3 className="text-2xl font-semibold mb-2">Card Plan</h3>
         <input
           type="text"
           placeholder="Plan Name"
@@ -106,7 +106,7 @@ const InputForm = ({ onAddPlan, onAddService, onAddDiscount }) => {
       </div>
 
       {/* Add Service Fee */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <h3 className="text-xl font-semibold mb-2">Add Service Fee</h3>
         <input
           type="text"
@@ -128,10 +128,10 @@ const InputForm = ({ onAddPlan, onAddService, onAddDiscount }) => {
         >
           Add Service
         </button>
-      </div>
+      </div> */}
 
       {/* List of Service Fees with Remove Button */}
-      <div>
+      {/* <div>
         {servicesList.map((service, index) => (
           <div key={index} className="flex justify-between items-center mb-2">
             <span>{service.name}</span>
@@ -143,10 +143,10 @@ const InputForm = ({ onAddPlan, onAddService, onAddDiscount }) => {
             </button>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Add Discount */}
-      <div>
+      {/* <div>
         <h3 className="text-xl font-semibold mb-2">Add Discount</h3>
         <input
           type="text"
@@ -161,7 +161,7 @@ const InputForm = ({ onAddPlan, onAddService, onAddDiscount }) => {
         >
           Add Discount
         </button>
-      </div>
+      </div> */}
 
       {/* List of Discounts with Remove Button */}
       <div>
