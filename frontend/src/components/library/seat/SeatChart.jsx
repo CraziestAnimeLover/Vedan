@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '../../shared/Navbar';
+import SeatNavbar from './SeatNavbar';
 
 const SeatChart = () => {
   // Mock seat data for rows and columns (with more realistic dimensions)
@@ -75,23 +76,8 @@ const SeatChart = () => {
   return (
     <div>
     <Navbar/>
-    <div className="p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Library Seat Chart</h2>
-
-      <div className="flex flex-col items-center">
-        {renderSeatLayout()}
-      </div>
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">Click on available seats to book them. Seats that are occupied are marked in grey.</p>
-      </div>
-
-      <div className="mt-6 text-center">
-        <button className="bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 focus:outline-none">
-          Book Selected Seats
-        </button>
-      </div>
-    </div>
+    <SeatNavbar/>
+   
     </div>
   );
 };

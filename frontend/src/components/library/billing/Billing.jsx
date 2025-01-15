@@ -1,11 +1,13 @@
 import React from 'react'
-import MembershipPlan from './Feestruct/MembershipPlan'
-import FeeStructure from './Feestruct/FeeStructure'
+// import MembershipPlan from './Feestruct/MembershipPlan'
+// import FeeStructure from './Feestruct/FeeStructure'
 import Navbar from '../../shared/Navbar'
-import ServiceTypeSelection from './ServiceTypeSelection'
+// import ServiceTypeSelection from './ServiceTypeSelection'
 import LibraryFeeStructure from './Feestruct/LibraryFeeStructure'
-import InputForm from './Feestruct/InputForm'
-import Account from '../account/Account'
+import WaiveOff from './Feestruct/WaiveOff'
+import OutputPage from './Feestruct/OutputPage'
+// import InputForm from './Feestruct/InputForm'
+// import Account from '../account/Account'
 
 const Billing = () => {
   return (
@@ -22,6 +24,7 @@ const Billing = () => {
 {/* <InputForm/> */}
 <div>
   <LibraryFeeStructure/>
+
   
 </div>
 
