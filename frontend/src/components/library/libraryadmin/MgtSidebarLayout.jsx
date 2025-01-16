@@ -8,7 +8,7 @@ const MgtSidebarLayout = () => {
   const location = useLocation(); // Get the current route to highlight the active menu item
 
   const menuItems = [
-    { name: "Profile", icon: <FaUser />, path: "/profile" },
+    { name: "Profile", icon: <FaUser />, path: "/mgtservice/mgtlibrary/profile" },
     { name: "Billing", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/billing" },
     { name: "Messages", icon: <FaEnvelope />, path: "/messages" },
     { name: "Seat", icon: <FaCog />, path: "/mgtservice/mgtlibrary/seat" },

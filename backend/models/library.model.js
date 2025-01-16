@@ -1,23 +1,24 @@
-// models/user.model.js
 import mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
-    fullname: {
+const LibrarySchema = new mongoose.Schema({
+    pincode: {
         type: String,
         required: true,
     },
-    email: {
+    timeSlot: {
         type: String,
-        required: true,
-        unique: true,
-    },
-    role: {
-        type: String,
-        enum: ['student', 'librarian'],
+        enum: ['Morning', 'Afternoon', 'Evening', 'Night'],
         required: true,
     },
-    // other fields...
+    dateJoining: {
+        type: Date,
+        required: true,
+    },
+    fee: {
+        type: Number,
+        required: true,
+    },
 });
 
-const User = mongoose.model('User', UserSchema);
-export default User;
+const Library = mongoose.model('Library', LibrarySchema);
+export default Library;

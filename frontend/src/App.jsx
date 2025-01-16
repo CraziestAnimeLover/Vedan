@@ -33,6 +33,7 @@ import SocialServicePage from './components/Pages/SocialServicePage'
 import Account from './components/library/account/Account'
 import Libshell from './components/library/bookshell/Libshell'
 import BookList from './components/library/bookshell/books/BookList'
+import LibraryProfile from './components/library/profile/libmgtprofile/LibraryProfile'
 
 
 
@@ -73,6 +74,9 @@ const approuter = createBrowserRouter([
  
   { path: '/mgtservice/mgtlibrary', 
     element: <MgtSidebarLayout/>
+  },
+  { path: '/mgtservice/mgtlibrary/profile', 
+    element: <LibraryProfile/>
   },
   { path: '/mgtservice/mgtlibrary/billing', 
     element: <Billing/>

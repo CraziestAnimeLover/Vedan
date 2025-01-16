@@ -91,7 +91,15 @@ app.get("/api/v1/library/books", async (req, res) => {
           ]
         };
       }
-  
+      
+      app.get('/libraries', (req, res) => {
+        const { pincode } = req.query;
+        // Fetch libraries from database that match the pincode
+        const libraries = db.query("SELECT * FROM libraries WHERE pincode = ?", [pincode]);
+        
+        res.json(libraries);
+      });
+      
       const books = await Book.find(filter);
       return res.status(200).json(books);
     } catch (error) {
