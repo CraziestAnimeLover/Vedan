@@ -1,25 +1,29 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { LIBRARY_API_END_POINT } from "../../../../utils/constant.js";
+import { useNavigate } from "react-router-dom"; // Importing useNavigate
 
 const AddBook = () => {
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
     genre: "",
+    series:"",
     year: "",
     isbn: "",
     series: "",
     publisherDate: "",
+    publisher: "",
     format: "Paper Book",
     language: "English",
     price: "",
-    quantity: "",
+    copies: "",
     pages: "",
   });
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +42,8 @@ const AddBook = () => {
       const response = await axios.post(`${LIBRARY_API_END_POINT}/books`, bookData);
       console.log("Book added:", response.data);
       setSuccess(true); // Display success message
+      // Navigate to the books list page after the book is added
+      navigate("/mgtservice/mgtlibrary/bookshell/books");
     } catch (error) {
       console.error("Error adding book:", error);
       setError("Failed to add book. Please try again.");
@@ -77,36 +83,39 @@ const AddBook = () => {
           />
         </div>
 
-        <div>
-          <label className="block text-lg font-medium text-gray-700" htmlFor="genre">Genre</label>
-          <input
-            type="text"
-            id="genre"
-            name="genre"
-            value={bookData.genre}
-            onChange={handleChange}
-            placeholder="Enter genre"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
+       
 
         <div>
-          <label className="block text-lg font-medium text-gray-700" htmlFor="series">Series</label>
+          <label className="block text-lg font-medium text-gray-700" htmlFor="series">Genre</label>
           <select
             className="border p-2 rounded-lg w-full"
             value={bookData.series}
             onChange={(e) => setBookData({ ...bookData, series: e.target.value })}
           >
-            <option value="Ast">Ast</option>
+            <option value="Ast">Art</option>
             <option value="Children's Book">Children's Book</option>
+            <option value="Buisness">Buisness</option>
             <option value="Comic">Comic</option>
             <option value="Education">Education</option>
             <option value="History">History</option>
             <option value="Literature">Literature</option>
-            <option value="Social">Social</option>
+            <option value="Autobography">Autobiography</option>
             <option value="Social Science">Social Science</option>
           </select>
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium text-gray-700" htmlFor="publisher">Publisher</label>
+          <input
+            type="text"
+            id="publisher"
+            name="publisher"
+            value={bookData.publisher}
+            onChange={handleChange}
+            placeholder="Enter publisher name"
+            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
         </div>
 
         <div>
@@ -154,16 +163,21 @@ const AddBook = () => {
 
         <div>
           <label className="block text-lg font-medium text-gray-700" htmlFor="language">Language</label>
-          <input
-            type="text"
-            id="language"
-            name="language"
+          <select
+            className="border p-2 rounded-lg w-full"
             value={bookData.language}
-            onChange={handleChange}
-            placeholder="Enter language"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+            onChange={(e) => setBookData({ ...bookData, language: e.target.value })}
+          >
+            <option value="English">English</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Marathi">Marathi</option>
+            <option value="Kumaoni">Kumaoni</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Sanskrit">Sanskrit</option>
+            {/* <option value="Social Science">Social Science</option> */}
+          </select>
         </div>
 
         <div>
@@ -181,7 +195,7 @@ const AddBook = () => {
         </div>
 
         <div>
-          <label className="block text-lg font-medium text-gray-700" htmlFor="quantity">Quantity</label>
+          <label className="block text-lg font-medium text-gray-700" htmlFor="copies">Copies</label>
           <input
             type="number"
             id="quantity"
