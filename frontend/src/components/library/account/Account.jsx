@@ -1,76 +1,93 @@
-import React, { useState } from 'react';
-import InputForm from './InputForm';
-import AccountForm from './AccountForm';
-import TransactionForm from './TransactionForm';
-import AccountSummary from './AccountSummary';
-import AccountInfo from './AccountInfo';
+import React, { useState } from "react";
+import FeeDetails from "./FeeDetails";
+import Navbar from "../../shared/Navbar";
 
 const Account = () => {
-  const [users, setUsers] = useState([]);
-  const [plans, setPlans] = useState([]);
-  const [services, setServices] = useState([]);
-  const [discounts, setDiscounts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [userDetails] = useState({ userName: 'John Doe' });
+  // Initial data for the table with month names as keys
+  const [tableData, setTableData] = useState({
+    January: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    February: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    March: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    April: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    May: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    June: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    July: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    August: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    September: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    October: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    November: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+    December: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
+  });
 
-  const addUser = (user) => {
-    setUsers([...users, user]);
+  // Handle changes in table cells
+  const handleChange = (month, col, value) => {
+    setTableData((prevData) => ({
+      ...prevData,
+      [month]: {
+        ...prevData[month],
+        [col]: value,
+      },
+    }));
   };
 
-  const addPlan = (plan) => {
-    setPlans([...plans, plan]);
-  };
-
-  const addService = (service) => {
-    setServices([...services, service]);
-  };
-
-  const addDiscount = (discount) => {
-    setDiscounts([...discounts, discount]);
-  };
-
-  const handleAddTransaction = (newTransaction) => {
-    setTransactions([...transactions, newTransaction]);
-  };
-
-  // Calculate Total Income, Total Expenses, and Net Balance
-  const totalIncome = transactions
-    .filter((transaction) => transaction.category.toLowerCase() === 'income')
-    .reduce((total, transaction) => total + parseFloat(transaction.amount), 0);
-
-  const totalExpenses = transactions
-    .filter((transaction) => transaction.category.toLowerCase() === 'expense')
-    .reduce((total, transaction) => total + parseFloat(transaction.amount), 0);
-
-  const netBalance = totalIncome - totalExpenses;
-
-  const accountDetails = {
-    userName: userDetails.userName,
-    totalIncome,
-    totalExpenses,
-    netBalance,
-    transactions,
+  // Handle update button click
+  const handleUpdate = (month) => {
+    console.log(`Updated data for ${month}:`, tableData[month]);
+    // Perform any other operations here, such as sending the data to an API or updating the database
   };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-center mb-6">Library Management System</h1>
-      
-      {/* Input Form for Adding Users */}
-      <InputForm onAddUser={addUser} />
-
-      {/* Account Form for Plans, Services, and Discounts */}
-      <AccountForm onAddPlan={addPlan} onAddService={addService} onAddDiscount={addDiscount} />
-
-      {/* Transaction Form for Adding Transactions */}
-      <TransactionForm onAddTransaction={handleAddTransaction} />
-
-      {/* Account Summary showing transaction details */}
-      <AccountSummary transactions={transactions} />
-
-      {/* Account Information showing user account balance details */}
-      <AccountInfo accountDetails={accountDetails} />
-    </div>
+    <>
+      <Navbar />
+      <div className="p-6 bg-white shadow-lg rounded-lg max-w-7xl mx-auto mt-8">
+        <div className="pb-8">
+          <FeeDetails />
+        </div>
+        <h2 className="text-3xl font-semibold mb-6 text-gray-800">Fee Card Maintain</h2>
+        <table className="table-auto w-full border-collapse shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="border p-4 text-left font-medium">Month</th>
+              <th className="border p-4 text-center font-medium">Enquiry</th>
+              <th className="border p-4 text-center font-medium">Applied</th>
+              <th className="border p-4 text-center font-medium">Learning</th>
+              <th className="border p-4 text-center font-medium">Fees Covered</th>
+              <th className="border p-4 text-center font-medium">Left Fees</th>
+              <th className="border p-4 text-center font-medium">P/L</th>
+              <th className="border p-4 text-center font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(tableData).map((month, rowIndex) => (
+              <tr
+                key={rowIndex}
+                className={`${rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+              >
+                <td className="border p-4 text-center text-gray-600">{month}</td>
+                {["Enquiry", "Applied", "Learning", "FeesCovered", "LeftFees", "P/L"].map((col, colIndex) => (
+                  <td key={colIndex} className="border p-4">
+                    <input
+                      type="text"
+                      value={tableData[month][col]}
+                      onChange={(e) => handleChange(month, col, e.target.value)}
+                      className="w-full border p-2 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </td>
+                ))}
+                <td className="border p-4 text-center">
+                  <button
+                    onClick={() => handleUpdate(month)}
+                    className="w-full bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    Update
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 
