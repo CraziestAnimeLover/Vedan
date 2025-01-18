@@ -2,39 +2,93 @@ import React, { useState } from "react";
 import FeeDetails from "./FeeDetails";
 import Navbar from "../../shared/Navbar";
 
+
 const Account = () => {
-  // Initial data for the table with month names as keys
-  const [tableData, setTableData] = useState({
-    January: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    February: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    March: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    April: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    May: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    June: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    July: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    August: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    September: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    October: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    November: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-    December: { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" },
-  });
+  // List of months
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  // Initial data for the table
+  const initialTableData = months.reduce((acc, month) => {
+    acc[month] = { Enquiry: "", Applied: "", Learning: "", FeesCovered: "", LeftFees: "", "P/L": "" };
+    return acc;
+  }, {});
+
+  const [tableData, setTableData] = useState(initialTableData);
 
   // Handle changes in table cells
   const handleChange = (month, col, value) => {
+    const sanitizedValue = col !== "Enquiry" && col !== "Applied" && col !== "Learning"
+      ? value.replace(/[^0-9.-]/g, "")
+      : value;
     setTableData((prevData) => ({
       ...prevData,
       [month]: {
         ...prevData[month],
-        [col]: value,
+        [col]: sanitizedValue,
       },
     }));
   };
 
   // Handle update button click
-  const handleUpdate = (month) => {
-    console.log(`Updated data for ${month}:`, tableData[month]);
-    // Perform any other operations here, such as sending the data to an API or updating the database
+  const handleUpdate = async (month) => {
+    try {
+      const dataToSend = { month, data: { ...tableData[month] } };
+  
+      // Check that P/L is defined
+      if (!dataToSend.data["P/L"]) {
+        dataToSend.data["P/L"] = "0"; // Ensure P/L field has a value
+      }
+  
+      console.log('Sending data:', JSON.stringify(dataToSend));
+  
+      const response = await fetch(`http://localhost:8000/api/update-fees`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+  
+      if (!response.ok) {
+        const errorDetails = await response.json();
+        throw new Error(`Failed to update: ${errorDetails.message || 'Unknown error'}`);
+      }
+  
+      console.log(`Data for ${month} updated successfully.`);
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
   };
+  
+  
+  
+
+  // Reusable TableRow component
+  const TableRow = ({ month, data }) => (
+    <tr className={`bg-${months.indexOf(month) % 2 === 0 ? "gray-50" : "white"}`}>
+      <td className="border p-4 text-center text-gray-600">{month}</td>
+      {Object.keys(data).map((col, index) => (
+        <td key={index} className="border p-4">
+          <input
+            type="text"
+            value={data[col]}
+            onChange={(e) => handleChange(month, col, e.target.value)}
+            className="w-full border p-2 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={`Edit ${col} for ${month}`}
+          />
+        </td>
+      ))}
+      <td className="border p-4 text-center">
+        <button
+          onClick={() => handleUpdate(month)}
+          className="w-full bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Update
+        </button>
+      </td>
+    </tr>
+  );
 
   return (
     <>
@@ -58,31 +112,8 @@ const Account = () => {
             </tr>
           </thead>
           <tbody>
-            {Object.keys(tableData).map((month, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={`${rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-              >
-                <td className="border p-4 text-center text-gray-600">{month}</td>
-                {["Enquiry", "Applied", "Learning", "FeesCovered", "LeftFees", "P/L"].map((col, colIndex) => (
-                  <td key={colIndex} className="border p-4">
-                    <input
-                      type="text"
-                      value={tableData[month][col]}
-                      onChange={(e) => handleChange(month, col, e.target.value)}
-                      className="w-full border p-2 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </td>
-                ))}
-                <td className="border p-4 text-center">
-                  <button
-                    onClick={() => handleUpdate(month)}
-                    className="w-full bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  >
-                    Update
-                  </button>
-                </td>
-              </tr>
+            {months.map((month) => (
+              <TableRow key={month} month={month} data={tableData[month]} />
             ))}
           </tbody>
         </table>

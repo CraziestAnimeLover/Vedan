@@ -6,6 +6,7 @@ import Navbar from '../../shared/Navbar'
 import LibraryFeeStructure from './Feestruct/LibraryFeeStructure'
 import WaiveOff from './Feestruct/WaiveOff'
 import OutputPage from './Feestruct/OutputPage'
+import LoanBook from '../bookloan/LoanBook'
 // import InputForm from './Feestruct/InputForm'
 // import Account from '../account/Account'
 

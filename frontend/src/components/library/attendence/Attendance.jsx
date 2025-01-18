@@ -2,11 +2,7 @@ import React, { useState, useRef } from "react";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 
 const Attendance = () => {
-  const [attendanceList, setAttendanceList] = useState([
-    { id: "001", name: "Sunny", timeIn: "9:00 AM", timeOut: "5:00 PM", sign: "" },
-    { id: "002", name: "Vinay", timeIn: "9:30 AM", timeOut: "5:30 PM", sign: "" },
-    { id: "003", name: "Kapil", timeIn: "10:00 AM", timeOut: "6:00 PM", sign: "" },
-  ]);
+  const [attendanceList, setAttendanceList] = useState([]);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const tableRef = useRef(null);
 
@@ -17,16 +13,22 @@ const Attendance = () => {
   };
 
   const addRow = () => {
-    const newRow = { id: "", name: "", timeIn: "", timeOut: "", sign: "" };
+    const newRow = { id: generateUniqueId(), name: "", timeIn: "", timeOut: "", sign: "" };
     setAttendanceList([...attendanceList, newRow]);
   };
 
-  const removeRow = (index) => {
-    const updatedList = attendanceList.filter((_, i) => i !== index);
+  const removeRow = (id) => {
+    const updatedList = attendanceList.filter(row => row.id !== id ); // Filter by ID to remove row
     setAttendanceList(updatedList);
   };
 
-  // Toggle attendance (Present/Absent)
+  // Function to generate unique IDs based on the current year and an index
+  const generateUniqueId = () => {
+    const currentYear = new Date().getFullYear(); // Get the current year
+    const index = attendanceList.length + 1; // Use the next index to generate unique ID
+    return `${currentYear}_प${index}`; // Example format: 2025_प1
+  };
+
   const toggleAttendance = (index) => {
     const updatedList = [...attendanceList];
     const currentSign = updatedList[index].sign;
@@ -45,6 +47,29 @@ const Attendance = () => {
     }
   };
 
+  const saveAttendance = async () => {
+    console.log("Attendance data being sent:", attendanceList);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/save-attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ attendanceList }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Attendance saved successfully!");
+      } else {
+        alert(`Failed to save attendance: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error saving attendance:", error);
+    }
+  };
+
   const total = attendanceList.length;
   const present = attendanceList.filter((entry) => entry.sign === "Present").length;
   const absent = total - present;
@@ -54,7 +79,6 @@ const Attendance = () => {
       <div className="max-w-full mx-auto bg-white p-3 sm:p-6 rounded-lg shadow-lg">
         <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-4">Library Attendance</h2>
 
-        {/* Scroll Button (placed above the table) */}
         {attendanceList.length >= 10 && (
           <div className="gap-4 mb-4">
             <button
@@ -66,10 +90,8 @@ const Attendance = () => {
           </div>
         )}
 
-        {/* Table Container */}
         <div className="overflow-x-auto relative" ref={tableRef} style={{ maxHeight: "400px", overflowY: "auto" }}>
           <table className="w-full table-auto border-collapse border border-gray-300 text-xs sm:text-sm">
-            {/* Table Header */}
             <thead>
               <tr className="bg-gray-100">
                 <th className="py-2 px-3 border">SNo.</th>
@@ -82,10 +104,9 @@ const Attendance = () => {
               </tr>
             </thead>
 
-            {/* Table Body */}
             <tbody>
               {attendanceList.map((entry, index) => (
-                <tr key={index} className="hover:bg-gray-50">
+                <tr key={entry.id} className="hover:bg-gray-50">
                   <td className="py-2 px-3 border text-center">{index + 1}</td>
                   <td className="py-2 px-3 border">
                     <input
@@ -101,6 +122,7 @@ const Attendance = () => {
                       value={entry.id}
                       onChange={(e) => handleInputChange(index, "id", e.target.value)}
                       className="w-full p-1 border rounded bg-transparent focus:outline-none text-xs sm:text-sm"
+                      disabled
                     />
                   </td>
                   <td className="py-2 px-3 border">
@@ -120,22 +142,19 @@ const Attendance = () => {
                     />
                   </td>
 
-                  {/* Attendance Sign (Present / Absent) */}
                   <td className="py-2 px-3 border text-center">
                     <button
                       onClick={() => toggleAttendance(index)}
-                      className={`px-2 py-1 rounded ${
-                        entry.sign === "Present" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                      }`}
+                      aria-label={`Mark ${entry.name} as ${entry.sign === 'Present' ? 'Absent' : 'Present'}`}
+                      className={`px-2 py-1 rounded ${entry.sign === "Present" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                     >
                       {entry.sign || "Absent"}
                     </button>
                   </td>
 
-                  {/* Remove Row Button */}
                   <td className="py-2 px-3 border text-center">
                     <button
-                      onClick={() => removeRow(index)}
+                      onClick={() => removeRow(entry.id)} // Ensure ID is passed correctly
                       className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 text-xs sm:text-sm"
                     >
                       Remove
@@ -147,7 +166,6 @@ const Attendance = () => {
           </table>
         </div>
 
-        {/* Add Row Button */}
         <div className="mt-3 sm:mt-4 flex justify-center">
           <button
             onClick={addRow}
@@ -157,7 +175,6 @@ const Attendance = () => {
           </button>
         </div>
 
-        {/* Present, Absent, Total Summary */}
         <div className="mt-6 bg-gray-100 p-4 rounded-md">
           <h3 className="font-bold text-lg">Attendance Summary</h3>
           <div className="grid grid-cols-3 gap-4 mt-2">
@@ -173,6 +190,15 @@ const Attendance = () => {
               <span className="text-gray-600">Absent</span>
               <p className="text-xl font-semibold">{absent}</p>
             </div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={saveAttendance}
+              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+            >
+              Submit Attendance
+            </button>
           </div>
         </div>
       </div>

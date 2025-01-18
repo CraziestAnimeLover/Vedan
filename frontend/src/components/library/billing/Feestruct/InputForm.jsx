@@ -2,25 +2,87 @@ import React, { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa"; // Font Awesome Trash icon
 
 const InputForm = ({ onAddPlan }) => {
-  const [plan, setPlan] = useState({ name: "", fee: "", details: "" });
+  const [plan, setPlan] = useState({
+    name: "",
+    fee: "",
+    free: "",
+    affordable: "",
+    standard: "",
+    premium: "",
+    details: "",
+  });
   const [plansList, setPlansList] = useState([]);
 
   const handleAddPlan = () => {
-    if (plan.name && plan.fee && plan.details) {
+    if (
+      plan.name &&
+      plan.fee &&
+      plan.free &&
+      plan.affordable &&
+      plan.standard &&
+      plan.premium &&
+      plan.details
+    ) {
       const newPlan = {
         name: plan.name,
         fee: plan.fee,
+        free: plan.free,
+        affordable: plan.affordable,
+        standard: plan.standard,
+        premium: plan.premium,
         details: plan.details.split(",").map((d) => d.trim()),
       };
+
       onAddPlan(newPlan); // Pass the new plan to the parent
       setPlansList([...plansList, newPlan]);
-      setPlan({ name: "", fee: "", details: "" });
+      setPlan({
+        name: "",
+        fee: "",
+        free: "",
+        affordable: "",
+        standard: "",
+        premium: "",
+        details: "",
+      });
+
+      // Trigger the submit action
+      handleSubmit(); // Now this will only call the submit handler
     }
   };
 
   const handleRemovePlan = (index) => {
     const updatedPlans = plansList.filter((_, i) => i !== index);
     setPlansList(updatedPlans);
+  };
+
+  const handleSubmit = (e) => {
+    // Prevent default if it's a form submission
+    if (e) e.preventDefault();
+
+    const newPlan = {
+      name: plan.name,
+      fee: plan.fee,
+      free: plan.free,
+      affordable: plan.affordable,
+      standard: plan.standard,
+      premium: plan.premium,
+      details: plan.details.split(",").map((d) => d.trim()), // Assuming details is a comma-separated string
+    };
+
+    fetch("http://localhost:8000/plans", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newPlan),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Plan added:", data);
+      })
+      .catch((error) => {
+        console.error("Error adding plan:", error);
+      });
   };
 
   return (
@@ -36,9 +98,37 @@ const InputForm = ({ onAddPlan }) => {
         />
         <input
           type="text"
-          placeholder="Fee (e.g. Free, 400, 1000, 1500)"
+          placeholder="Fee"
           value={plan.fee}
           onChange={(e) => setPlan({ ...plan, fee: e.target.value })}
+          className="block w-full mb-2 p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Free"
+          value={plan.free}
+          onChange={(e) => setPlan({ ...plan, free: e.target.value })}
+          className="block w-full mb-2 p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Affordable"
+          value={plan.affordable}
+          onChange={(e) => setPlan({ ...plan, affordable: e.target.value })}
+          className="block w-full mb-2 p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Standard"
+          value={plan.standard}
+          onChange={(e) => setPlan({ ...plan, standard: e.target.value })}
+          className="block w-full mb-2 p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Premium"
+          value={plan.premium}
+          onChange={(e) => setPlan({ ...plan, premium: e.target.value })}
           className="block w-full mb-2 p-2 border rounded"
         />
         <input

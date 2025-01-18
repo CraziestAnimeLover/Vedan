@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import {LIBRARY_API_END_POINT} from '../utils/constant.js'
 
 // Async thunk to fetch books
 export const fetchBooks = createAsyncThunk("books/fetchBooks", async () => {
-  const response = await axios.get("http://localhost:8000/api/v1/library/books");
+  const response = await axios.get(`${LIBRARY_API_END_POINT}/books`);
   return response.data.books; // Assuming the API returns an array of books
 });
 

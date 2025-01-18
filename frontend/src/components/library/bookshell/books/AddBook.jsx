@@ -11,7 +11,6 @@ const AddBook = () => {
     series:"",
     year: "",
     isbn: "",
-    series: "",
     publisherDate: "",
     publisher: "",
     format: "Paper Book",

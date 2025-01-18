@@ -37,7 +37,7 @@ const ParentComponent = () => {
         onEditPlan={handleEditPlan}
         plansList={plans}  // Passing plansList to InputForm
       />
-      <MembershipPlansCards plans={plans} />
+      <MembershipPlansCards  apiUrl="http://localhost:8000" plans={plans} />
       <div>
         <WaiveOff/>
       </div>
@@ -45,7 +45,7 @@ const ParentComponent = () => {
       {/* <OutputPage plans={plans} /> */}
       <div>
 
-      <MembershipPlansCards plans={plans} />
+      <MembershipPlansCards  apiUrl="http://localhost:8000" plans={plans} />
       </div>
     </div>
   );

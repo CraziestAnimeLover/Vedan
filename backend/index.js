@@ -2,11 +2,19 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import connectDB from './utils/db.js';
 import bookRoute from './routes/book.routes.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
+import planRouter from './routes/plan.routes.js';  // Ensure the path is correct
+
+import Library from './models/library.model.js';  // <-- Import the Library model
+import { Attendance } from './models/attendanceSchema.model.js';
+
+import FeeData from './models/feeDataSchema.model.js';  // <-- Import the FeeData model
+
 import { isAuthenticated, isLibrarian, isStudent } from './middlewares/isAuthenticated.js';
 
 dotenv.config();
@@ -37,91 +45,193 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Routes
-app.get("/home", (req, res) => {
+app.get('/home', (req, res) => {
     return res.status(200).json({
-        message: "Welcome",
+        message: 'Welcome',
         success: true,
     });
 });
 
-app.use("/api/v1/user", userRoute);
-app.use("/api/v1/company", companyRoute);
-app.use("/api/v1/job", jobRoute);
-app.use("/api/v1/library/books", bookRoute); // Ensure this route is correctly used for books
+// Book Management Routes
+app.use('/api/v1/library/books', bookRoute);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        message: "Something went wrong!",
-        success: false,
-    });
-});
-app.post('/api/v1/library/books', async (req, res) => {
+// User, Company, and Job Routes
+app.use('/api/v1/user', userRoute);
+app.use('/api/v1/company', companyRoute);
+app.use('/api/v1/job', jobRoute);
+app.use('/plans', planRouter);
+
+// Fee Data Endpoints
+app.post('/api/update-fees', async (req, res) => {
+    const { month, data } = req.body;
+
+    // Validation
+    if (!month || !data) {
+        return res.status(400).json({ error: 'Month and data are required' });
+    }
+
     try {
-        const { title, author, genre, year, isbn, format, language, price, quantity } = req.body;
-        
-        // Validate data (optional)
-        if (!title || !author || !isbn) {
-            return res.status(400).json({ message: 'Missing required fields' });
+        // Check if fee data already exists for the given month
+        let feeEntry = await FeeData.findOne({ month });
+ console.log(feeEntry)
+        if (feeEntry) {
+            // If the data exists, update it
+            feeEntry.data = data;
+            await feeEntry.save();
+            return res.status(200).json({ message: `Data for ${month} updated successfully.` });
+        } else {
+            // If no data exists, create a new entry
+            feeEntry = new FeeData({ month, data });
+            await feeEntry.save();
+            return res.status(201).json({ message: `Data for ${month} created successfully.` });
         }
-
-        const newBook = new Book({
-            title, author, genre, year, isbn, format, language, price, quantity
-        });
-        
-        await newBook.save();
-        return res.status(201).json({ book: newBook });
     } catch (error) {
-        console.error('Error adding book:', error);
-        return res.status(500).json({ message: 'Error adding book' });
+        console.error('Error updating fee data:', error);
+        return res.status(500).json({ error: 'Something went wrong while updating fee data.' });
     }
 });
 
-app.get("/api/v1/library/books", async (req, res) => {
+app.get('/api/fees', async (req, res) => {
     try {
-      const { search } = req.query;
-      let filter = {};
-      if (search) {
-        filter = {
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { author: { $regex: search, $options: 'i' } },
-            { genre: { $regex: search, $options: 'i' } }
-          ]
-        };
-      }
-      
-      app.get('/libraries', (req, res) => {
-        const { pincode } = req.query;
-        // Fetch libraries from database that match the pincode
-        const libraries = db.query("SELECT * FROM libraries WHERE pincode = ?", [pincode]);
-        
-        res.json(libraries);
-      });
-      
-      const books = await Book.find(filter);
-      return res.status(200).json(books);
+        const fees = await FeeData.find();
+        return res.status(200).json({ success: true, fees });
     } catch (error) {
-      console.error('Error fetching books:', error);
-      return res.status(500).json({ message: 'Error fetching books' });
+        console.error('Error fetching fee data:', error);
+        return res.status(500).json({ success: false, error: 'Something went wrong while fetching fee data.' });
+    }
+});
+
+
+
+// Endpoint to save attendance
+
+app.post('/api/save-attendance', async (req, res) => {
+    const { attendanceList } = req.body;
+  
+    // Check if attendanceList is present and not empty
+    if (!attendanceList || attendanceList.length === 0) {
+      return res.status(400).json({ message: "Attendance list is empty" });
+    }
+  
+    // Loop through each entry and check for missing required fields
+    for (let entry of attendanceList) {
+      if (!entry.id || !entry.name || !entry.timeIn || !entry.timeOut) {
+        return res.status(400).json({ message: "All fields (id, name, timeIn, timeOut) are required" });
+      }
+    }
+  
+    try {
+      // If validation passes, save the data
+      await Attendance.insertMany(attendanceList);
+      res.status(200).json({ message: "Attendance saved successfully" });
+    } catch (error) {
+      console.error("Error saving attendance:", error);
+      res.status(500).json({ message: "Error saving attendance" });
     }
   });
   
+  
+  
+  // Start the server
+ ;
 
 
+// Library Management Endpoints
+app.post('/api/add-library', async (req, res) => {
+    const { pincode, timeSlot, dateJoining, fee } = req.body;
 
+    try {
+        const newLibrary = new Library({
+            pincode,
+            timeSlot,
+            dateJoining,
+            fee,
+        });
 
+        await newLibrary.save();
 
+        return res.status(201).json({
+            success: true,
+            message: 'Library added successfully!',
+            library: newLibrary,
+        });
+    } catch (error) {
+        console.error('Error adding library:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong while adding the library.',
+        });
+    }
+});
 
+app.get('/api/libraries', async (req, res) => {
+    try {
+        const libraries = await Library.find();
+        return res.status(200).json({
+            success: true,
+            libraries,
+        });
+    } catch (error) {
+        console.error('Error fetching libraries:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong while fetching libraries.',
+        });
+    }
+});
 
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        message: 'Something went wrong!',
+        success: false,
+    });
+});
+
+// In-memory storage for plans
+let plans = [
+    { id: 1, name: "Basic Plan", fee: 1000, free: 0, affordable: 500, standard: 800, premium: 1200 },
+    { id: 2, name: "Premium Plan", fee: 2000, free: 0, affordable: 1000, standard: 1500, premium: 2000 },
+  ];
+  
+  // 1. Endpoint to add a new plan
+  app.post('/plans', (req, res) => {
+    // Handle plan addition logic here
+    const newPlan = req.body;
+    // Save the plan to the database or in-memory storage
+    res.status(201).json(newPlan);  // Send back the newly added plan
+  });
+  
+  
+  // 2. Endpoint to get all plans
+  app.get("/plans", (req, res) => {
+    res.status(200).json(plans);
+  });
+  
+  // 3. Endpoint to apply a waiver
+  app.put("/plans/:id/waive", (req, res) => {
+    const { id } = req.params;
+    const { waiverAmount } = req.body;
+    
+    const planIndex = plans.findIndex(plan => plan.id === parseInt(id));
+    if (planIndex !== -1) {
+      plans[planIndex].fee -= waiverAmount;
+      res.status(200).json(plans[planIndex]);
+    } else {
+      res.status(404).json({ message: "Plan not found" });
+    }
+  });
+
+// Start Server
 const PORT = process.env.PORT || 8000;
 
-// Connect to database and start server
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+connectDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Database connection error:', err);
     });
-}).catch(err => {
-    console.error("Database connection error:", err);
-});

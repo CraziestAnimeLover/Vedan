@@ -1,0 +1,42 @@
+.app-container {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  .book-loan-form {
+    margin-bottom: 20px;
+  }
+  
+  .book-loan-form input,
+  .book-loan-form button {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+  }
+  
+  .loan-list {
+    margin-top: 20px;
+  }
+  
+  .loan-button {
+    padding: 8px 12px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .loan-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .loan-card {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
