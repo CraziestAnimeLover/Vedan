@@ -34,6 +34,7 @@ import Account from './components/library/account/Account'
 import Libshell from './components/library/bookshell/Libshell'
 import BookList from './components/library/bookshell/books/BookList'
 import LibraryProfile from './components/library/profile/libmgtprofile/LibraryProfile'
+import ChessGame from './components/game/chessgame/components/ChessGame'
 // import BookListSection from './components/library/bookshell/books/BookListSection'
 
 
@@ -132,6 +133,9 @@ const approuter = createBrowserRouter([
    },
    { path: '/browse', 
     element: <Browse/>
+   },
+   { path: '/game', 
+    element: <ChessGame/>
    },
    { path: '/profile', 
     element: <Profile/>

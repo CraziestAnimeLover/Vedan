@@ -64,7 +64,7 @@ const ServiceButton = ({ title }) => (
 const services = [
   // { title: "NewsFeed", url: "/newsfeed" },
   { title: "Placement", url: "/service/student" },
-  // { title: "Industry", url: "/jobs" },
+  { title: "Game", url: "/game" },
   { title: "Library", url: "/library" },
   // { title: "Blood Help", url: "#" }, // Placeholder URL
   // { title: "Lost n Found", url: "/lostnfound" },
