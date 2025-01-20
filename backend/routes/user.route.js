@@ -10,7 +10,10 @@ router.route("/register").post(singleUpload,register);
 router.route("/login").post(login);
 router.route("/logout").get(logout);
 router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile);
-router.put('/profile/update', isAuthenticated, updateProfile);
+router.put('/profile/update', isAuthenticated, singleUpload, updateProfile);
+
+
+
 // Forgot Password & Reset Password routes
 // In your user.routes.js (or equivalent)
 router.post('/library', isAuthenticated, isLibrarian);  // Example route

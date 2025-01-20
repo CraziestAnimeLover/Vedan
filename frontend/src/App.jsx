@@ -34,6 +34,7 @@ import Account from './components/library/account/Account'
 import Libshell from './components/library/bookshell/Libshell'
 import BookList from './components/library/bookshell/books/BookList'
 import LibraryProfile from './components/library/profile/libmgtprofile/LibraryProfile'
+import LoanBook from './components/library/bookloan/LoanBook'
 // import BookListSection from './components/library/bookshell/books/BookListSection'
 
 
@@ -93,8 +94,11 @@ const approuter = createBrowserRouter([
   { path: '/mgtservice/mgtlibrary/account', 
     element: <Account/>
   },
-  { path: '/mgtservice/mgtlibrary/bookshell', 
+  { path: '/mgtservice/mgtlibrary/books', 
     element: <Libshell/>
+  },
+  { path: '/mgtservice/mgtlibrary/bookloan', 
+    element: <LoanBook/>
   },
   {
     path: "/mgtservice/mgtlibrary/bookshell/books",

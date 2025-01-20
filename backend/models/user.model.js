@@ -20,21 +20,18 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        required: false,  // Make this optional
-        enum: ['student', 'recruiter'], // You can still limit to certain roles if needed
+        required: false,
+        enum: ['student', 'recruiter', 'librarian'], // Added librarian as an optional role
     },
     profile: {
         profilePhoto: {
             type: String,
         },
-        profileNumber: {
-            type: String,  // You can change the type based on your requirements
-        },
-        handlerName: {
-            type: String,
-        },
+    },
+    vedannId: {
+        type: String, // New field for Vedann ID
+        default: 'Not Assigned',
     },
 });
 
-// Export User model
 export const User = mongoose.model('User', userSchema);

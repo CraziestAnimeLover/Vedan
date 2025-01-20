@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import BookLoanForm from "./BookLoanForm";
 import LoanCard from "./LoanCard";
 import "./index.css"; // Assuming you have a separate CSS file for any custom styles
 
 const LoanBook = () => {
-  const [loans, setLoans] = useState([]);
+  const [loans, setLoans] = useState(() => {
+    const savedLoans = localStorage.getItem("loans");
+    return savedLoans ? JSON.parse(savedLoans) : [];
+  });
 
+
+  useEffect(() => {
+    localStorage.setItem("loans", JSON.stringify(loans));
+  }, [loans]);
+
+
+  
   const handleAddLoan = (loan) => {
     setLoans((prevLoans) => [...prevLoans, loan]);
   };
+  
 
   return (
     <div className="app-container max-w-7xl mx-auto p-6">

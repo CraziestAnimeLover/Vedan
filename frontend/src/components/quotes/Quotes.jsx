@@ -39,7 +39,7 @@ const Quotes = () => {
   }, []);
 
   return (
-    <div className="h-[50vh] bg-gray-100 flex flex-col items-center justify-center space-y-6">
+    <div className="h-[50vh] bg-gray-400 flex flex-col items-center justify-center space-y-6">
       <div className="relative w-full max-w-2xl">
         <QuoteCard
           quote={quotes[currentIndex].quote}

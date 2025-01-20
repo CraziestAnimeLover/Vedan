@@ -1,46 +1,148 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import ProfileCard from './ProfileCard'; // Import the ProfileCard component
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 
 const LibraryProfile = () => {
-  const profile = {
-    profilePicture: 'https://randomuser.me/api/portraits/men/21.jpg', // Use a real URL for an image
-    fullName: 'John Doe',
-    vedannId: 'VD123456',
-    address: '123 Main Street',
-  };
+  const fileInputRef = useRef(null);  // Create a ref for the file input
+  const { user,loading } = useSelector((store) => store.auth);
+  const navigate = useNavigate(); // Initialize the navigate function
 
-  // State to control the active form
+  // Redirect to the home page if user is not found
+  useEffect(() => {
+    if (!loading && user === null) {
+      navigate('/login'); // Redirect to the home page if no user is found
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading state while the user is being fetched
+  }
+
+  if (user === null) {
+    return <div>No user found</div>; // You can show a message or redirect elsewhere
+  }
+
+  if (user === null) {
+    return <div>Loading...</div>; // You can show a loading message or spinner
+  }
+
   const [activeForm, setActiveForm] = useState('');
-
-  // State to hold form data
   const [formData, setFormData] = useState({
     mobile: "",
     email: "",
-    social: "",
-    address: profile.address || "",
+    social: [], // Initialize as an empty array
+    address: user?.profile?.address || "",
     GST: "",
     PAN: "",
     OTHERID: "",
     Name: "",
     VedanId: "",
   });
+  
+
+  // State for form validation errors
+  const [errors, setErrors] = useState({});
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+// Function to handle changes in social media links
+const handleSocialLinkChange = (e, index) => {
+  const { value } = e.target;
+  const updatedSocialLinks = [...formData.social];
+  updatedSocialLinks[index] = value;
+  setFormData((prev) => ({ ...prev, social: updatedSocialLinks }));
+};
 
   const handleToggleForm = (formType) => {
     setActiveForm(formType); // Set the active form
   };
 
+    // Add a new social link input field
+    const handleAddSocialLink = () => {
+      setFormData((prev) => ({ ...prev, social: [...prev.social, ""] }));
+    };
+  
+    // Remove a social link input field
+    const handleRemoveSocialLink = (index) => {
+      const updatedSocial = formData.social.filter((_, i) => i !== index);
+      setFormData((prev) => ({ ...prev, social: updatedSocial }));
+    };
+
+    
+  // Form validation function
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.mobile) newErrors.mobile = 'Mobile number is required';
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Valid email is required';
+    if (!formData.address) newErrors.address = 'Address is required';
+    if (activeForm === 'verification') {
+      if (!formData.GST) newErrors.GST = 'GST number is required';
+      if (!formData.PAN) newErrors.PAN = 'PAN number is required';
+    }
+    if (activeForm === 'founder') {
+      if (!formData.Name) newErrors.Name = 'Name is required';
+      if (!formData.VedanId) newErrors.VedanId = 'Vedan ID is required';
+    }
+    return newErrors;
+  };
+
+ 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        const token = user.token;
+        const formData = new FormData();  // FormData to handle file uploads
+        formData.append('fullname', formData.Name || user.fullname);
+        formData.append('email', formData.email);
+        formData.append('phoneNumber', formData.mobile);
+        formData.append('role', user.role);
+        formData.append('social', JSON.stringify(formData.social));
+        formData.append('address', formData.address);
+        formData.append('vedanId', formData.VedanId || user.vedanId);
+
+        // Check if there's a file input and append the selected file to the formData
+        if (fileInputRef.current && fileInputRef.current.files[0]) {
+          formData.append('profilePhoto', fileInputRef.current.files[0]);
+        }
+
+        const response = await axios.put(
+          '/api/user/profile/update',
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',  // Important for file upload
+            },
+          }
+        );
+
+        console.log('Profile updated:', response.data);
+      } catch (error) {
+        console.error('Error updating profile:', error.response?.data?.message || error.message);
+      }
+    }
+  };
+  
+  
+  
+
   return (
     <div className="h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="w-full md:w-1/4 bg-[#20354b] px-4 py-6 shadow-lg flex flex-col justify-between">
+      <div className="w-full md:w-1/4 bg-[#20354b] px-4 py-6 shadow-lg flex flex-col justify-between overflow-auto">
+
         <div>
           {/* ProfileCard placed at the top */}
-          <ProfileCard profile={profile} />
+          <ProfileCard profile={user?.profile} />
         </div>
 
         {/* Sidebar Navigation */}
@@ -65,7 +167,8 @@ const LibraryProfile = () => {
       </div>
 
       {/* Profile Details Section */}
-      <div className="flex-1 bg-[#071e34] p-6 flex justify-start items-start">
+      <div className="flex-1 bg-[#071e34] p-6 flex justify-start items-start overflow-auto">
+
         {/* Default Message when no form is selected */}
         {activeForm === '' && (
           <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg text-center">
@@ -81,7 +184,7 @@ const LibraryProfile = () => {
         {activeForm === 'contact' && (
           <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h3 className="text-white font-semibold text-lg">Edit Contact Details</h3>
-            <form className="mt-4">
+            <form className="mt-4" onSubmit={handleSubmit}>
               {/* Mobile */}
               <div className="mb-4">
                 <label className="text-gray-400">Mobile</label>
@@ -93,6 +196,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter mobile number"
                 />
+                {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
               </div>
 
               {/* Email */}
@@ -106,19 +210,38 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter email"
                 />
+                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
               </div>
 
               {/* Social Media */}
               <div className="mb-4">
-                <label className="text-gray-400">Social</label>
-                <input
-                  type="text"
-                  name="social"
-                  value={formData.social}
-                  onChange={handleFormChange}
-                  className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                  placeholder="Enter social media link"
-                />
+                <label className="text-gray-400">Social Links</label>
+                {Array.isArray(formData.social) && formData.social.map((link, index) => (
+  <div key={index} className="flex items-center mb-2">
+    <input
+      type="text"
+      value={link}
+      onChange={(e) => handleSocialLinkChange(e, index)}
+      className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+      placeholder="Enter social media link"
+    />
+    <button
+      type="button"
+      onClick={() => handleRemoveSocialLink(index)}
+      className="ml-2 text-red-500"
+    >
+      Remove
+    </button>
+  </div>
+))}
+
+                <button
+                  type="button"
+                  onClick={handleAddSocialLink}
+                  className="mt-2 w-full bg-yellow-500 text-white py-2 rounded-md"
+                >
+                  Add Another Social Link
+                </button>
               </div>
 
               {/* Address */}
@@ -131,6 +254,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter address"
                 />
+                {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
               </div>
 
               <button
@@ -146,7 +270,7 @@ const LibraryProfile = () => {
         {activeForm === 'verification' && (
           <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h3 className="text-white font-semibold text-lg">Edit Verification Details</h3>
-            <form className="mt-4">
+            <form className="mt-4" onSubmit={handleSubmit}>
               {/* GST */}
               <div className="mb-4">
                 <label className="text-gray-400">GST</label>
@@ -158,6 +282,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter GST number"
                 />
+                {errors.GST && <p className="text-red-500 text-sm">{errors.GST}</p>}
               </div>
 
               {/* PAN */}
@@ -171,6 +296,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter PAN number"
                 />
+                {errors.PAN && <p className="text-red-500 text-sm">{errors.PAN}</p>}
               </div>
 
               {/* Other ID */}
@@ -197,9 +323,9 @@ const LibraryProfile = () => {
         )}
 
         {activeForm === 'founder' && (
-          <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
+          <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full h-fit max-w-lg">
             <h3 className="text-white font-semibold text-lg">Edit Founder Details</h3>
-            <form className="mt-4">
+            <form className="mt-4" onSubmit={handleSubmit}>
               {/* Name */}
               <div className="mb-4">
                 <label className="text-gray-400">Name</label>
@@ -211,6 +337,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter name"
                 />
+                {errors.Name && <p className="text-red-500 text-sm">{errors.Name}</p>}
               </div>
 
               {/* Vedan ID */}
@@ -224,6 +351,7 @@ const LibraryProfile = () => {
                   className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
                   placeholder="Enter Vedan ID"
                 />
+                {errors.VedanId && <p className="text-red-500 text-sm">{errors.VedanId}</p>}
               </div>
 
               <button

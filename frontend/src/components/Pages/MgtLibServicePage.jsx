@@ -71,7 +71,7 @@ const services = [
   { title: "Gym", url: "/" },
   { title: "Cake", url: "/service/recriuter" },
   { title: "Industry", url: "/jobs" },
-  { title: "LibraryMGT", url: "/mgtservice/mgtlibrary" },
+  { title: "Vijnan (Library)", url: "/mgtservice/mgtlibrary" },
   // { title: "Blood Help", url: "/blood-help" }, // Updated to a valid URL
   // { title: "Lost n Found", url: "/lostnfound" },
 ];

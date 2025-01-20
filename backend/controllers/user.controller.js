@@ -7,7 +7,7 @@ import nodemailer from "nodemailer"; // We'll use nodemailer to send emails
 // Register Function
 export const register = async (req, res) => {
     try {
-        const { fullname, email, phoneNumber, password } = req.body;
+        const { fullname, email, phoneNumber, password, role } = req.body;
 
         if (!fullname || !email || !phoneNumber || !password) {
             return res.status(400).json({
@@ -27,14 +27,20 @@ export const register = async (req, res) => {
 
         // Hash password and create user
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // If no role provided, default to 'student'
+        const newRole = role || 'student';
+
         await User.create({
             fullname,
             email,
             phoneNumber,
             password: hashedPassword,
+            role: newRole, // Assigning the role here
             profile: {
                 // No profile photo here
-            }
+            },
+            vedannId: 'Not Assigned', // Default Vedan ID
         });
 
         return res.status(201).json({
@@ -47,6 +53,7 @@ export const register = async (req, res) => {
     }
 };
 
+// Login Function
 // Login Function
 export const login = async (req, res) => {
     try {
@@ -75,8 +82,12 @@ export const login = async (req, res) => {
             });
         }
 
-        // Generate JWT token
-        const tokenData = { userId: user._id };
+        // Generate JWT token with role and Vedan ID
+        const tokenData = {
+            userId: user._id,
+            role: user.role,
+            vedannId: user.vedannId,
+        };
         const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         // Prepare user data
@@ -85,7 +96,9 @@ export const login = async (req, res) => {
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
-            profile: user.profile
+            profile: user.profile,
+            role: user.role,
+            vedannId: user.vedannId,
         };
 
         return res.status(200).cookie("token", token, { 
@@ -103,6 +116,7 @@ export const login = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
 
 // Logout Function
 export const logout = async (req, res) => {
@@ -209,33 +223,88 @@ export const resetPassword = async (req, res) => {
 };
 
 // Update Profile Function
-export const updateProfile = async (req, res) => {
-    try {
-        const { fullname, email, phoneNumber, bio, skills, profileNumber, handlerName } = req.body;
+// Update Profile Function
+  // For password hashing (if needed)
 
-        let skillsArray;
-        if (skills) {
-            skillsArray = skills.split(",");
+export const updateProfile = async (req, res) => {
+  try {
+    const { userId } = req.user;  // Get the user ID from the token
+
+    // Prepare the updated profile data
+    const updatedData = {
+      fullname: req.body.fullname || req.user.fullname,
+      email: req.body.email || req.user.email,
+      phoneNumber: req.body.phoneNumber || req.user.phoneNumber,
+      role: req.body.role || req.user.role,
+      vedanId: req.body.vedanId || req.user.vedanId,
+      profile: req.body.profile || req.user.profile,
+    };
+
+    if (req.file) {
+      // If there's a file uploaded, handle it (e.g., profile picture)
+      updatedData.profilePhoto = req.file.path;  // assuming file is uploaded to a folder and path is stored
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating profile' });
+  }
+};
+
+
+  
+
+export const authorize = (roles) => {
+    return (req, res, next) => {
+        const userRole = req.user.role; // Assuming the user role is stored in the JWT token
+        
+        if (!roles.includes(userRole)) {
+            return res.status(403).json({ message: "Access Denied" });
         }
 
-        const userId = req.id; // Middleware should set req.id
+        next();
+    };
+};
+
+// Profile Update Function for Librarian/Student
+export const updateLibraryProfile = async (req, res) => {
+    const { mobile, email, social, address, GST, PAN, Name, VedanId } = req.body;
+    const userId = req.userId; // Assuming middleware sets req.userId from the JWT token
+
+    try {
         let user = await User.findById(userId);
 
         if (!user) {
-            return res.status(400).json({
-                message: "User not found.",
-                success: false
-            });
+            return res.status(400).json({ message: "User not found.", success: false });
         }
 
-        // Update fields as needed
-        if (fullname) user.fullname = fullname;
-        if (email) user.email = email;
-        if (phoneNumber) user.phoneNumber = phoneNumber;
-        if (bio) user.profile.bio = bio;
-        if (skills) user.profile.skills = skillsArray;
-        if (profileNumber) user.profileNumber = profileNumber;  // Add this line to handle profileNumber
-        if (handlerName) user.handlerName = handlerName;  // Add this line to handle handlerName
+        // Update fields based on the role
+        if (mobile) user.profile.mobile = mobile;
+        if (email) user.profile.email = email;
+        if (social) user.profile.social = social; // Array of social links
+        if (address) user.profile.address = address;
+
+        // Only allow GST/PAN/Founder ID to be updated if the role is 'librarian' or 'founder'
+        if (user.role === 'librarian') {
+            if (GST) user.profile.GST = GST;
+            if (PAN) user.profile.PAN = PAN;
+        }
+
+        // Update founder details if role is 'founder'
+        if (user.role === 'founder') {
+            if (Name) user.profile.Name = Name;
+            if (VedanId) user.profile.VedanId = VedanId;
+        }
 
         await user.save();
 
@@ -245,8 +314,8 @@ export const updateProfile = async (req, res) => {
             email: user.email,
             phoneNumber: user.phoneNumber,
             profile: user.profile,
-            profileNumber: user.profileNumber,  // Include this in the response
-            handlerName: user.handlerName,  // Include this in the response
+            role: user.role,
+            vedannId: user.vedannId,
         };
 
         return res.status(200).json({
@@ -259,5 +328,3 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
-
-
