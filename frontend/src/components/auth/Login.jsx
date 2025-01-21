@@ -50,7 +50,7 @@ const Login = () => {
             });
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user))
-                navigate("/service");
+                navigate("/select");
                 toast.success(res.data.message);
             }
         } catch (error) {

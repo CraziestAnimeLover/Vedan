@@ -48,13 +48,16 @@ const Home = () => {
         </motion.div> */}
 
         {/* Signup Section */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-        >
+        > */}
+          <div className='space-x-4'>
+
           <Signup />
-        </motion.div>
+        </div>
+        {/* </motion.div> */}
 
         {/* Quotes Section */}
         <motion.div

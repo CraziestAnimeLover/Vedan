@@ -32,8 +32,8 @@ const Navbar = () => {
     };
 
     return (
-        <div className="bg-white rounded-md shadow-xl sticky top-0 z-50">
-            <div className="flex items-center justify-between mx-auto max-w-7xl h-20 p-4 md:p-0 relative">
+        <div className="bg-white  shadow-xl sticky top-0 z-50 ">
+            <div className="flex items-center justify-between mx-auto max-w-7xl h-24 p-4 md:p-0 relative">
                 {/* Center Section (Logo and Vedann) */}
                 <div className="absolute left-0 transform-none md:left-1/2 md:transform -translate-x-1/2 flex items-center gap-2">
                     <img
@@ -62,15 +62,15 @@ const Navbar = () => {
                     {!user ? (
                         location.pathname === '/login' ? (
                             <div className='flex items-center gap-2'>
-                                <Link to="/register">
+                                {/* <Link to="/register">
                                     <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Sign Up</Button>
-                                </Link>
+                                </Link> */}
                             </div>
                         ) : (
                             <div className='flex items-center gap-2'>
-                                <Link to="/login">
+                                {/* <Link to="/login">
                                     <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Login</Button>
-                                </Link>
+                                </Link> */}
                             </div>
                         )
                     ) : (

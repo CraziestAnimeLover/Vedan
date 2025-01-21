@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '@/redux/authSlice';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import myImage from '../../assets/signupback.jpeg';
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -87,12 +88,19 @@ const Signup = () => {
   }, [user, navigate]);
 
   return (
-    <div>
+    <div className='pb-2'>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div
+      className="flex items-end justify-end min-h-screen pe-10 pb-2 opacity-89"
+      style={{
+        backgroundImage: `url(${myImage})`, // Only use the image without gradient
+        backgroundSize: 'cover', // Ensure the image covers the entire div
+        backgroundPosition: 'center', // Center the image
+      }}
+    >
         <form
           onSubmit={submitHandler}
-          className="w-full max-w-lg bg-white border border-gray-200 rounded-md p-4 shadow-lg pb-10 mb-10 mt-10 pt-10"
+          className="w-full max-w-lg bg-blue-100 border border-gray-900 rounded-md  p-4 shadow-lg pb-10 mb-10 mt-10 pt-10"
         >
           <h1 className="font-bold text-xl sm:text-2xl mb-5 text-center">Sign Up</h1>
 
