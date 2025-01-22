@@ -31,3 +31,19 @@ export const addBook = async (req, res) => {
         res.status(500).json({ message: "Error adding book", error });
     }
 };
+
+// Controller function to fetch a book by ID
+export const getBookById = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        const book = await Book.findById(bookId);
+        
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        res.json({ book });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching book", error });
+    }
+};

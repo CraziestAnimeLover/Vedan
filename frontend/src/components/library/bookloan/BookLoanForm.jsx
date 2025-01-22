@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios"; // Import axios
 
 const BookLoanForm = ({ onAddLoan }) => {
   const [loan, setLoan] = useState({
@@ -21,26 +22,40 @@ const BookLoanForm = ({ onAddLoan }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
     if (!loan.loanId || !loan.bookName || !loan.borrowerName || !loan.loanDate) {
       alert("Please fill in all required fields.");
       return;
     }
-    onAddLoan(loan);
-    setLoan({
-      loanId: "",
-      bookName: "",
-      bookId: "",
-      borrowerName: "",
-      loanDate: "",
-      dueDate: "",
-      returnBook: false,
-    });
+  
+    // Send POST request to backend
+    axios
+      .post("http://localhost:8000/api/loans", loan)
+      .then((response) => {
+        // After successful loan creation, update the UI with the new loan
+        onAddLoan(response.data.loan);
+        setLoan({
+          loanId: "",
+          bookName: "",
+          bookId: "",
+          borrowerName: "",
+          loanDate: "",
+          dueDate: "",
+          returnBook: false,
+        });
+      })
+      .catch((error) => {
+        console.error("Error adding loan:", error);
+        alert("There was an error adding the loan.");
+      });
   };
+  
 
   return (
     <form className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg" onSubmit={handleSubmit}>
       <h2 className="text-2xl font-semibold text-center mb-6">Book Loan Form</h2>
-      
+
+      {/* Form Fields (same as before) */}
       <div className="mb-4">
         <label htmlFor="loanId" className="block text-gray-700 font-medium mb-2">Loan ID</label>
         <input
@@ -132,7 +147,6 @@ const BookLoanForm = ({ onAddLoan }) => {
         />
         <label htmlFor="returnBook" className="ml-2 text-gray-700 font-medium">Return Book</label>
       </div>
-
       <button
         type="submit"
         className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"

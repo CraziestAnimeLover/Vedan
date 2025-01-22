@@ -17,7 +17,7 @@ const MgtSidebarLayout = () => {
     { name: "Account", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/account" },
     { name: "Attendence", icon: <FaFileInvoiceDollar />, path: "/mgtservice/mgtlibrary/attendence" },
     { name: "Books", icon: <FaBook />, path: "/mgtservice/mgtlibrary/bookshell" },
-    { name: "Enquiry", icon: <FaQuestionCircle />, path: "/enquiry" },
+    { name: "Enquiry", icon: <FaQuestionCircle />, path: "/mgtservice/mgtlibrary/enquiry" },
     { name: "Logout", icon: <FaSignOutAlt />, path: "/logout" },
   ];
 
@@ -32,65 +32,68 @@ const MgtSidebarLayout = () => {
           </div>
           <nav className="p-4">
             <ul className="space-y-2">
-            {menuItems.map((item, index) => (
-  <li key={index}>
-    {item.name === "Books" ? (
-      <>
-        <button
-          onClick={() => setIsBooksOpen((prev) => !prev)}
-          className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition w-full text-left ${
-            location.pathname.startsWith("/mgtservice/mgtlibrary/bookshell") ? "bg-gray-700" : ""
-          }`}
-        >
-          <span className="text-xl">{item.icon}</span>
-          <span className="font-medium">{item.name}</span>
-        </button>
-        {isBooksOpen && (
-          <ul className="pl-6 space-y-2 mt-2">
-            <li>
-              <button
-                onClick={() => navigate("/mgtservice/mgtlibrary/books")}
-                className={`block text-left w-full p-2 rounded-lg hover:bg-gray-700 transition ${
-                  location.pathname === "/mgtservice/mgtlibrary/books" ? "bg-gray-700" : ""
-                }`}
-              >
-                Books
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => navigate("/mgtservice/mgtlibrary/bookloan")}
-                className={`block text-left w-full p-2 rounded-lg hover:bg-gray-700 transition ${
-                  location.pathname === "/mgtservice/mgtlibrary/bookloan" ? "bg-gray-700" : ""
-                }`}
-              >
-                Book Loan
-              </button>
-            </li>
-          </ul>
-        )}
-      </>
-    ) : (
-      <button
-        onClick={() => {
-          if (item.name === "Enquiry") {
-            // Add your custom logic here
-            console.log("Enquiry button clicked");
-            alert("Navigating to the Enquiry page...");
-          }
-          navigate("/mgtservice/mgtlibrary/enquiry"); // Navigate to the specified path
-        }}
-        className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition w-full text-left ${
-          location.pathname === "/mgtservice/mgtlibrary/enquiry" ? "bg-gray-700" : ""
-        }`}
-      >
-        <span className="text-xl">{item.icon}</span>
-        <span className="font-medium">{item.name}</span>
-      </button>
-    )}
-  </li>
-))}
-
+              {menuItems.map((item, index) => (
+                <li key={index}>
+                  {item.name === "Books" ? (
+                    <>
+                      <button
+                        onClick={() => setIsBooksOpen((prev) => !prev)}
+                        className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition w-full text-left ${
+                          location.pathname.startsWith("/mgtservice/mgtlibrary/bookshell")
+                            ? "bg-gray-700"
+                            : ""
+                        }`}
+                      >
+                        <span className="text-xl">{item.icon}</span>
+                        <span className="font-medium">{item.name}</span>
+                      </button>
+                      {isBooksOpen && (
+                        <ul className="pl-6 space-y-2 mt-2">
+                          <li>
+                            <button
+                              onClick={() => navigate("/mgtservice/mgtlibrary/books")}
+                              className={`block text-left w-full p-2 rounded-lg hover:bg-gray-700 transition ${
+                                location.pathname === "/mgtservice/mgtlibrary/books" ? "bg-gray-700" : ""
+                              }`}
+                            >
+                              Books
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => navigate("/mgtservice/mgtlibrary/bookloan")}
+                              className={`block text-left w-full p-2 rounded-lg hover:bg-gray-700 transition ${
+                                location.pathname === "/mgtservice/mgtlibrary/bookloan"
+                                  ? "bg-gray-700"
+                                  : ""
+                              }`}
+                            >
+                              Book Loan
+                            </button>
+                          </li>
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        // Handle the "Enquiry" item specifically
+                        if (item.name === "Enquiry") {
+                          console.log("Enquiry button clicked");
+                        }
+                        // Always navigate to the respective path
+                        navigate(item.path);
+                      }}
+                      className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition w-full text-left ${
+                        location.pathname === item.path ? "bg-gray-700" : ""
+                      }`}
+                    >
+                      <span className="text-xl">{item.icon}</span>
+                      <span className="font-medium">{item.name}</span>
+                    </button>
+                  )}
+                </li>
+              ))}
             </ul>
           </nav>
         </aside>

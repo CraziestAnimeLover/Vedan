@@ -9,8 +9,8 @@ const LoanCard = ({ loan, onEdit, onDelete }) => {
         isOverdue ? "bg-red-100" : "bg-white"
       }`}
     >
-      <h3 className="text-xl font-semibold text-gray-700 mb-4">Loan ID: {loan.loanId}</h3>
-      <div className="mb-2">
+      <h3 className="text-xl font-semibold text-gray-700 mb-4 cursor-pointer" >Loan ID: {loan.loanId}</h3>
+      {/* <div className="mb-2">
         <p><strong className="text-gray-700">Book Name:</strong> {loan.bookName}</p>
         {loan.bookId && <p><strong className="text-gray-700">Book ID:</strong> {loan.bookId}</p>}
         <p><strong className="text-gray-700">Borrower Name:</strong> {loan.borrowerName}</p>
@@ -25,8 +25,8 @@ const LoanCard = ({ loan, onEdit, onDelete }) => {
         {isOverdue && (
           <p className="text-red-500 font-bold mt-2">Overdue</p>
         )}
-      </div>
-      <div className="flex space-x-4 mt-4">
+      </div> */}
+      {/* <div className="flex space-x-4 mt-4">
         <button
           onClick={() => onEdit(loan.loanId)}
           className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -39,7 +39,7 @@ const LoanCard = ({ loan, onEdit, onDelete }) => {
         >
           Delete
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

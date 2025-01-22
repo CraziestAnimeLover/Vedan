@@ -8,8 +8,10 @@ import bookRoute from './routes/book.routes.js';
 import userRoute from './routes/user.route.js';
 import companyRoute from './routes/company.route.js';
 import jobRoute from './routes/job.route.js';
-import planRouter from './routes/plan.routes.js';  // Ensure the path is correct
-
+import planRouter from './routes/plan.routes.js'; 
+import bookRoutes from './routes/book.routes.js';
+import loanRoutes from './routes/loan.routes.js'; // Ensure the path is correct
+import ticketRoutes from './routes/ticketRoutes.js';
 import Library from './models/library.model.js';  // <-- Import the Library model
 import { Attendance } from './models/attendanceSchema.model.js';
 
@@ -60,7 +62,9 @@ app.use('/api/v1/user', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/job', jobRoute);
 app.use('/plans', planRouter);
-
+app.use('/api/books', bookRoutes);
+app.use('/api/loans', loanRoutes);
+app.use(ticketRoutes);
 // Fee Data Endpoints
 app.post('/api/update-fees', async (req, res) => {
     const { month, data } = req.body;
@@ -222,6 +226,26 @@ let plans = [
       res.status(404).json({ message: "Plan not found" });
     }
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Start Server
 const PORT = process.env.PORT || 8000;

@@ -4,10 +4,10 @@ import SeatForm from "./SeatForm";
 const Seat = ({ timeSlot }) => {
   const [seats, setSeats] = useState([]);
   const [selectedSeat, setSelectedSeat] = useState(null); // For the modal
+  const [rowCount, setRowCount] = useState(5);  // Initial rows count
+  const [colCount, setColCount] = useState(5);  // Initial columns count
 
-  const generateSeatMatrix = (timeSlot) => {
-    const rows = 5;
-    const cols = 5;
+  const generateSeatMatrix = (timeSlot, rows, cols) => {
     const matrix = [];
     let seatNumber = 1;
 
@@ -37,8 +37,8 @@ const Seat = ({ timeSlot }) => {
   };
 
   useEffect(() => {
-    setSeats(generateSeatMatrix(timeSlot));
-  }, [timeSlot]);
+    setSeats(generateSeatMatrix(timeSlot, rowCount, colCount));
+  }, [timeSlot, rowCount, colCount]);
 
   const toggleSeat = (row, col) => {
     const updatedSeats = [...seats];
@@ -57,6 +57,23 @@ const Seat = ({ timeSlot }) => {
   const totalSeats = seats?.length * (seats[0]?.length || 0);
   const allottedSeats = seats?.flat().filter((seat) => seat.occupied).length || 0;
 
+  // Handle adding/removing rows and columns
+  const handleAddRow = () => {
+    setRowCount((prevRowCount) => prevRowCount + 1);
+  };
+
+  const handleRemoveRow = () => {
+    if (rowCount > 1) setRowCount((prevRowCount) => prevRowCount - 1);
+  };
+
+  const handleAddColumn = () => {
+    setColCount((prevColCount) => prevColCount + 1);
+  };
+
+  const handleRemoveColumn = () => {
+    if (colCount > 1) setColCount((prevColCount) => prevColCount - 1);
+  };
+
   if (!seats || seats.length === 0) {
     return <p>Loading seat layout...</p>;
   }
@@ -66,13 +83,13 @@ const Seat = ({ timeSlot }) => {
       <h3 className="text-2xl font-bold mb-4">{timeSlot} Seat Layout</h3>
       <p className="text-lg mb-4">Seats available for {timeSlot}.</p>
 
-      <div className="flex gap-6 mb-6">
-        <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg w-1/2 text-center">
+      <div className="flex gap-6 mb-6 flex-wrap sm:flex-nowrap">
+        <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg w-full sm:w-1/2 text-center mb-4 sm:mb-0">
           <p className="text-xl font-semibold">Total Seats</p>
           <p className="text-4xl font-bold">{totalSeats}</p>
         </div>
         <div
-          className={`p-6 rounded-lg shadow-lg w-1/2 text-center ${
+          className={`p-6 rounded-lg shadow-lg w-full sm:w-1/2 text-center ${
             allottedSeats > 0 ? "bg-red-500" : "bg-green-500"
           } text-white`}
         >
@@ -81,13 +98,40 @@ const Seat = ({ timeSlot }) => {
         </div>
       </div>
 
-      <table className="table-auto border-collapse border border-gray-300 w-full">
+      <div className="flex justify-center mb-6 flex-wrap gap-4">
+        <button
+          onClick={handleAddRow}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+        >
+          Add Row
+        </button>
+        <button
+          onClick={handleRemoveRow}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full sm:w-auto"
+        >
+          Remove Row
+        </button>
+        <button
+          onClick={handleAddColumn}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+        >
+          Add Column
+        </button>
+        <button
+          onClick={handleRemoveColumn}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full sm:w-auto"
+        >
+          Remove Column
+        </button>
+      </div>
+
+      <table className="table-auto border-collapse border border-gray-300 w-full overflow-x-auto">
         <thead>
           <tr>
-            <th className="py-2 px-4 border">#</th>
-            {Array.from({ length: seats[0].length }).map((_, colIndex) => (
+            <th className="py-2 px-4 border"></th>
+            {Array.from({ length: colCount }).map((_, colIndex) => (
               <th key={colIndex} className="py-2 px-4 border">
-                Col {colIndex + 1}
+                {/* Col {colIndex + 1} */}
               </th>
             ))}
           </tr>
@@ -95,7 +139,7 @@ const Seat = ({ timeSlot }) => {
         <tbody>
           {seats.map((row, rowIndex) => (
             <tr key={rowIndex}>
-              <td className="py-2 px-4 border">{`Row ${rowIndex + 1}`}</td>
+              <td className="py-2 px-4 border">{` `}</td>
               {row.map((seat, colIndex) => (
                 <td
                   key={colIndex}
@@ -111,7 +155,7 @@ const Seat = ({ timeSlot }) => {
           ))}
         </tbody>
       </table>
-      
+
       {selectedSeat && (
         <div
           className="relative z-10"

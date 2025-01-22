@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {  FaUser, FaEnvelope, FaCog, FaQuestionCircle, FaSignOutAlt,FaSearch } from "react-icons/fa";
+import { FaUser, FaEnvelope,   FaSignOutAlt, FaSearch, FaBook, FaFile, FaPage4, FaPager, FaBookmark, FaBookDead } from "react-icons/fa";
 import AddLibraryForm from "../../auth/AddLibraryForm";
 
 const SidebarLayout = () => {
@@ -9,11 +9,12 @@ const SidebarLayout = () => {
 
   const menuItems = [
     { name: "Profile", icon: <FaUser />, path: "/profile" },
-    { name: "Search", icon: <FaSearch />, path: "/library/dashboard" },
-    { name: "Messages", icon: <FaEnvelope />, path: "/messages" },
-    { name: "Settings", icon: <FaCog />, path: "/settings" },
-    { name: "Help", icon: <FaQuestionCircle />, path: "/help" },
-    { name: "Logout", icon: <FaSignOutAlt />, path: "/logout" },
+    { name: "Library Seat No", icon: <FaSearch />, path: "/library/dashboard" },
+    { name: "Exam ID", icon: <FaPager />, path: "/messages" },
+    { name: "Attendance", icon: <FaFile />, path: "/settings" },
+    { name: "Book Read/Load", icon: <FaBook />, path: "/help" },
+    { name: "Account", icon: <FaBookDead />, path: "/logout" },
+    { name: "Enquiry", icon: <FaSignOutAlt />, path: "/logout" },
   ];
 
   return (
@@ -63,7 +64,7 @@ const SidebarLayout = () => {
         <h2 className="text-2xl font-semibold mb-4">Dashboard</h2>
         <p className="text-gray-600">
           Welcome to your dashboard! Use the navigation on the left to explore.
-          <AddLibraryForm/>
+          <AddLibraryForm />
         </p>
       </main>
     </div>

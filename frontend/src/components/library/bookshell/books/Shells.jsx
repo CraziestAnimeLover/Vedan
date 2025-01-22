@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import BookList from "./BookList";
+import BookModal from "./BookModal";
 
-const BookListSection = ({ onBookClick }) => {
+const Shells = () => {
   const books = useSelector((state) => state.books.items);
   const status = useSelector((state) => state.books.status);
+  const [selectedBook, setSelectedBook] = useState(null);
+
+  const handleBookClick = (book) => {
+    setSelectedBook(book); // Set the selected book to display in the modal
+  };
+
+  const closeModal = () => {
+    setSelectedBook(null); // Close the modal by setting the selected book to null
+  };
 
   if (status === "loading") {
     return (
@@ -32,23 +42,14 @@ const BookListSection = ({ onBookClick }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg text-gray-800">
       <h2 className="text-xl font-semibold mb-4">Books Available</h2>
-      {books.length > 0 ? (
-        <ul className="space-y-2">
-          {books.map((book, index) => (
-            <li
-              key={book.id}
-              onClick={() => onBookClick(book)} // Trigger book selection
-              className="cursor-pointer hover:bg-gray-200 p-2 rounded"
-            >
-              {index + 1}. {book.title}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500 text-center">No books found.</p>
-      )}
+
+      {/* Render Book List */}
+      <BookList books={books} onBookClick={handleBookClick} />
+
+      {/* Show Book Modal if a book is selected */}
+      {selectedBook && <BookModal book={selectedBook} onClose={closeModal} />}
     </div>
   );
 };
 
-export default BookListSection;
+export default Shells;
