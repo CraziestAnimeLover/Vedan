@@ -1,23 +1,29 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
 
-import connectDB from './utils/db.js';
-import bookRoute from './routes/book.routes.js';
-import userRoute from './routes/user.route.js';
-import companyRoute from './routes/company.route.js';
-import jobRoute from './routes/job.route.js';
-import planRouter from './routes/plan.routes.js'; 
-import bookRoutes from './routes/book.routes.js';
-import loanRoutes from './routes/loan.routes.js'; // Ensure the path is correct
-import ticketRoutes from './routes/ticketRoutes.js';
-import Library from './models/library.model.js';  // <-- Import the Library model
-import { Attendance } from './models/attendanceSchema.model.js';
+import connectDB from "./utils/db.js";
+import bookRoute from "./routes/book.routes.js";
+import userRoute from "./routes/user.route.js";
+import companyRoute from "./routes/company.route.js";
+import jobRoute from "./routes/job.route.js";
+import planRouter from "./routes/plan.routes.js";
+import bookRoutes from "./routes/book.routes.js";
+import loanRoutes from "./routes/loan.routes.js"; // Ensure the path is correct
+import ticketRoutes from "./routes/ticketRoutes.js";
+import Library from "./models/library.model.js"; // <-- Import the Library model
+import studentRoutes from './routes/student.routes.js'; // Your student routes
+import seatRoutes from './routes/seat.routes.js'; // Your seat booking routes
+import { Attendance } from "./models/attendanceSchema.model.js";
 
-import FeeData from './models/feeDataSchema.model.js';  // <-- Import the FeeData model
+import FeeData from "./models/feeDataSchema.model.js"; // <-- Import the FeeData model
 
-import { isAuthenticated, isLibrarian, isStudent } from './middlewares/isAuthenticated.js';
+import {
+  isAuthenticated,
+  isLibrarian,
+  isStudent,
+} from "./middlewares/isAuthenticated.js";
 
 dotenv.config();
 
@@ -29,233 +35,290 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS Configuration
-const allowedOrigins = ['http://localhost:5173', 'https://www.vedann.com'];
+const allowedOrigins = ["http://localhost:5173", "https://www.vedann.com"];
 
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
 
 // Routes
-app.get('/home', (req, res) => {
-    return res.status(200).json({
-        message: 'Welcome',
-        success: true,
-    });
+app.get("/home", (req, res) => {
+  return res.status(200).json({
+    message: "Welcome",
+    success: true,
+  });
 });
 
 // Book Management Routes
-app.use('/api/v1/library/books', bookRoute);
+app.use("/api/v1/library/books", bookRoute);
 
 // User, Company, and Job Routes
-app.use('/api/v1/user', userRoute);
-app.use('/api/v1/company', companyRoute);
-app.use('/api/v1/job', jobRoute);
-app.use('/plans', planRouter);
-app.use('/api/books', bookRoutes);
-app.use('/api/loans', loanRoutes);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/company", companyRoute);
+app.use("/api/v1/job", jobRoute);
+app.use("/plans", planRouter);
+app.use("/api/books", bookRoutes);
+app.use("/api/loans", loanRoutes);
 app.use(ticketRoutes);
+
+// Use routes
+app.use('/api/student', studentRoutes);  // Ensure the student routes are included
+app.use('/api/book-seat', seatRoutes);   // Ensure the seat booking routes are included
+
+app.use('/update-library-profile', userRoute);
+app.get("/update-library-profile", async (req, res) => {
+  try {
+    const { userId } = req.query; // Get the userId from the query parameters
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    // Find the user by their ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Send the user data in the response
+    return res.status(200).json({
+      message: "User data retrieved successfully",
+      user: user, // Send the user object
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return res.status(500).json({ message: "Error during retrieval" });
+  }
+});
+
+app.put("/update-library-profile", async (req, res) => {
+  try {
+    // Update logic here (e.g., updating user or other data)
+    res.status(200).json({ message: "Update successful" });
+  } catch (error) {
+    console.error("Error updating:", error);
+    res.status(500).json({ message: "Error during update" });
+  }
+});
+
 // Fee Data Endpoints
-app.post('/api/update-fees', async (req, res) => {
-    const { month, data } = req.body;
+app.post("/api/update-fees", async (req, res) => {
+  const { month, data } = req.body;
 
-    // Validation
-    if (!month || !data) {
-        return res.status(400).json({ error: 'Month and data are required' });
-    }
+  // Validation
+  if (!month || !data) {
+    return res.status(400).json({ error: "Month and data are required" });
+  }
 
-    try {
-        // Check if fee data already exists for the given month
-        let feeEntry = await FeeData.findOne({ month });
- console.log(feeEntry)
-        if (feeEntry) {
-            // If the data exists, update it
-            feeEntry.data = data;
-            await feeEntry.save();
-            return res.status(200).json({ message: `Data for ${month} updated successfully.` });
-        } else {
-            // If no data exists, create a new entry
-            feeEntry = new FeeData({ month, data });
-            await feeEntry.save();
-            return res.status(201).json({ message: `Data for ${month} created successfully.` });
-        }
-    } catch (error) {
-        console.error('Error updating fee data:', error);
-        return res.status(500).json({ error: 'Something went wrong while updating fee data.' });
+  try {
+    // Check if fee data already exists for the given month
+    let feeEntry = await FeeData.findOne({ month });
+    console.log(feeEntry);
+    if (feeEntry) {
+      // If the data exists, update it
+      feeEntry.data = data;
+      await feeEntry.save();
+      return res
+        .status(200)
+        .json({ message: `Data for ${month} updated successfully.` });
+    } else {
+      // If no data exists, create a new entry
+      feeEntry = new FeeData({ month, data });
+      await feeEntry.save();
+      return res
+        .status(201)
+        .json({ message: `Data for ${month} created successfully.` });
     }
+  } catch (error) {
+    console.error("Error updating fee data:", error);
+    return res
+      .status(500)
+      .json({ error: "Something went wrong while updating fee data." });
+  }
 });
 
-app.get('/api/fees', async (req, res) => {
-    try {
-        const fees = await FeeData.find();
-        return res.status(200).json({ success: true, fees });
-    } catch (error) {
-        console.error('Error fetching fee data:', error);
-        return res.status(500).json({ success: false, error: 'Something went wrong while fetching fee data.' });
-    }
+app.get("/api/fees", async (req, res) => {
+  try {
+    const fees = await FeeData.find();
+    return res.status(200).json({ success: true, fees });
+  } catch (error) {
+    console.error("Error fetching fee data:", error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error: "Something went wrong while fetching fee data.",
+      });
+  }
 });
 
-
+// After successful login
+app.post("/login", (req, res) => {
+  const token = generateToken(); // Replace with your token generation logic
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+    maxAge: 3600000, // 1 hour cookie expiration
+  });
+  res.json({ message: "Logged in successfully" });
+});
 
 // Endpoint to save attendance
 
-app.post('/api/save-attendance', async (req, res) => {
-    const { attendanceList } = req.body;
-  
-    // Check if attendanceList is present and not empty
-    if (!attendanceList || attendanceList.length === 0) {
-      return res.status(400).json({ message: "Attendance list is empty" });
-    }
-  
-    // Loop through each entry and check for missing required fields
-    for (let entry of attendanceList) {
-      if (!entry.id || !entry.name || !entry.timeIn || !entry.timeOut) {
-        return res.status(400).json({ message: "All fields (id, name, timeIn, timeOut) are required" });
-      }
-    }
-  
-    try {
-      // If validation passes, save the data
-      await Attendance.insertMany(attendanceList);
-      res.status(200).json({ message: "Attendance saved successfully" });
-    } catch (error) {
-      console.error("Error saving attendance:", error);
-      res.status(500).json({ message: "Error saving attendance" });
-    }
-  });
-  
-  
-  
-  // Start the server
- ;
+app.post("/api/save-attendance", async (req, res) => {
+  const { attendanceList } = req.body;
 
+  // Check if attendanceList is present and not empty
+  if (!attendanceList || attendanceList.length === 0) {
+    return res.status(400).json({ message: "Attendance list is empty" });
+  }
 
-// Library Management Endpoints
-app.post('/api/add-library', async (req, res) => {
-    const { pincode, timeSlot, dateJoining, fee } = req.body;
-
-    try {
-        const newLibrary = new Library({
-            pincode,
-            timeSlot,
-            dateJoining,
-            fee,
-        });
-
-        await newLibrary.save();
-
-        return res.status(201).json({
-            success: true,
-            message: 'Library added successfully!',
-            library: newLibrary,
-        });
-    } catch (error) {
-        console.error('Error adding library:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Something went wrong while adding the library.',
+  // Loop through each entry and check for missing required fields
+  for (let entry of attendanceList) {
+    if (!entry.id || !entry.name || !entry.timeIn || !entry.timeOut) {
+      return res
+        .status(400)
+        .json({
+          message: "All fields (id, name, timeIn, timeOut) are required",
         });
     }
+  }
+
+  try {
+    // If validation passes, save the data
+    await Attendance.insertMany(attendanceList);
+    res.status(200).json({ message: "Attendance saved successfully" });
+  } catch (error) {
+    console.error("Error saving attendance:", error);
+    res.status(500).json({ message: "Error saving attendance" });
+  }
 });
 
-app.get('/api/libraries', async (req, res) => {
-    try {
-        const libraries = await Library.find();
-        return res.status(200).json({
-            success: true,
-            libraries,
-        });
-    } catch (error) {
-        console.error('Error fetching libraries:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Something went wrong while fetching libraries.',
-        });
-    }
+// Start the server
+// Library Management Endpoints
+app.post("/api/add-library", async (req, res) => {
+  const { pincode, timeSlot, dateJoining, fee } = req.body;
+
+  try {
+    const newLibrary = new Library({
+      pincode,
+      timeSlot,
+      dateJoining,
+      fee,
+    });
+
+    await newLibrary.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Library added successfully!",
+      library: newLibrary,
+    });
+  } catch (error) {
+    console.error("Error adding library:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while adding the library.",
+    });
+  }
+});
+
+app.get("/api/libraries", async (req, res) => {
+  try {
+    const libraries = await Library.find();
+    return res.status(200).json({
+      success: true,
+      libraries,
+    });
+  } catch (error) {
+    console.error("Error fetching libraries:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching libraries.",
+    });
+  }
 });
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        message: 'Something went wrong!',
-        success: false,
-    });
+  console.error(err.stack);
+  res.status(500).json({
+    message: "Something went wrong!",
+    success: false,
+  });
 });
 
 // In-memory storage for plans
 let plans = [
-    { id: 1, name: "Basic Plan", fee: 1000, free: 0, affordable: 500, standard: 800, premium: 1200 },
-    { id: 2, name: "Premium Plan", fee: 2000, free: 0, affordable: 1000, standard: 1500, premium: 2000 },
-  ];
-  
-  // 1. Endpoint to add a new plan
-  app.post('/plans', (req, res) => {
-    // Handle plan addition logic here
-    const newPlan = req.body;
-    // Save the plan to the database or in-memory storage
-    res.status(201).json(newPlan);  // Send back the newly added plan
-  });
-  
-  
-  // 2. Endpoint to get all plans
-  app.get("/plans", (req, res) => {
-    res.status(200).json(plans);
-  });
-  
-  // 3. Endpoint to apply a waiver
-  app.put("/plans/:id/waive", (req, res) => {
-    const { id } = req.params;
-    const { waiverAmount } = req.body;
-    
-    const planIndex = plans.findIndex(plan => plan.id === parseInt(id));
-    if (planIndex !== -1) {
-      plans[planIndex].fee -= waiverAmount;
-      res.status(200).json(plans[planIndex]);
-    } else {
-      res.status(404).json({ message: "Plan not found" });
-    }
-  });
+  {
+    id: 1,
+    name: "Basic Plan",
+    fee: 1000,
+    free: 0,
+    affordable: 500,
+    standard: 800,
+    premium: 1200,
+  },
+  {
+    id: 2,
+    name: "Premium Plan",
+    fee: 2000,
+    free: 0,
+    affordable: 1000,
+    standard: 1500,
+    premium: 2000,
+  },
+];
 
+// 1. Endpoint to add a new plan
+app.post("/plans", (req, res) => {
+  // Handle plan addition logic here
+  const newPlan = req.body;
+  // Save the plan to the database or in-memory storage
+  res.status(201).json(newPlan); // Send back the newly added plan
+});
 
+// 2. Endpoint to get all plans
+app.get("/plans", (req, res) => {
+  res.status(200).json(plans);
+});
 
+// 3. Endpoint to apply a waiver
+app.put("/plans/:id/waive", (req, res) => {
+  const { id } = req.params;
+  const { waiverAmount } = req.body;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  const planIndex = plans.findIndex((plan) => plan.id === parseInt(id));
+  if (planIndex !== -1) {
+    plans[planIndex].fee -= waiverAmount;
+    res.status(200).json(plans[planIndex]);
+  } else {
+    res.status(404).json({ message: "Plan not found" });
+  }
+});
 
 // Start Server
 const PORT = process.env.PORT || 8000;
 
 connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error('Database connection error:', err);
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err);
+  });

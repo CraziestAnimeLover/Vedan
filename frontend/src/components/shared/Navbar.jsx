@@ -32,7 +32,7 @@ const Navbar = () => {
     };
 
     return (
-        <div className="bg-white  shadow-xl sticky top-0 z-50 ">
+        <div className="bg-white shadow-xl sticky top-0 z-50">
             <div className="flex items-center justify-between mx-auto max-w-7xl h-24 p-4 md:p-0 relative">
                 {/* Center Section (Logo and Vedann) */}
                 <div className="absolute left-0 transform-none md:left-1/2 md:transform -translate-x-1/2 flex items-center gap-2">
@@ -91,7 +91,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col my-2 text-gray-600'>
-                                    {user && (
+                                    {user && user.role !== 'librarian' && (
                                         <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                             <User2 />
                                             <Button variant="link">
@@ -114,3 +114,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

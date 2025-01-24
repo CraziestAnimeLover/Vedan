@@ -3,9 +3,11 @@ import SeatForm from "./SeatForm";
 
 const Seat = ({ timeSlot }) => {
   const [seats, setSeats] = useState([]);
-  const [selectedSeat, setSelectedSeat] = useState(null); // For the modal
-  const [rowCount, setRowCount] = useState(5);  // Initial rows count
-  const [colCount, setColCount] = useState(5);  // Initial columns count
+  const [selectedSeat, setSelectedSeat] = useState(null);
+  const [rowCount, setRowCount] = useState(5);
+  const [colCount, setColCount] = useState(5);
+  const [searchTerm, setSearchTerm] = useState(""); // State for member search
+  const [foundSeat, setFoundSeat] = useState(null); // State for found seat
 
   const generateSeatMatrix = (timeSlot, rows, cols) => {
     const matrix = [];
@@ -17,6 +19,7 @@ const Seat = ({ timeSlot }) => {
         const seat = {
           number: seatNumber++,
           occupied: false,
+          memberName: null, // Assume you can store the member name here
         };
 
         if (timeSlot === "Morning" && i === 0) {
@@ -40,18 +43,17 @@ const Seat = ({ timeSlot }) => {
     setSeats(generateSeatMatrix(timeSlot, rowCount, colCount));
   }, [timeSlot, rowCount, colCount]);
 
-  const toggleSeat = (row, col) => {
-    const updatedSeats = [...seats];
-    updatedSeats[row][col].occupied = !updatedSeats[row][col].occupied;
-    setSeats(updatedSeats);
+  const handleSearch = () => {
+    const found = seats.flat().find((seat) => seat.memberName === searchTerm);
+    setFoundSeat(found || null); // Set found seat or null if not found
   };
 
   const handleSeatClick = (rowIndex, colIndex) => {
-    setSelectedSeat(seats[rowIndex][colIndex]); // Set selected seat for the form
+    setSelectedSeat(seats[rowIndex][colIndex]);
   };
 
   const closeForm = () => {
-    setSelectedSeat(null); // Reset selectedSeat to close the modal
+    setSelectedSeat(null);
   };
 
   const totalSeats = seats?.length * (seats[0]?.length || 0);
@@ -83,21 +85,48 @@ const Seat = ({ timeSlot }) => {
       <h3 className="text-2xl font-bold mb-4">{timeSlot} Seat Layout</h3>
       <p className="text-lg mb-4">Seats available for {timeSlot}.</p>
 
-      <div className="flex gap-6 mb-6 flex-wrap sm:flex-nowrap">
-        <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg w-full sm:w-1/2 text-center mb-4 sm:mb-0">
+      {/* Search Bar */}
+      <div className="mb-6 flex justify-center">
+        <input
+          type="text"
+          placeholder="Enter Member ID"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg"
+        />
+        <button
+          onClick={handleSearch}
+          className="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Search
+        </button>
+      </div>
+
+      {/* Display Search Result */}
+      {foundSeat && (
+        <div className="bg-green-500 text-white p-6 rounded-lg shadow-lg mb-6">
+          <p className="text-xl font-semibold">Seat Details</p>
+          <p>Seat Number: {foundSeat.number}</p>
+          <p>Status: {foundSeat.occupied ? "Occupied" : "Available"}</p>
+          <p>Booked By: {foundSeat.memberName || "N/A"}</p>
+        </div>
+      )}
+
+      {/* Information boxes */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg w-full text-center">
           <p className="text-xl font-semibold">Total Seats</p>
           <p className="text-4xl font-bold">{totalSeats}</p>
         </div>
         <div
-          className={`p-6 rounded-lg shadow-lg w-full sm:w-1/2 text-center ${
-            allottedSeats > 0 ? "bg-red-500" : "bg-green-500"
-          } text-white`}
+          className={`p-6 rounded-lg shadow-lg w-full text-center ${allottedSeats > 0 ? "bg-red-500" : "bg-green-500"} text-white`}
         >
           <p className="text-xl font-semibold">Allotted (Occupied) Seats</p>
           <p className="text-4xl font-bold">{allottedSeats}</p>
         </div>
       </div>
 
+      {/* Control Buttons */}
       <div className="flex justify-center mb-6 flex-wrap gap-4">
         <button
           onClick={handleAddRow}
@@ -125,56 +154,41 @@ const Seat = ({ timeSlot }) => {
         </button>
       </div>
 
-      <table className="table-auto border-collapse border border-gray-300 w-full overflow-x-auto">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border"></th>
-            {Array.from({ length: colCount }).map((_, colIndex) => (
-              <th key={colIndex} className="py-2 px-4 border">
-                {/* Col {colIndex + 1} */}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {seats.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td className="py-2 px-4 border">{` `}</td>
-              {row.map((seat, colIndex) => (
-                <td
-                  key={colIndex}
-                  className={`py-2 px-4 border cursor-pointer ${
-                    seat.occupied ? "bg-red-200" : "bg-green-200"
-                  }`}
-                  onClick={() => handleSeatClick(rowIndex, colIndex)}
-                >
-                  {seat.number}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Seat Layout Table */}
+      <div className="overflow-x-auto">
+        <table className="table-auto border-collapse border border-gray-300 w-full">
+          <tbody>
+            {seats.map((row, rowIndex) => {
+              if (row.some((seat) => seat.number !== undefined)) {
+                return (
+                  <tr key={rowIndex}>
+                    {row.map((seat, colIndex) => (
+                      seat.number !== undefined && (
+                        <td
+                          key={colIndex}
+                          className={`py-2 px-4 border cursor-pointer ${seat.occupied ? "bg-red-200" : "bg-green-200"}`}
+                          onClick={() => handleSeatClick(rowIndex, colIndex)}
+                        >
+                          {seat.number}
+                        </td>
+                      )
+                    ))}
+                  </tr>
+                );
+              }
+              return null;
+            })}
+          </tbody>
+        </table>
+      </div>
 
+      {/* Modal Form */}
       {selectedSeat && (
-        <div
-          className="relative z-10"
-          aria-labelledby="modal-title"
-          role="dialog"
-          aria-modal="true"
-        >
-          {/* Background Overlay with fade-in animation */}
-          <div
-            className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-0 animate-fade-in"
-            aria-hidden="true"
-          ></div>
-
-          {/* Modal Content with slide-up animation */}
+        <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-0 animate-fade-in" aria-hidden="true"></div>
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div
-                className="relative transform overflow-hidden rounded-lg bg-gray-100 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg animate-slide-up"
-              >
+              <div className="relative transform overflow-hidden rounded-lg bg-gray-100 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg animate-slide-up">
                 <div className="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <SeatForm seatNumber={selectedSeat.number} onClose={closeForm} />
                 </div>

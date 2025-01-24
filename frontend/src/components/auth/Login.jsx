@@ -29,13 +29,13 @@ const Login = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-
+    
         // Validate inputs
         if (!input.email || !input.password) {
             toast.error("Email and password are required.");
             return;
         }
-
+    
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(input.email)) {
             toast.error("Please enter a valid email address.");
@@ -43,23 +43,42 @@ const Login = () => {
         }
     
         try {
-            dispatch(setLoading(true));
+            dispatch(setLoading(true)); // Set loading state
             const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
                 headers: { 'Content-Type': "application/json" },
-                withCredentials: true,
+                withCredentials: true,  // Add credentials if using cookies for token
             });
+    
             if (res.data.success) {
-                dispatch(setAuthUser(res.data.user))
+                // Store token securely (e.g., via httpOnly cookie or sessionStorage)
+                localStorage.setItem('token', res.data.token); // You may want to use sessionStorage instead of localStorage for session-based login
+    
+                // Dispatch user data to Redux store
+                dispatch(setAuthUser(res.data.user));
+    
+                // Redirect to select page after successful login
                 navigate("/select");
+    
+                // Show success message
                 toast.success(res.data.message);
+            } else {
+                // If success flag is false, handle appropriately
+                toast.error(res.data.message || "Login failed. Please try again.");
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response?.data?.message || "An error occurred.");
+    
+            // Better error handling, check for network errors or response errors
+            if (!error.response) {
+                toast.error("Network error. Please try again later.");
+            } else {
+                toast.error(error.response?.data?.message || "An error occurred.");
+            }
         } finally {
-            dispatch(setLoading(false));
+            dispatch(setLoading(false)); // Reset loading state
         }
     }
+    
 
     useEffect(() => {
         if (user) {
@@ -106,7 +125,13 @@ const Login = () => {
                     )
                 }
                 
-                <span className='text-sm'>Already have an account? <Link to="/register" className='text-blue-600'>Signup</Link></span>
+                <span className='text-sm'>
+  Don't have an account? 
+  <Link to="/register" className='text-blue-600 hover:underline'>
+    Sign Up
+  </Link>
+</span>
+
                 
                 {/* Forgot password link */}
                 <div className="mt-4 text-center">

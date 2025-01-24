@@ -1,34 +1,25 @@
 import express from "express";
-import { login,  logout,  register, updateProfile,forgotPassword ,resetPassword} from "../controllers/user.controller.js";
+import { login, logout, register, updateProfile, forgotPassword, resetPassword, updateLibraryProfile } from "../controllers/user.controller.js";
 import { isAuthenticated, isLibrarian, isStudent } from '../middlewares/isAuthenticated.js';
-
 import { singleUpload } from "../middlewares/mutler.js";
- 
+
 const router = express.Router();
 
-router.route("/register").post(singleUpload,register);
+// Register, login, logout
+router.route("/register").post(singleUpload, register);
 router.route("/login").post(login);
 router.route("/logout").get(logout);
-router.route("/profile/update").post(isAuthenticated,singleUpload,updateProfile);
-router.put('/profile/update', isAuthenticated, singleUpload, updateProfile);
 
+// Profile update routes (separate paths for different updates)
+router.put('/update-profile', isAuthenticated, singleUpload, updateProfile); // Regular profile update
+router.put('/update-library-profile', isAuthenticated, singleUpload, updateLibraryProfile); // Library profile update
 
-
-// Forgot Password & Reset Password routes
-// In your user.routes.js (or equivalent)
-router.post('/library', isAuthenticated, isLibrarian);  // Example route
-router.get('/libraries', isAuthenticated, isStudent); // Another example route
-
+// Forgot password and reset password routes
 router.route("/forgot-password").post(forgotPassword);
-
 router.route("/reset-password/:token").post(resetPassword);
 
-// router.route("/reset-password/:token").post((req, res, next) => {
-//     console.log("Reset Password Route Hit:", req.params.token);
-//     next();
-// }, resetPassword);  // Reset password
-
-
-
+// Example route (Librarian / Student checks)
+router.post('/library', isAuthenticated, isLibrarian);  // Example route for Librarian
+router.get('/libraries', isAuthenticated, isStudent);   // Example route for Student
 
 export default router;

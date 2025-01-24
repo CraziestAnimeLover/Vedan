@@ -36,6 +36,7 @@ import BookList from './components/library/bookshell/books/BookList'
 import LibraryProfile from './components/library/profile/libmgtprofile/LibraryProfile'
 import LoanBook from './components/library/bookloan/LoanBook'
 import FakeTicketEnquiry from './components/library/enquiry/FakeTicketEnquiry'
+import Shells from './components/library/bookshell/books/Shells'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -104,8 +105,8 @@ const approuter = createBrowserRouter([
     element: <LoanBook/>
   },
   {
-    path: "/mgtservice/mgtlibrary/bookshell/books",
-    element: <BookList books={[]} />, // Pass filteredBooks as state or use context here
+    path: "/mgtservice/mgtlibrary/bookshells",
+    element: <Shells/>, // Pass filteredBooks as state or use context here
   },
   {
     path: "/mgtservice/mgtlibrary/enquiry",

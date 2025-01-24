@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../../shared/Navbar';
 import SeatNavbar from './SeatNavbar';
+import CircularSeat from './CircularSeat';
 
 const SeatChart = () => {
   // Mock seat data for rows and columns (with more realistic dimensions)
@@ -77,7 +78,7 @@ const SeatChart = () => {
     <div>
     <Navbar/>
     <SeatNavbar/>
-   
+   <CircularSeat timeSlot="Morning"/>
     </div>
   );
 };

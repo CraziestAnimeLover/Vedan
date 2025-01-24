@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import Shells from "../bookshell/books/Shells";
 
 const Attendance = () => {
   const [attendanceList, setAttendanceList] = useState([]);
@@ -200,6 +201,7 @@ const Attendance = () => {
               Submit Attendance
             </button>
           </div>
+          <Shells/>
         </div>
       </div>
     </>

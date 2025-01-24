@@ -104,7 +104,7 @@ export const login = async (req, res) => {
         return res.status(200).cookie("token", token, { 
             maxAge: 86400000, 
             httpOnly: true, 
-            sameSite: 'strict', 
+            sameSite: 'None', 
             secure: process.env.NODE_ENV === 'production' // Ensure cookies are only secure in production
         }).json({
             message: `Welcome back ${user.fullname}`,
@@ -226,40 +226,41 @@ export const resetPassword = async (req, res) => {
 // Update Profile Function
   // For password hashing (if needed)
 
-export const updateProfile = async (req, res) => {
-  try {
-    const { userId } = req.user;  // Get the user ID from the token
-
-    // Prepare the updated profile data
-    const updatedData = {
-      fullname: req.body.fullname || req.user.fullname,
-      email: req.body.email || req.user.email,
-      phoneNumber: req.body.phoneNumber || req.user.phoneNumber,
-      role: req.body.role || req.user.role,
-      vedanId: req.body.vedanId || req.user.vedanId,
-      profile: req.body.profile || req.user.profile,
-    };
-
-    if (req.file) {
-      // If there's a file uploaded, handle it (e.g., profile picture)
-      updatedData.profilePhoto = req.file.path;  // assuming file is uploaded to a folder and path is stored
+  export const updateProfile = async (req, res) => {
+    try {
+      const { userId } = req.user;  // Get the user ID from the token
+  
+      // Prepare the updated profile data
+      const updatedData = {
+        fullname: req.body.fullname || req.user.fullname,
+        email: req.body.email || req.user.email,
+        phoneNumber: req.body.phoneNumber || req.user.phoneNumber,
+        role: req.body.role || req.user.role,
+        vedanId: req.body.vedanId || req.user.vedanId,
+        profile: req.body.profile || req.user.profile,
+      };
+  
+      if (req.file) {
+        // If there's a file uploaded, handle it (e.g., profile picture)
+        updatedData.profilePhoto = req.file.path;  // assuming file is uploaded to a folder and path is stored
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json({
+        message: 'Profile updated successfully',
+        updatedUser,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error updating profile' });
     }
-
-    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.json({
-      message: 'Profile updated successfully',
-      updatedUser,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error updating profile' });
-  }
-};
+  };
+  
 
 
   
@@ -279,13 +280,17 @@ export const authorize = (roles) => {
 // Profile Update Function for Librarian/Student
 export const updateLibraryProfile = async (req, res) => {
     const { mobile, email, social, address, GST, PAN, Name, VedanId } = req.body;
-    const userId = req.userId; // Assuming middleware sets req.userId from the JWT token
+    const userId = req.userId;  // Assuming middleware sets req.userId from the JWT token
 
     try {
         let user = await User.findById(userId);
-
         if (!user) {
             return res.status(400).json({ message: "User not found.", success: false });
+        }
+
+        // Validate required fields
+        if (!mobile && !email && !address) {
+            return res.status(400).json({ message: "At least one field (mobile, email, address) is required.", success: false });
         }
 
         // Update fields based on the role
@@ -295,10 +300,10 @@ export const updateLibraryProfile = async (req, res) => {
         if (address) user.profile.address = address;
 
         // Only allow GST/PAN/Founder ID to be updated if the role is 'librarian' or 'founder'
-        if (user.role === 'librarian') {
-            if (GST) user.profile.GST = GST;
-            if (PAN) user.profile.PAN = PAN;
+        if (user.role === 'librarian' && (!GST || !PAN)) {
+            return res.status(400).json({ message: "GST and PAN are required for Librarians.", success: false });
         }
+        
 
         // Update founder details if role is 'founder'
         if (user.role === 'founder') {
@@ -306,19 +311,15 @@ export const updateLibraryProfile = async (req, res) => {
             if (VedanId) user.profile.VedanId = VedanId;
         }
 
+        // Handle profile image upload if provided
+        if (req.file) {
+            // Assuming file is uploaded to a folder and path is stored
+            user.profile.profilePhoto = req.file.path;
+        }
+
         await user.save();
 
-        user = {
-            _id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            profile: user.profile,
-            role: user.role,
-            vedannId: user.vedannId,
-        };
-
-        return res.status(200).json({
+        res.status(200).json({
             message: "Profile updated successfully.",
             user,
             success: true
@@ -328,3 +329,4 @@ export const updateLibraryProfile = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+

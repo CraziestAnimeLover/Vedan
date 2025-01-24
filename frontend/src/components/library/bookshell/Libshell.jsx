@@ -6,7 +6,6 @@ import AddBook from "./books/AddBook";
 import BookListSection from "./books/BookListSection";
 import Shells from "./books/Shells";
 
-
 const Libshell = () => {
   const dispatch = useDispatch();
   const books = useSelector((state) => state.books?.list || []);
@@ -51,6 +50,18 @@ const Libshell = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Format Book ID function
+  const formatBookId = (index) => {
+    // Get the current year
+    const currentYear = new Date().getFullYear();
+    
+    // Generate the book number with leading zeros, starting from 00001, 00002, etc.
+    const bookNumber = (index + 1).toString().padStart(2, "0");
+
+    // Construct the book ID as (YYYYBXXXXX)
+    return `(${currentYear}प${bookNumber})`;
+  };
 
   return (
     <>
@@ -113,6 +124,7 @@ const Libshell = () => {
                 <p className="text-gray-700 mb-2"><strong>Price:</strong> ${selectedBook.price}</p>
                 <p className="text-gray-700 mb-2"><strong>Copies:</strong> {selectedBook.copies}</p>
                 <p className="text-gray-700 mb-2"><strong>Pages:</strong> {selectedBook.pages}</p>
+                <p className="text-gray-700 mb-2"><strong>Book ID:</strong> {formatBookId(books.findIndex(b => b._id === selectedBook._id))}</p>
               </div>
             )}
 
@@ -133,7 +145,7 @@ const Libshell = () => {
             )}
           </div>
         </div>
-      <Shells/>
+      {/* <Shells/> */}
       </div>
     </>
   );
