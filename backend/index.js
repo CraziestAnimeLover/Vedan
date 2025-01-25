@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import bodyParser from 'body-parser';
 import connectDB from "./utils/db.js";
 import bookRoute from "./routes/book.routes.js";
 import userRoute from "./routes/user.route.js";
@@ -10,6 +10,7 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import planRouter from "./routes/plan.routes.js";
 import bookRoutes from "./routes/book.routes.js";
+
 import loanRoutes from "./routes/loan.routes.js"; // Ensure the path is correct
 import ticketRoutes from "./routes/ticketRoutes.js";
 import Library from "./models/library.model.js"; // <-- Import the Library model
@@ -33,7 +34,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use(bodyParser.json());
 // CORS Configuration
 const allowedOrigins = ["http://localhost:5173", "https://www.vedann.com"];
 
@@ -74,7 +75,9 @@ app.use(ticketRoutes);
 
 // Use routes
 app.use('/api/student', studentRoutes);  // Ensure the student routes are included
-app.use('/api/book-seat', seatRoutes);   // Ensure the seat booking routes are included
+app.use('/api', seatRoutes);   // Ensure the seat booking routes are included
+
+
 
 app.use('/update-library-profile', userRoute);
 app.get("/update-library-profile", async (req, res) => {
@@ -309,6 +312,52 @@ app.put("/plans/:id/waive", (req, res) => {
     res.status(404).json({ message: "Plan not found" });
   }
 });
+
+
+app.post('/api/create-role', async (req, res) => {
+  const { role } = req.body; // Get the role from the request body
+
+  try {
+    // Assuming you already have a user model with a role field
+    const user = await User.findById(req.user._id); // Replace with the actual user fetching logic, e.g. from token
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Assign the role to the user
+    user.role = role;  // Assuming 'role' is a field in your user schema
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Role created successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error creating role' });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Start Server
 const PORT = process.env.PORT || 8000;

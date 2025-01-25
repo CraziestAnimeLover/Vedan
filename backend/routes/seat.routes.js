@@ -1,10 +1,15 @@
-// seat.routes.js
 import express from 'express';
-import { bookSeat } from '../controllers/seat.controller.js'; // Controller for booking a seat
+import { bookSeat, getSeatBookings, getSeatBookingDetails } from '../controllers/seat.controller.js';
 
 const router = express.Router();
 
-// POST to book a seat
-router.post('/', bookSeat);
+// POST request to book a seat
+router.post('/book-seat', bookSeat);
+
+// GET request to fetch all seat bookings or filter by memberId
+router.get('/book-seat', getSeatBookings);
+
+// GET request to fetch seat booking details by seat number
+router.get('/book-seat-details/:seatNumber', getSeatBookingDetails);
 
 export default router;

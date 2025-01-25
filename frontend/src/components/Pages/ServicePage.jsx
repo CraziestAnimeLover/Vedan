@@ -1,119 +1,143 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../shared/Navbar";
-import { motion } from "framer-motion";
+import ProfileCard from "../library/profile/libmgtprofile/ProfileCard";
 
 const ServicePage = () => {
-  const [selectedService, setSelectedService] = useState(null);
-
-  const handleServiceClick = (service) => {
-    setSelectedService(service);
-  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <>
       <Navbar />
       <div className="flex min-h-screen">
-        {/* Left Sidebar */}
-        <div className="w-64 bg-gradient-to-r from-blue-200 to-purple-200 p-6">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">Services</h2>
-          <ul className="space-y-4">
+        {/* Backdrop when Sidebar is Open */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black opacity-50 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          ></div>
+        )}
+
+        {/* Left Sidebar (Responsive) */}
+        <div
+          className={`lg:w-64 w-full bg-gray-100 p-6 shadow-md transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0 transition-transform ease-in-out duration-300 fixed inset-0 z-10 mt-20 lg:relative lg:block`}
+        >
+          <ProfileCard />
+          <ul className="space-y-4 mt-6">
             {services.map((service) => (
-              <li key={service.title}>
-                <button
-                  onClick={() => handleServiceClick(service)}
-                  className="w-full text-left bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
-                >
+              <li key={service.title} className="relative group">
+                <button className="w-full text-left bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
                   {service.title}
                 </button>
+                {/* Display Items when Hovering over the Service */}
+                <div className="absolute left-full top-0 mt-1 w-56 bg-white shadow-lg rounded-md hidden group-hover:block">
+                  <ul className="space-y-2 p-4">
+                    {serviceItems[service.title]?.map((item) => (
+                      <li key={item.title}>
+                        <Link
+                          to={item.url}
+                          className="block text-blue-600 hover:text-blue-800"
+                        >
+                          {item.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Right Side Content */}
-        <div className="flex-1 p-8 bg-white">
-          <motion.h1
-            className="text-4xl font-bold text-center text-gray-800 mb-10"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            {selectedService ? selectedService.title : "Select a Service"}
-          </motion.h1>
+        {/* Mobile Hamburger Menu Button */}
+        <button
+          className="lg:hidden p-4 text-white bg-blue-500 rounded-full fixed top-5 right-4 z-50"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <div className="space-y-1">
+            <div className="w-6 h-1 bg-white"></div>
+            <div className="w-6 h-1 bg-white"></div>
+            <div className="w-6 h-1 bg-white"></div>
+          </div>
+        </button>
 
-          {/* Display Selected Service or Default Cards */}
-          {selectedService ? (
-            <motion.div
-              className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div
-                key={selectedService.title}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <Link to={selectedService.url} aria-label={`Go to ${selectedService.title}`}>
-                  <ServiceButton title={selectedService.title} />
-                </Link>
-              </motion.div>
-            </motion.div>
-          ) : (
-            // Default Cards for "Past", "Present", and "Future"
-            <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6">
-              {cards.map((card, index) => (
-                <motion.div
-                  key={card.title}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                >
-                  <div className="block bg-white text-gray-800 text-center py-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 hover:bg-gray-100">
-                    <h2 className="text-2xl font-semibold">{card.title}</h2>
-                    <p className="mt-4">{card.content}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+        {/* Right Side Content */}
+        <div className="flex-1 p-4 mt-16 bg-white">
+          {/* Default Cards for "Past", "Present", and "Future" */}
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6">
+            {cards.map((card) => (
+              <div key={card.title}>
+                <div className="block bg-gray-50 text-gray-800 text-center py-8 rounded shadow hover:shadow-lg h-40">
+                  <h2 className="text-lg font-semibold">{card.title}</h2>
+                  <p className="mt-2 text-sm cursor-pointer ">{card.content1}</p>
+                  <p className="mt-2 text-sm cursor-pointer">{card.content2}</p>
+                  <p className="mt-2 text-sm cursor-pointer">{card.content3}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>
   );
 };
 
-const ServiceButton = ({ title }) => (
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="block bg-white text-gray-800 text-center py-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 hover:bg-gray-100"
-  >
-    <h2 className="text-2xl font-semibold">{title} </h2>
-  </motion.div>
-);
-
 const services = [
-  { title: "Placement", url: "/service/student" },
+  { title: "Placement", url: "/industry" },
   { title: "Library", url: "/library" },
   { title: "Exam", url: "/industry" },
   { title: "Activity", url: "/industry" },
+  { title: "Diet Chart", url: "/industry" },
 ];
+
+// Define a mapping of services to their respective items
+const serviceItems = {
+  Library: [
+    { title: "SeatNo", url: "/library/book1" },
+    { title: "Attendence", url: "/library/book2" },
+    { title: "Fees", url: "/library/article1" },
+    { title: "Book Rent", url: "/library/article1" },
+  ],
+  Exam: [
+    { title: "Fill Up", url: "/exam/papers" },
+    { title: "Test Series", url: "/exam/upcoming" },
+    { title: "Scholarship Scheme", url: "/exam/scholarship" },
+    { title: "Result", url: "/exam/result" },
+    { title: "Admit Card", url: "/exam/admitcard" },
+    { title: "Study Center", url: "/exam/studycenter" },
+  ],
+  Activity: [
+    { title: "Clubs & Events", url: "/activity/clubs" },
+    { title: "Sports", url: "/activity/sports" },
+  ],
+  "Diet Chart": [
+    { title: "Breakfast Ideas", url: "/diet/breakfast" },
+    { title: "Lunch Ideas", url: "/diet/lunch" },
+  ],
+  Placement: [
+    { title: "Job Openings", url: "/placement/jobs" },
+    { title: "Internships", url: "/placement/internships" },
+  ],
+};
 
 const cards = [
   {
-    title: "Past",
-    content: "This represents the past achievements, history, and foundation of the services."
+    title: "Throwback",
+    content1: "Resume",
+    content2: "Result",
   },
   {
-    title: "Present",
-    content: "This section highlights the current offerings, achievements, and goals in the service."
+    title: "Remainder",
+    content1: "TimeTable",
+    content2: "Exam Notification",
+    content3: "Time Until",
   },
   {
-    title: "Future",
-    content: "The future section outlines what is planned, upcoming developments, and aspirations."
+    title: "Upskills",
+    content1: "course",
+    content2: "Events",
   },
 ];
 

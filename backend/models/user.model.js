@@ -29,11 +29,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ['student', 'recruiter', 'librarian'],
-      default: 'student', // Default role
-    },
+    role: { type: String, enum: ['user', 'admin', 'librarian', 'recruiter'], default: 'user' }, // Add role field
     profile: {
       profilePhoto: {
         type: String,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaUser, FaEnvelope, FaCog, FaQuestionCircle, FaSignOutAlt, FaFileInvoiceDollar, FaBook } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaCog, FaQuestionCircle, FaSignOutAlt, FaFileInvoiceDollar, FaBook, FaBars } from "react-icons/fa";
 import Navbar from "../../shared/Navbar";
 import axios from "axios";
 import { USER_API_END_POINT } from '../../../utils/constant.js'; // Make sure this is correctly imported
@@ -14,7 +14,8 @@ const MgtSidebarLayout = () => {
   const dispatch = useDispatch(); // Access Redux dispatch
 
   const [isBooksOpen, setIsBooksOpen] = useState(false); // Track submenu state
-  
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Track sidebar visibility on small screens
+
   // Logout handler
   const logoutHandler = async () => {
     try {
@@ -48,7 +49,9 @@ const MgtSidebarLayout = () => {
       <Navbar />
       <div className="flex flex-col lg:flex-row h-screen">
         {/* Sidebar */}
-        <aside className="w-full lg:w-64 bg-gray-800 text-white">
+        <aside
+          className={`w-full lg:w-64 bg-gray-800 text-white lg:block ${sidebarOpen ? 'block' : 'hidden lg:block'}`}
+        >
           <div className="p-4 border-b border-gray-700">
             <h1 className="text-xl font-bold text-center">Vijnan (Library)</h1>
           </div>
@@ -125,8 +128,16 @@ const MgtSidebarLayout = () => {
           </nav>
         </aside>
 
+        {/* Hamburger Button */}
+        <button
+          className="lg:hidden fixed top-24 left-2 p-2 bg-gray-800 text-white rounded-full"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <FaBars />
+        </button>
+
         {/* Main Content */}
-        <main className="flex-1 bg-gray-100 p-6">
+        <main className="flex-1 bg-gray-100 p-8">
           <h2 className="text-2xl font-semibold mb-4">Dashboard</h2>
           <p className="text-gray-600">
             Welcome to your dashboard! Use the navigation on the left to explore.

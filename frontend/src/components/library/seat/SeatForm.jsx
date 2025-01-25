@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const SeatForm = ({ seatNumber, onClose }) => {
+const SeatForm = ({ seatNumber }) => {
   const [formData, setFormData] = useState({
     memberId: "",
     planDetails: "",
@@ -11,12 +11,13 @@ const SeatForm = ({ seatNumber, onClose }) => {
     paidAmount: "",
     dueAmount: "",
     nextBillDate: "",
-    tableNo: "", // Add this field to track table number
+    tableNo: "",
   });
-  
+
   const [studentDetails, setStudentDetails] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null); // Store the submitted data
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -54,10 +55,20 @@ const SeatForm = ({ seatNumber, onClose }) => {
       setLoading(true);
       const response = await axios.post("http://localhost:8000/api/book-seat", {
         ...formData,
-        seatNumber,
+        seatNumber, // The selected seat number is passed along with the other form data
       });
-      console.log("Booking successful:", response.data);
-      onClose(); // Close the form after successful submission
+
+      if (response.data.success) {
+        // Successful booking, set the submitted data to display it
+        setSubmittedData({
+          ...formData,
+          seatNumber,
+          studentDetails, // Include student details in the data
+        });
+        alert("Seat booked successfully!");
+      } else {
+        alert("Booking failed. Please try again.");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
@@ -65,26 +76,39 @@ const SeatForm = ({ seatNumber, onClose }) => {
     }
   };
 
-  // Reset form data on close
-  const handleClose = () => {
-    setFormData({
-      memberId: "",
-      planDetails: "",
-      startDate: "",
-      expiryDate: "",
-      paymentMethod: "",
-      paidAmount: "",
-      dueAmount: "",
-      nextBillDate: "",
-    });
-    setStudentDetails(null);
-    setError("");
-    onClose();
-  };
+  // Render the form or submitted details
+  if (submittedData) {
+    return (
+      <div className="p-12 max-w-2xl mx-auto w-auto top-12 my-8 bg-gray-300 shadow-md rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Seat Details</h2>
+        <div className="space-y-4">
+          <p><strong>Seat Number:</strong> {submittedData.seatNumber}</p>
+          <p><strong>Member ID:</strong> {submittedData.memberId}</p>
+          <p><strong>Table Number:</strong> {submittedData.tableNo}</p>
+          <p><strong>Plan Details:</strong> {submittedData.planDetails}</p>
+          <p><strong>Start Date:</strong> {submittedData.startDate}</p>
+          <p><strong>Expiry Date:</strong> {submittedData.expiryDate}</p>
+          <p><strong>Payment Method:</strong> {submittedData.paymentMethod}</p>
+          <p><strong>Paid Amount:</strong> {submittedData.paidAmount}</p>
+          <p><strong>Due Amount:</strong> {submittedData.dueAmount}</p>
+          <p><strong>Next Bill Date:</strong> {submittedData.nextBillDate}</p>
+
+          {/* Display Student Details */}
+          {submittedData.studentDetails && (
+            <div className="mt-4 p-4 bg-gray-100 rounded">
+              <p><strong>Name:</strong> {submittedData.studentDetails.name}</p>
+              <p><strong>Course:</strong> {submittedData.studentDetails.course}</p>
+              <p><strong>Email:</strong> {submittedData.studentDetails.email}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-12 max-w-2xl mx-auto w-auto top-12 my-8 bg-red-300 shadow-md rounded-lg justify-center">
-      <h2 className="p-12 max-w-2xl mx-auto text-xl font-bold mb-4">Seat {seatNumber} Form</h2>
+      <h2 className="text-xl font-bold mb-4">Seat {seatNumber} Form</h2>
       <form onSubmit={handleSubmit}>
         {/* Member ID */}
         <div className="mb-4">
@@ -102,17 +126,17 @@ const SeatForm = ({ seatNumber, onClose }) => {
         </div>
 
         <div className="mb-4">
-  <label className="block text-sm font-medium mb-2" htmlFor="tableNo">Table Number</label>
-  <input
-    type="text"
-    name="tableNo"
-    id="tableNo"
-    value={formData.tableNo}
-    onChange={handleChange}
-    className="w-full p-2 border rounded"
-    required
-  />
-</div>
+          <label className="block text-sm font-medium mb-2" htmlFor="tableNo">Table Number</label>
+          <input
+            type="text"
+            name="tableNo"
+            id="tableNo"
+            value={formData.tableNo}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
 
         {/* Display Student Details */}
         {studentDetails && (
@@ -226,7 +250,7 @@ const SeatForm = ({ seatNumber, onClose }) => {
         <div className="flex justify-end gap-4">
           <button
             type="button"
-            onClick={handleClose}
+            onClick={() => setSubmittedData(null)} // Clear the submitted data to show form again
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
             Cancel

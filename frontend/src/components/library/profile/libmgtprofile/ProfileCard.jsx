@@ -2,17 +2,24 @@ import React, { useState } from 'react';
 import { Avatar, AvatarImage } from '../../../ui/avatar';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import { Contact, Mail, Edit } from 'lucide-react';
+import { Contact, Mail } from 'lucide-react';
 import { updateProfile } from '../../../../redux/updateProfileSlice';
 
 const ProfileCard = ({ profile }) => {
-  const { profilePicture, fullName, email, phoneNumber, _id } = profile;
-  const { user, loading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
 
-  const [image, setImage] = useState(profilePicture || user?.profile?.profilePhoto);
-  const [name, setName] = useState(fullName || user?.fullname || '');
-  const [emailAddress, setEmailAddress] = useState(email || user?.email || '');
+  const {
+    profilePicture = user?.profile?.profilePhoto || '',
+    fullName = user?.fullname || '',
+    email = user?.email || '',
+    phoneNumber = user?.phoneNumber || '',
+    _id = 'Not Assigned',
+  } = profile || {};
+
+  const [image, setImage] = useState(profilePicture);
+  const [name, setName] = useState(fullName);
+  const [emailAddress, setEmailAddress] = useState(email);
   const [isEditing, setIsEditing] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,18 +35,12 @@ const ProfileCard = ({ profile }) => {
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload a valid image file.');
-        return;
-      }
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File size exceeds 2MB.');
-        return;
-      }
+    if (file && file.type.startsWith('image/') && file.size <= 2 * 1024 * 1024) {
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result);
       reader.readAsDataURL(file);
+    } else {
+      alert('Please upload a valid image file under 2MB.');
     }
   };
 
@@ -61,13 +62,13 @@ const ProfileCard = ({ profile }) => {
     }
   };
 
+  if (!profile && !user) {
+    return <div>Error: No profile or user data available.</div>;
+  }
+
   return (
-    <section
-      style={{ fontFamily: 'Montserrat' }}
-      className="bg-[#c41a8e] font-medium rounded-2xl flex justify-start items-start px-2 py-2 h-fit"
-    >
+    <section className="font-medium rounded-2xl flex justify-start items-start px-1/2 py-1/2 h-fit">
       <section className="w-48 bg-[#20354b] rounded-2xl mx-2 px-4 py-2 shadow-lg h-fit">
-        {/* Full Name */}
         <div className="flex flex-col items-center">
           {isEditing ? (
             <>
@@ -75,24 +76,22 @@ const ProfileCard = ({ profile }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="text-white bg-transparent border-b-1 border-yellow-400 text-center font-bold text-xl tracking-wide outline-none p-1 mb-1"
+                className="text-white bg-transparent border-b border-yellow-400 text-center font-bold text-xl tracking-wide outline-none p-1 mb-1"
                 placeholder="Full Name"
               />
-              {formErrors.name && (
-                <span className="text-red-500 text-xs">{formErrors.name}</span>
-              )}
+              {formErrors.name && <span className="text-red-500 text-xs">{formErrors.name}</span>}
             </>
           ) : (
-            <span className="text-2xl text-white">{name || user?.name || '+1234567890'}</span>
+            <span className="text-2xl text-white">{name}</span>
           )}
         </div>
 
-        {/* Profile Picture */}
         <div className="mt-1 flex justify-center">
           <Avatar className="h-24 w-24">
             <AvatarImage src={image} alt="profile" />
           </Avatar>
         </div>
+
         <div className="mt-1 text-center">
           <label htmlFor="file-input" className="cursor-pointer text-yellow-500 underline">
             Change Profile Picture
@@ -106,17 +105,16 @@ const ProfileCard = ({ profile }) => {
           />
         </div>
 
-        {/* Email */}
         <div className="">
           {isEditing ? (
             <>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 ">
                 <Mail className="text-yellow-500" />
                 <input
                   type="email"
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
-                  className="text-white bg-transparent border-b-1 border-yellow-400 outline-none p-1"
+                  className="text-white bg-transparent border-b border-yellow-400 outline-none p-4"
                   placeholder="Email Address"
                 />
               </div>
@@ -125,28 +123,25 @@ const ProfileCard = ({ profile }) => {
               )}
             </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
               <Mail />
-              <span className="text-xl text-white">{emailAddress || user?.email || 'example@gmail.com'}</span>
+              <span className="text-xl text-white ">{emailAddress}</span>
             </div>
           )}
         </div>
 
-        {/* Phone Number */}
         <div className="mt-4 text-white">
           <div className="flex items-center gap-3">
             <Contact />
-            <span>{phoneNumber || user?.phoneNumber || '+1234567890'}</span>
+            <span>{phoneNumber}</span>
           </div>
         </div>
 
-        {/* Vedann ID */}
         <div className="text-white text-sm">
           <span className="text-gray-400 font-semibold">Vedann ID:</span>
-          <span> {_id || 'Not Assigned'}</span>
+          <span> {_id}</span>
         </div>
 
-        {/* Librarian-Specific Message */}
         {user?.role === 'librarian' && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -158,7 +153,6 @@ const ProfileCard = ({ profile }) => {
           </motion.div>
         )}
 
-        {/* Buttons */}
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
@@ -178,6 +172,10 @@ const ProfileCard = ({ profile }) => {
       </section>
     </section>
   );
+};
+
+ProfileCard.defaultProps = {
+  profile: null,
 };
 
 export default ProfileCard;
