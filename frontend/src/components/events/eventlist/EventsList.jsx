@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardTitle } from '../../ui/card';
+import { Card, CardContent, CardTitle } from '../../ui/Card.jsx';
 import EventService from '../../events/EventService.js';
 
 const EventCard = ({ event }) => {
