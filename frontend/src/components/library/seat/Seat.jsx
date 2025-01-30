@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo ,useRef} from "react";
 import SeatForm from "./SeatForm";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import MemberDetails from "./MemberDetails";
 
 const Seat = ({ timeSlot }) => {
   const [seats, setSeats] = useState([]);
@@ -10,10 +12,20 @@ const Seat = ({ timeSlot }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [foundSeat, setFoundSeat] = useState(null);
   const [error, setError] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+    const listRef = useRef(null);
   const [bookingSuccess, setBookingSuccess] = useState(null);
   const [submittedData, setSubmittedData] = useState(null); // Store submitted data here
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
 
   const memberId = sessionStorage.getItem("memberId");
+ 
+
+  // Scroll functions
+  const scrollUp = () => listRef.current?.scrollBy({ top: -100, behavior: "smooth" });
+  const scrollDown = () => listRef.current?.scrollBy({ top: 100, behavior: "smooth" });
 
   // Fetch seat data from backend
   useEffect(() => {
@@ -31,6 +43,10 @@ const Seat = ({ timeSlot }) => {
     fetchSeats();
   }, []);
 
+
+ ;
+
+ 
   // Generate seat matrix based on rowCount, colCount, and backend seat data
   const generateSeatMatrix = useMemo(() => {
     const matrix = [];
@@ -54,7 +70,11 @@ const Seat = ({ timeSlot }) => {
   useEffect(() => {
     setSeats(generateSeatMatrix);
   }, [generateSeatMatrix]);
-
+  useEffect(() => {
+    console.log("Backend Seats Data:", backendSeats); // Check the structure
+  }, [backendSeats]);
+  
+ 
   // Handle seat click (show details if occupied, or allow booking)
   const handleSeatClick = (rowIndex, colIndex) => {
     const clickedSeat = seats[rowIndex][colIndex];
@@ -67,7 +87,7 @@ const Seat = ({ timeSlot }) => {
   };
 
   // Book seat logic
-  const bookSeat = async (seatDetails) => {
+  const bookSeat = async (seatDetails  ) => {
     if (!memberId) {
       alert("Please login to book a seat.");
       return;
@@ -122,17 +142,30 @@ const Seat = ({ timeSlot }) => {
       setBookingSuccess(false);
     }
   };
-
   const handleSearch = () => {
-    // Search for a seat by memberId
-    const found = seats.flat().find((seat) => seat.memberName === searchTerm);
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+    console.log("Searching for Member ID:", normalizedSearchTerm);
+  
+    // Find the seat that matches the memberId entered
+    const found = seats.flat().find(
+      (seat) => seat.memberName && seat.memberName.toLowerCase() === normalizedSearchTerm
+    );
+    
+    console.log("Searching with:", normalizedSearchTerm);
+    console.log("Seats member name:", seats.flat().map((seat) => seat.memberName));
+  
     if (found) {
       setFoundSeat(found);
+      console.log("Seat found:", found);
     } else {
       setFoundSeat(null);
       alert("No seat found with that member ID.");
+      console.log("No seat found.");
     }
   };
+  
+  
+  
 
   // Close seat form modal
   const closeForm = () => setSelectedSeat(null);
@@ -171,13 +204,14 @@ const Seat = ({ timeSlot }) => {
       </div>
 
       {foundSeat && (
-        <div className="bg-green-500 text-white p-6 rounded-lg shadow-lg mb-6">
-          <p className="text-xl font-semibold">Seat Details</p>
-          <p>Seat Number: {foundSeat.number}</p>
-          <p>Status: {foundSeat.occupied ? "Occupied" : "Available"}</p>
-          <p>Booked By: {foundSeat.memberName || "N/A"}</p>
-        </div>
-      )}
+  <div className="bg-green-500 text-white p-6 rounded-lg shadow-lg mb-6">
+    <p className="text-xl font-semibold">Seat Details</p>
+    <p>Seat Number: {foundSeat.number}</p>
+    <p>Status: {foundSeat.occupied ? "Occupied" : "Available"}</p>
+    <p>Booked By: {foundSeat.memberName || "N/A"}</p>
+  </div>
+)}
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
         <div className="bg-blue-500 text-white p-6 rounded-lg shadow-lg w-full text-center">
@@ -224,34 +258,54 @@ const Seat = ({ timeSlot }) => {
       </div>
 
       {/* Display booked seat details at the bottom */}
-      <div className="mt-8">
-        <h4 className="text-xl font-semibold mb-4">Booked Seats Details</h4>
-        <ul className="space-y-4">
-          {backendSeats.map((seat) => (
-            <li
-              key={seat.seatNumber}
-              className={`bg-gray-100 p-4 rounded-lg shadow-md ${backendSeats.find(s => s.seatNumber === seat.seatNumber) ? 'bg-green-200' : 'bg-red-200'}`}
-            >
-              <p>Seat Number: {seat.seatNumber}</p>
-              <p>Booked By: {seat.memberId}</p>
-              <p>Booking Time: {new Date(seat.bookingTime).toLocaleString()}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      
+      <MemberDetails  backendSeats ={ backendSeats }/>
+    
 
+      {/* Collapsible List */}
+      {isExpanded && (
+        <div className="relative max-h-60 overflow-hidden border p-2 rounded-lg">
+          <ul ref={listRef} className="max-h-60 overflow-y-auto space-y-4">
+            {backendSeats.map((seat) => (
+              <li key={seat.seatNumber} className={`bg-gray-100 p-4 rounded-lg shadow-md ${seat.memberId ? "bg-green-200" : "bg-red-200"}`}>
+                <p>Seat Number: {seat.seatNumber}</p>
+                <p>Table No: {seat.tableNo || "N/A"}</p>
+                <p>MemberId: {seat.memberId}</p>
+                <p>Start Date: {new Date(seat.startDate).toLocaleString()}</p>
+                <p>Booking Time: {new Date(seat.bookingTime).toLocaleString()}</p>
+                <p>Plan Details: {seat.planDetails || "N/A"}</p>
+                <p>Payment Method: {seat.paymentMethod || "N/A"}</p>
+                <p>Paid Amount: {seat.paidAmount ? seat.paidAmount : "N/A"}</p>
+                <p>Due Amount: {seat.dueAmount ? seat.dueAmount : "N/A"}</p>
+                <p>Next Bill Date: {seat.nextBillDate ? new Date(seat.nextBillDate).toLocaleString() : "N/A"}</p>
+              </li>
+            ))}
+          </ul>
+
+          {/* Scroll Buttons */}
+          <div className="absolute right-2 top-2 flex flex-col gap-2">
+            <button onClick={scrollUp} className="bg-gray-300 p-2 rounded-full shadow hover:bg-gray-400">
+              <ChevronUp size={20} />
+            </button>
+            <button onClick={scrollDown} className="bg-gray-300 p-2 rounded-full shadow hover:bg-gray-400">
+              <ChevronDown size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+    
       {selectedSeat && (
         <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-0 animate-fade-in" aria-hidden="true"></div>
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <div className="relative transform overflow-hidden rounded-lg bg-gray-100 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg animate-slide-up">
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-24 right-4">
                   <button onClick={closeForm} className="text-gray-600 text-xl font-bold">
                     X
                   </button>
                 </div>
-                <div className="px-4 pb-4 pt-8 mt-8 sm:p-6 sm:pb-4">
+                <div className="px-4 pb-4 pt-8 mt-16 sm:p-6 sm:pb-4">
                   <SeatForm seatNumber={selectedSeat.number} onClose={closeForm} />
                   <button onClick={() => bookSeat(selectedSeat)} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Book Seat
@@ -262,6 +316,7 @@ const Seat = ({ timeSlot }) => {
           </div>
         </div>
       )}
+      
     </div>
   );
 };

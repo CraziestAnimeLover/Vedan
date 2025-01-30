@@ -10,6 +10,7 @@ import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import planRouter from "./routes/plan.routes.js";
 import bookRoutes from "./routes/book.routes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 import loanRoutes from "./routes/loan.routes.js"; // Ensure the path is correct
 import ticketRoutes from "./routes/ticketRoutes.js";
@@ -72,6 +73,7 @@ app.use("/plans", planRouter);
 app.use("/api/books", bookRoutes);
 app.use("/api/loans", loanRoutes);
 app.use(ticketRoutes);
+app.use('/api/events', eventRoutes);
 
 // Use routes
 app.use('/api/student', studentRoutes);  // Ensure the student routes are included
@@ -79,8 +81,8 @@ app.use('/api', seatRoutes);   // Ensure the seat booking routes are included
 
 
 
-app.use('/update-library-profile', userRoute);
-app.get("/update-library-profile", async (req, res) => {
+app.use('/api/v1/user/update-profile', userRoute);
+app.get("/api/v1/user/update-profile", async (req, res) => {
   try {
     const { userId } = req.query; // Get the userId from the query parameters
 
@@ -106,7 +108,7 @@ app.get("/update-library-profile", async (req, res) => {
   }
 });
 
-app.put("/update-library-profile", async (req, res) => {
+app.put("/api/v1/user/update-profile", async (req, res) => {
   try {
     // Update logic here (e.g., updating user or other data)
     res.status(200).json({ message: "Update successful" });

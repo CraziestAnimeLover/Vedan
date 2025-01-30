@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Contact, Mail } from 'lucide-react';
 import { updateProfile } from '../../../../redux/updateProfileSlice';
 
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
 
@@ -174,8 +174,6 @@ const ProfileCard = ({ profile }) => {
   );
 };
 
-ProfileCard.defaultProps = {
-  profile: null,
-};
+
 
 export default ProfileCard;

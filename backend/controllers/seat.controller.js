@@ -51,3 +51,21 @@ export const getSeatBookingDetails = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch booking details", error });
     }
 };
+
+const generateMemberId = async () => {
+    try {
+      // Fetch the latest memberId from the database
+      const latestBooking = await SeatBooking.findOne().sort({ memberId: -1 }).exec();
+      let latestId = latestBooking ? latestBooking.memberId : "सA00000";
+  
+      // Extract numeric part and increment
+      const numberPart = parseInt(latestId.slice(2), 10) + 1;
+      return `सA${String(numberPart).padStart(5, "0")}`;
+    } catch (error) {
+      console.error("Error generating Member ID:", error);
+      throw new Error("Failed to generate Member ID.");
+    }
+  };
+  
+  // Controller function to book a seat
+  

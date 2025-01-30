@@ -5,15 +5,15 @@ const userSchema = new mongoose.Schema(
     fullname: {
       type: String,
       required: true,
-      trim: true, // Remove leading/trailing whitespace
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true, // Ensure email is stored in lowercase
+      lowercase: true,
       validate: {
-        validator: (value) => /\S+@\S+\.\S+/.test(value), // Email regex validation
+        validator: (value) => /\S+@\S+\.\S+/.test(value),
         message: (props) => `${props.value} is not a valid email!`,
       },
     },
@@ -29,18 +29,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: { type: String, enum: ['user', 'admin', 'librarian', 'recruiter'], default: 'user' }, // Add role field
+    role: { 
+      type: String, 
+      enum: ['user', 'admin', 'librarian', 'recruiter', 'student'], // Add 'student' role if needed
+      default: 'user' 
+    },
     profile: {
       profilePhoto: {
         type: String,
-        default: 'default-profile.jpg', // Provide a default profile photo
+        default: 'default-profile.jpg',
       },
       mobile: {
         type: String,
         required: true,
+        validate: {
+          validator: (value) => /^\d{10}$/.test(value), // Validate 10-digit mobile number
+          message: (props) => `${props.value} is not a valid mobile number!`,
+        },
       },
       social: {
-        type: [String], // Array of social media links
+        type: [String],
         default: [],
       },
       address: {
@@ -69,7 +77,7 @@ const userSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true } // Automatically add createdAt and updatedAt fields
+  { timestamps: true }
 );
 
 // Pre-save middleware to hash the password
@@ -88,3 +96,4 @@ userSchema.virtual('uppercaseFullname').get(function () {
 });
 
 export const User = mongoose.model('User', userSchema);
+

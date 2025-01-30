@@ -37,6 +37,7 @@ import LibraryProfile from './components/library/profile/libmgtprofile/LibraryPr
 import LoanBook from './components/library/bookloan/LoanBook'
 import FakeTicketEnquiry from './components/library/enquiry/FakeTicketEnquiry'
 import Shells from './components/library/bookshell/books/Shells'
+import Events from './components/events/Events'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -159,6 +160,9 @@ const approuter = createBrowserRouter([
    },
    { path: '/social', 
     element: <SocialServicePage/>
+   },
+   { path: '/social/events', 
+    element: <Events/>
    },
    { path: '/lostnfound', 
     element: <LostItem/>

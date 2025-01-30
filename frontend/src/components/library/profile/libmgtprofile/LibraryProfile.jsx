@@ -10,7 +10,22 @@ const LibraryProfile = () => {
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const navigate = useNavigate(); // Initialize the navigate function
 
-  // Redirect to the home page if user is not found
+  const [activeForm, setActiveForm] = useState("");
+  const [formData, setFormData] = useState({
+    mobile: "",
+    email: "",
+    social: [], // Initialize as an empty array
+    address: user?.profile?.address || "",
+    GST: "",
+    PAN: "",
+    OTHERID: "",
+    Name: "",
+    VedanId: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  // Fetch user profile data when the component mounts or when 'user' changes
   useEffect(() => {
     if (user && user.profile) {
       setFormData({
@@ -25,50 +40,17 @@ const LibraryProfile = () => {
         VedanId: user.profile.VedanId || "",
       });
     }
-  }, [user]); // This will run when 'user' changes
-
-  if (loading) {
-    return <div>Loading...</div>; // Show a loading state while the user is being fetched
-  }
-
-  if (user === null) {
-    return <div>No user found</div>; // You can show a message or redirect elsewhere
-  }
-
-  if (user === null) {
-    return <div>Loading...</div>; // You can show a loading message or spinner
-  }
-
-  const [activeForm, setActiveForm] = useState("");
-  const [formData, setFormData] = useState({
-    mobile: "",
-    email: "",
-    social: [], // Initialize as an empty array
-    address: user?.profile?.address || "",
-    GST: "",
-    PAN: "",
-    OTHERID: "",
-    Name: "",
-    VedanId: "",
-  });
-
-  // State for form validation errors
-  const [errors, setErrors] = useState({});
+  }, [user]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  // Function to handle changes in social media links
+
   const handleSocialLinkChange = (e, index) => {
     const { value } = e.target;
     const updatedSocialLinks = [...formData.social];
     updatedSocialLinks[index] = value;
-    if (isValidURL(value)) {
-      setErrors((prev) => ({ ...prev, [`social_${index}`]: "" }));
-    } else {
-      setErrors((prev) => ({ ...prev, [`social_${index}`]: "Invalid URL" }));
-    }
     setFormData((prev) => ({ ...prev, social: updatedSocialLinks }));
   };
 
@@ -76,18 +58,15 @@ const LibraryProfile = () => {
     setActiveForm(formType); // Set the active form
   };
 
-  // Add a new social link input field
   const handleAddSocialLink = () => {
     setFormData((prev) => ({ ...prev, social: [...prev.social, ""] }));
   };
 
-  // Remove a social link input field
   const handleRemoveSocialLink = (index) => {
     const updatedSocial = formData.social.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, social: updatedSocial }));
   };
 
-  // Form validation function
   const validateForm = () => {
     const newErrors = {};
     const requiredFields =
@@ -112,33 +91,23 @@ const LibraryProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const validationErrors = validateForm();
     setErrors(validationErrors);
-
+  
     if (Object.keys(validationErrors).length === 0) {
-      console.log("Form Data:", formData); // Log the data
+      console.log(formData); // Check form data here
+  
+       // Use sessionStorage for session-based login
 
-      // Retrieve token from localStorage (or sessionStorage)
-      const token = localStorage.getItem("token"); // Make sure 'token' is correctly stored in localStorage after login
-      if (!token) {
-        console.error("Token is missing");
-        setSubmissionStatus("Please log in first.");
-        return;
-      }
-
+      // On the client-side, use sessionStorage.getItem('token')
+      const token = sessionStorage.getItem('token');
+  
       try {
-        const response = await axios.put(
-          "http://localhost:8000/update-library-profile",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data", // You might not need this if not sending files
-            },
-          }
-        );
-
+        const response = await axios.put('http://localhost:8000/api/v1/user/update-profile', formData, {
+          withCredentials: true, // Make sure the cookie is sent along
+        });
+  
         if (response.status === 200) {
           setSubmissionStatus("Profile updated successfully!");
         } else {
@@ -150,6 +119,7 @@ const LibraryProfile = () => {
       }
     }
   };
+  
 
   const TextInput = ({
     label,
@@ -173,6 +143,14 @@ const LibraryProfile = () => {
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user === null) {
+    return <div>No user found</div>;
+  }
 
   return (
     <>
@@ -233,39 +211,7 @@ const LibraryProfile = () => {
                 Edit Contact Details
               </h3>
               <form className="mt-4" onSubmit={handleSubmit}>
-                {/* Mobile */}
-                {/* <div className="mb-4">
-                  <label className="text-gray-400">Mobile</label>
-                  <input
-                    type="text"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter mobile number"
-                  />
-                  {errors.mobile && (
-                    <p className="text-red-500 text-sm">{errors.mobile}</p>
-                  )}
-                </div> */}
-
-                {/* Email */}
-                {/* <div className="mb-4">
-                  <label className="text-gray-400">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter email"
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email}</p>
-                  )}
-                </div> */}
-
-                {/* Social Media */}
+                {/* Social Media Links */}
                 <div className="mb-4">
                   <label className="text-gray-400">Social Links</label>
                   {Array.isArray(formData.social) &&
@@ -322,114 +268,115 @@ const LibraryProfile = () => {
             </div>
           )}
 
+          {/* Similar rendering for "verification" and "founder" forms */}
           {activeForm === "verification" && (
-            <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
-              <h3 className="text-white font-semibold text-lg">
-                Edit Verification Details
-              </h3>
-              <form className="mt-4" onSubmit={handleSubmit}>
-                {/* GST */}
-                <div className="mb-4">
-                  <label className="text-gray-400">GST</label>
-                  <input
-                    type="text"
-                    name="GST"
-                    value={formData.GST}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter GST number"
-                  />
-                  {errors.GST && (
-                    <p className="text-red-500 text-sm">{errors.GST}</p>
-                  )}
-                </div>
+  <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <h3 className="text-white font-semibold text-lg">
+      Edit Verification Details
+    </h3>
+    <form className="mt-4" onSubmit={handleSubmit}>
+      {/* GST */}
+      <div className="mb-4">
+        <label className="text-gray-400">GST</label>
+        <input
+          type="text"
+          name="GST"
+          value={formData.GST}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter GST number"
+        />
+        {errors.GST && (
+          <p className="text-red-500 text-sm">{errors.GST}</p>
+        )}
+      </div>
 
-                {/* PAN */}
-                <div className="mb-4">
-                  <label className="text-gray-400">PAN</label>
-                  <input
-                    type="text"
-                    name="PAN"
-                    value={formData.PAN}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter PAN number"
-                  />
-                  {errors.PAN && (
-                    <p className="text-red-500 text-sm">{errors.PAN}</p>
-                  )}
-                </div>
+      {/* PAN */}
+      <div className="mb-4">
+        <label className="text-gray-400">PAN</label>
+        <input
+          type="text"
+          name="PAN"
+          value={formData.PAN}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter PAN number"
+        />
+        {errors.PAN && (
+          <p className="text-red-500 text-sm">{errors.PAN}</p>
+        )}
+      </div>
 
-                {/* Other ID */}
-                <div className="mb-4">
-                  <label className="text-gray-400">Other ID</label>
-                  <input
-                    type="text"
-                    name="OTHERID"
-                    value={formData.OTHERID}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter other ID"
-                  />
-                </div>
+      {/* Other ID */}
+      <div className="mb-4">
+        <label className="text-gray-400">Other ID</label>
+        <input
+          type="text"
+          name="OTHERID"
+          value={formData.OTHERID}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter other ID"
+        />
+      </div>
 
-                <button
-                  type="submit"
-                  className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-md"
-                >
-                  Save Changes
-                </button>
-              </form>
-            </div>
-          )}
+      <button
+        type="submit"
+        className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-md"
+      >
+        Save Changes
+      </button>
+    </form>
+  </div>
+)}
 
-          {activeForm === "founder" && (
-            <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full h-fit max-w-lg">
-              <h3 className="text-white font-semibold text-lg">
-                Edit Founder Details
-              </h3>
-              <form className="mt-4" onSubmit={handleSubmit}>
-                {/* Name */}
-                <div className="mb-4">
-                  <label className="text-gray-400">Name</label>
-                  <input
-                    type="text"
-                    name="Name"
-                    value={formData.Name}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter name"
-                  />
-                  {errors.Name && (
-                    <p className="text-red-500 text-sm">{errors.Name}</p>
-                  )}
-                </div>
+{activeForm === "founder" && (
+  <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full h-fit max-w-lg">
+    <h3 className="text-white font-semibold text-lg">
+      Edit Founder Details
+    </h3>
+    <form className="mt-4" onSubmit={handleSubmit}>
+      {/* Name */}
+      <div className="mb-4">
+        <label className="text-gray-400">Name</label>
+        <input
+          type="text"
+          name="Name"
+          value={formData.Name}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter name"
+        />
+        {errors.Name && (
+          <p className="text-red-500 text-sm">{errors.Name}</p>
+        )}
+      </div>
 
-                {/* Vedan ID */}
-                <div className="mb-4">
-                  <label className="text-gray-400">Vedan ID</label>
-                  <input
-                    type="text"
-                    name="VedanId"
-                    value={formData.VedanId}
-                    onChange={handleFormChange}
-                    className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
-                    placeholder="Enter Vedan ID"
-                  />
-                  {errors.VedanId && (
-                    <p className="text-red-500 text-sm">{errors.VedanId}</p>
-                  )}
-                </div>
+      {/* Vedan ID */}
+      <div className="mb-4">
+        <label className="text-gray-400">Vedan ID</label>
+        <input
+          type="text"
+          name="VedanId"
+          value={formData.VedanId}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter Vedan ID"
+        />
+        {errors.VedanId && (
+          <p className="text-red-500 text-sm">{errors.VedanId}</p>
+        )}
+      </div>
 
-                <button
-                  type="submit"
-                  className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-md"
-                >
-                  Save Changes
-                </button>
-              </form>
-            </div>
-          )}
+      <button
+        type="submit"
+        className="mt-4 w-full bg-yellow-500 text-white py-2 rounded-md"
+      >
+        Save Changes
+      </button>
+    </form>
+  </div>
+)}
         </div>
       </div>
     </>
@@ -437,3 +384,4 @@ const LibraryProfile = () => {
 };
 
 export default LibraryProfile;
+

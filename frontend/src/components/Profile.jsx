@@ -18,6 +18,7 @@ const Profile = () => {
   const [updatedProfileNumber, setUpdatedProfileNumber] = useState(user?.profile?.userId || '');
   const [updatedRating, setUpdatedRating] = useState(user?.profile?.rating || 0);
   const [updatedHandlerName, setUpdatedHandlerName] = useState(user?.profile?.handlerName || '');
+  const [editableHandlerName, setEditableHandlerName] = useState(false);
 
   const handleProfileNumberChange = (newProfileNumber) => {
     setUpdatedProfileNumber(newProfileNumber);
@@ -27,8 +28,8 @@ const Profile = () => {
     setUpdatedRating(newRating);
   };
 
-  const handleHandlerNameChange = (newHandlerName) => {
-    setUpdatedHandlerName(newHandlerName);
+  const handleHandlerNameChange = (e) => {
+    setUpdatedHandlerName(e.target.value);
   };
 
   const handleSubmit = async () => {
@@ -123,46 +124,33 @@ const Profile = () => {
           </div>
         </motion.div>
 
+        {/* Editable Name Section */}
         <motion.div
           className="my-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          transition={{ duration: 0.7, delay: 1.2 }}
         >
-          <h1>Skills</h1>
-          {Array.isArray(user?.profile?.skills) && user.profile.skills.length > 0 ? (
-            user.profile.skills.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-              >
-                <Badge>{item}</Badge>
-              </motion.div>
-            ))
+          <h1 className="font-bold text-lg">Handler Name</h1>
+          {editableHandlerName ? (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={updatedHandlerName}
+                onChange={handleHandlerNameChange}
+                className="border p-2 rounded-md"
+              />
+              <Button onClick={() => setEditableHandlerName(false)} className="bg-blue-500 text-white">Save</Button>
+            </div>
           ) : (
-            <span>NA</span>
+            <div className="flex items-center gap-2">
+              <span>{updatedHandlerName}</span>
+              <Button onClick={() => setEditableHandlerName(true)} className="bg-gray-300">Edit</Button>
+            </div>
           )}
         </motion.div>
 
-        <motion.div
-          className="grid w-full max-w-sm items-center gap-1.5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          <Label className="text-md font-bold">Resume</Label>
-          {user?.profile?.resume ? (
-            <a href={user?.profile?.resume} target="_blank" className="text-blue-500 w-full hover:underline cursor-pointer">
-              {user?.profile?.resumeOriginalName}
-            </a>
-          ) : (
-            <span>NA</span>
-          )}
-        </motion.div>
-
-        {/* Save Changes Button with Loading Spinner */}
+        {/* Save Changes Button */}
         <motion.div
           className="flex justify-center mt-5"
           initial={{ opacity: 0 }}
@@ -183,18 +171,6 @@ const Profile = () => {
             )}
           </Button>
         </motion.div>
-
-        {user?.role === 'student' && (
-          <motion.div
-            className="max-w-4xl mx-auto bg-white rounded-2xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.7 }}
-          >
-            <h1 className="font-bold text-lg my-5">Applied Jobs</h1>
-            {/* <AppliedJobTable /> */}
-          </motion.div>
-        )}
       </motion.div>
     </div>
   );

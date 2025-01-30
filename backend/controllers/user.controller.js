@@ -1,4 +1,3 @@
-
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -38,7 +37,7 @@ export const register = async (req, res) => {
             password: hashedPassword,
             role: newRole, // Assigning the role here
             profile: {
-                // No profile photo here
+                mobile: phoneNumber,  // Set mobile as phoneNumber
             },
             vedannId: 'Not Assigned', // Default Vedan ID
         });
@@ -53,7 +52,6 @@ export const register = async (req, res) => {
     }
 };
 
-// Login Function
 // Login Function
 export const login = async (req, res) => {
     try {
@@ -109,20 +107,6 @@ export const login = async (req, res) => {
         }).json({
             message: `Welcome back ${user.fullname}`,
             user,
-            success: true
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error", success: false });
-    }
-};
-
-
-// Logout Function
-export const logout = async (req, res) => {
-    try {
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-            message: "Logged out successfully.",
             success: true
         });
     } catch (error) {
@@ -223,10 +207,7 @@ export const resetPassword = async (req, res) => {
 };
 
 // Update Profile Function
-// Update Profile Function
-  // For password hashing (if needed)
-
-  export const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
     try {
       const { userId } = req.user;  // Get the user ID from the token
   
@@ -259,22 +240,6 @@ export const resetPassword = async (req, res) => {
       console.error(error);
       res.status(500).json({ message: 'Error updating profile' });
     }
-  };
-  
-
-
-  
-
-export const authorize = (roles) => {
-    return (req, res, next) => {
-        const userRole = req.user.role; // Assuming the user role is stored in the JWT token
-        
-        if (!roles.includes(userRole)) {
-            return res.status(403).json({ message: "Access Denied" });
-        }
-
-        next();
-    };
 };
 
 // Profile Update Function for Librarian/Student
@@ -303,7 +268,6 @@ export const updateLibraryProfile = async (req, res) => {
         if (user.role === 'librarian' && (!GST || !PAN)) {
             return res.status(400).json({ message: "GST and PAN are required for Librarians.", success: false });
         }
-        
 
         // Update founder details if role is 'founder'
         if (user.role === 'founder') {
@@ -329,4 +293,22 @@ export const updateLibraryProfile = async (req, res) => {
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
+// Logout Function
+export const logout = async (req, res) => {
+    try {
+        return res.status(200).clearCookie("token", {
+            httpOnly: true,
+            sameSite: 'None',
+            secure: process.env.NODE_ENV === 'production' // Secure in production
+        }).json({
+            message: "Logged out successfully.",
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error", success: false });
+    }
+};
+
 

@@ -1,12 +1,13 @@
 import axios from "axios";
 import { setAuthUser, setLoading } from "./authSlice";
 import { toast } from "sonner";  // Assuming you are using a toast library
+import {USER_API_END_POINT} from '../utils/constant.js'
 
 export const updateProfile = (input) => async (dispatch) => {
   try {
     dispatch(setLoading(true));  // Set loading state to true
 
-    const response = await axios.put(`${USER_API_END_POINT}/update`, input, {
+    const response = await axios.put(`${USER_API_END_POINT}/update-profile`, input, {
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });

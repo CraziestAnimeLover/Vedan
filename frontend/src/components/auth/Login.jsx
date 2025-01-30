@@ -51,7 +51,7 @@ const Login = () => {
     
             if (res.data.success) {
                 // Store token securely (e.g., via httpOnly cookie or sessionStorage)
-                localStorage.setItem('token', res.data.token); // You may want to use sessionStorage instead of localStorage for session-based login
+                sessionStorage.setItem('token', res.data.token); // You may want to use sessionStorage instead of localStorage for session-based login
     
                 // Dispatch user data to Redux store
                 dispatch(setAuthUser(res.data.user));

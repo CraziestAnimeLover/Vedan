@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const SeatForm = ({ seatNumber }) => {
   const [formData, setFormData] = useState({
-    memberId: "",
+    memberIdLetter1: "", // First letter input
+    memberIdLetter2: "", // Second letter input
+    memberId: "", // Full member ID
     planDetails: "",
     startDate: "",
     expiryDate: "",
@@ -17,7 +19,48 @@ const SeatForm = ({ seatNumber }) => {
   const [studentDetails, setStudentDetails] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submittedData, setSubmittedData] = useState(null); // Store the submitted data
+  const [submittedData, setSubmittedData] = useState(null);
+  const [notification, setNotification] = useState(""); // For displaying notifications
+
+  // Function to generate memberId number
+  const generateMemberIdNumber = () => {
+    const number = (Math.floor(Math.random() * 100000) + 1).toString().padStart(5, '0');
+    return number;
+  };
+
+  // Update the member ID when the letter part or number changes
+  const generateFullMemberId = () => {
+    const letter1 = formData.memberIdLetter1;
+    const letter2 = formData.memberIdLetter2;
+    const number = generateMemberIdNumber();
+    setFormData((prevData) => ({
+      ...prevData,
+      memberId: `स${letter1}${letter2}${number}`, // Combine both parts
+    }));
+  };
+
+  // Handle letter change for both parts
+  const handleLetterChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Only allow alphabetic characters
+    if (/^[A-Za-z]*$/.test(value)) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+
+      // Show a notification when letters are typed
+      setNotification(`${name} updated: ${value}`);
+    }
+  };
+
+  // Use effect to trigger ID generation when needed
+  useEffect(() => {
+    if (formData.memberIdLetter1 && formData.memberIdLetter2) {
+      generateFullMemberId();
+    }
+  }, [formData.memberIdLetter1, formData.memberIdLetter2]);
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -51,25 +94,30 @@ const SeatForm = ({ seatNumber }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    const formattedData = {
+      ...formData,
+      seatNumber,
+      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+      expiryDate: formData.expiryDate ? new Date(formData.expiryDate).toISOString() : null,
+      nextBillDate: formData.nextBillDate ? new Date(formData.nextBillDate).toISOString() : null,
+    };
+  
+    console.log("Formatted Data:", formattedData); // Debugging
+  
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/api/book-seat", {
-        ...formData,
-        seatNumber, // The selected seat number is passed along with the other form data
-      });
-
+      const response = await axios.post("http://localhost:8000/api/book-seat", formattedData);
+      console.log("Server response:", response.data); // Debugging
+  
       if (response.data.success) {
-        // Successful booking, set the submitted data to display it
-        setSubmittedData({
-          ...formData,
-          seatNumber,
-          studentDetails, // Include student details in the data
-        });
+        setSubmittedData({ ...formattedData, studentDetails });
         alert("Seat booked successfully!");
       } else {
         alert("Booking failed. Please try again.");
       }
     } catch (err) {
+      console.error("Error submitting form:", err.response?.data || err);
       setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -110,21 +158,58 @@ const SeatForm = ({ seatNumber }) => {
     <div className="p-12 max-w-2xl mx-auto w-auto top-12 my-8 bg-red-300 shadow-md rounded-lg justify-center">
       <h2 className="text-xl font-bold mb-4">Seat {seatNumber} Form</h2>
       <form onSubmit={handleSubmit}>
-        {/* Member ID */}
+        {/* Member ID Letter 1 */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2" htmlFor="memberId">Member ID</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="memberIdLetter1">Member ID Letter 1</label>
           <input
             type="text"
-            name="memberId"
-            id="memberId"
-            value={formData.memberId}
-            onChange={handleChange}
-            onBlur={handleMemberIdBlur}
+            name="memberIdLetter1"
+            id="memberIdLetter1"
+            value={formData.memberIdLetter1}
+            onChange={handleLetterChange}
             className="w-full p-2 border rounded"
             required
+            maxLength={1}
           />
         </div>
 
+        {/* Member ID Letter 2 */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2" htmlFor="memberIdLetter2">Member ID Letter 2</label>
+          <input
+            type="text"
+            name="memberIdLetter2"
+            id="memberIdLetter2"
+            value={formData.memberIdLetter2}
+            onChange={handleLetterChange}
+            className="w-full p-2 border rounded"
+            required
+            maxLength={1}
+          />
+        </div>
+
+        {/* Display real-time Member ID */}
+        <div className="mb-4">
+  <label className="block text-sm font-medium mb-2" htmlFor="memberId">Member ID</label>
+  <input
+    type="text"
+    name="memberId"
+    id="memberId"
+    value={formData.memberId}
+    onChange={handleChange}  // Allow changes to memberId
+    className="w-full p-2 border rounded"
+  />
+</div>
+
+
+        {/* Notification Display */}
+        {notification && (
+          <div className="p-2 mt-2 bg-green-200 text-green-800 rounded">
+            {notification}
+          </div>
+        )}
+
+        {/* Other form fields */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2" htmlFor="tableNo">Table Number</label>
           <input
@@ -137,18 +222,6 @@ const SeatForm = ({ seatNumber }) => {
             required
           />
         </div>
-
-        {/* Display Student Details */}
-        {studentDetails && (
-          <div className="mb-4 p-4 bg-gray-100 rounded">
-            <p><strong>Name:</strong> {studentDetails.name}</p>
-            <p><strong>Course:</strong> {studentDetails.course}</p>
-            <p><strong>Email:</strong> {studentDetails.email}</p>
-          </div>
-        )}
-
-        {/* Error message */}
-        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
         {/* Plan Details */}
         <div className="mb-4">
@@ -250,10 +323,10 @@ const SeatForm = ({ seatNumber }) => {
         <div className="flex justify-end gap-4">
           <button
             type="button"
-            onClick={() => setSubmittedData(null)} // Clear the submitted data to show form again
+            onClick={() => setFormData({ ...formData, memberIdLetter1: "", memberIdLetter2: "" })}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
-            Cancel
+            Clear
           </button>
           <button
             type="submit"

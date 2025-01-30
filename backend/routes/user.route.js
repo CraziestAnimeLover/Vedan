@@ -11,8 +11,8 @@ router.route("/login").post(login);
 router.route("/logout").get(logout);
 
 // Profile update routes (separate paths for different updates)
-router.put('/update-profile', isAuthenticated, singleUpload, updateProfile); // Regular profile update
-router.put('/update-library-profile', isAuthenticated, singleUpload, updateLibraryProfile); // Library profile update
+router.put('/api/v1/user/update-profile', isAuthenticated, singleUpload, updateProfile); // Regular profile update
+router.put('/api/v1/user/update-profile', isAuthenticated, singleUpload, updateLibraryProfile); // Library profile update
 
 // Forgot password and reset password routes
 router.route("/forgot-password").post(forgotPassword);
