@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 // import HeroSection from './HeroSection';
 // import CategoryCarousel from './CategoryCarousel';
 // import LatestJobs from './LatestJobs';
+import { useNavigate } from 'react-router-dom';
+
 import Footer from './Footer';
 // import Advertisement from './shared/Advertisement';
 import Signup from '../components/auth/Signup';
@@ -13,12 +15,17 @@ import AdvertisementEventCard from './events/eventlist/AdvertisementEventCard'; 
 const Home = () => {
   // State to manage advertisement visibility
   const [showAd, setShowAd] = useState(true);
+  const navigate = useNavigate()
 
   // Function to handle closing the advertisement
   const handleCloseAd = () => {
     setShowAd(false);
   };
 
+    // Function to handle advertisement click
+    const handleAdClick = () => {
+      navigate('/social/events'); // Navigate to the /social/event route
+    };
   return (
     <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-screen">
       {/* Optional Advertisement */}
@@ -74,7 +81,7 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <AdvertisementEventCard onClose={handleCloseAd} /> {/* Pass the close handler */}
+            <AdvertisementEventCard onClose={handleCloseAd} onClick={handleAdClick}/> {/* Pass the close handler */}
           </motion.div>
         )}
         {/* Quotes Section */}
