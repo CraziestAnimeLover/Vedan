@@ -33,7 +33,7 @@ const Home = () => {
         {/* Show Advertisement only if showAd is true */}
         {showAd && (
           <div>
-            <AdvertisementEventCard onClose={handleCloseAd} onClick={handleAdClick} /> {/* Pass the close handler */}
+            {/* <AdvertisementEventCard onClose={handleCloseAd} onClick={handleAdClick} /> Pass the close handler */}
           </div>
         )}
 
