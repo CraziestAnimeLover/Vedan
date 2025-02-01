@@ -38,6 +38,11 @@ import LoanBook from './components/library/bookloan/LoanBook'
 import FakeTicketEnquiry from './components/library/enquiry/FakeTicketEnquiry'
 import Shells from './components/library/bookshell/books/Shells'
 import Events from './components/events/Events'
+import Competition from './components/activity/competition/Competition'
+import Esports from './components/activity/esports/Esports'
+import Sports from './components/activity/sports/Sports'
+import Testseries from './components/exam/testseries/Testseries'
+import ScholarShip from './components/exam/scholarship/ScholarShip'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -116,6 +121,21 @@ const approuter = createBrowserRouter([
   
   { path: '/service', 
    element: <ServicePage/>
+  },
+  { path: '/service/activity/sports', 
+   element: <Sports/>
+  },
+  { path: '/service/activity/esports', 
+   element: <Esports/>
+  },
+  { path: '/service/activity/compition', 
+   element: <Competition/>
+  },
+  { path: '/service/exam/testseries', 
+   element: <Testseries/>
+  },
+  { path: '/service/exam/scholarship', 
+   element: <ScholarShip/>
   },
    { path: '/service/student', 
     element: <StudentForm/>

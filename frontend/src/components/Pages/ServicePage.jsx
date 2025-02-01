@@ -102,15 +102,16 @@ const serviceItems = {
   ],
   Exam: [
     { title: "Fill Up", url: "/exam/papers" },
-    { title: "Test Series", url: "/exam/upcoming" },
-    { title: "Scholarship Scheme", url: "/exam/scholarship" },
+    { title: "Test Series", url: "/service/exam/testseries" },
+    { title: "Scholarship Scheme", url: "/service/exam/scholarship" },
     { title: "Result", url: "/exam/result" },
     { title: "Admit Card", url: "/exam/admitcard" },
     { title: "Study Center", url: "/exam/studycenter" },
   ],
   Activity: [
-    { title: "Clubs & Events", url: "/activity/clubs" },
-    { title: "Sports", url: "/activity/sports" },
+    { title: "Sports", url: "/service/activity/sports" },
+    { title: "E-Sports", url: "/service/activity/esports" },
+    { title: "Competitions", url: "/service/activity/compition" },
   ],
   "Diet Chart": [
     { title: "Breakfast Ideas", url: "/diet/breakfast" },

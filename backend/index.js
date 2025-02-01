@@ -8,6 +8,7 @@ import bookRoute from "./routes/book.routes.js";
 import userRoute from "./routes/user.route.js";
 import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
+
 import planRouter from "./routes/plan.routes.js";
 import bookRoutes from "./routes/book.routes.js";
 import eventRoutes from "./routes/eventRoutes.js";
@@ -170,16 +171,16 @@ app.get("/api/fees", async (req, res) => {
 });
 
 // After successful login
-app.post("/login", (req, res) => {
-  const token = generateToken(); // Replace with your token generation logic
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "None",
-    maxAge: 3600000, // 1 hour cookie expiration
-  });
-  res.json({ message: "Logged in successfully" });
-});
+// app.post("/login", (req, res) => {
+//   const token = generateToken(); // Replace with your token generation logic
+//   res.cookie("token", token, {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === "production",
+//     sameSite: "None",
+//     maxAge: 3600000, // 1 hour cookie expiration
+//   });
+//   res.json({ message: "Logged in successfully" });
+// });
 
 // Endpoint to save attendance
 

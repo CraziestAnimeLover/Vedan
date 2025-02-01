@@ -39,36 +39,38 @@ const Signup = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
+  
     if (!phoneRegex.test(input.phoneNumber)) {
       toast.error('Phone number must be exactly 10 digits.');
       return;
     }
-
+  
     if (!passwordRegex.test(input.password)) {
       toast.error(
         'Password must include at least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character.'
       );
       return;
     }
-
+  
     if (input.password !== input.confirmPassword) {
       toast.error('Password and Confirm Password do not match.');
       return;
     }
-
-    const formData = new FormData();
-    Object.keys(input).forEach((key) => {
-      if (input[key]) formData.append(key, input[key]);
-    });
-
+  
+    const formData = {
+      fullname: input.fullname,
+      email: input.email,
+      phoneNumber: input.phoneNumber,
+      password: input.password,
+    };
+  
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'application/json' }, // Ensure the content type is JSON
         withCredentials: true,
       });
-
+  
       if (res.data.success) {
         navigate('/login');
         toast.success(res.data.message);
@@ -80,6 +82,7 @@ const Signup = () => {
       dispatch(setLoading(false));
     }
   };
+  
 
   useEffect(() => {
     if (user) {
@@ -88,20 +91,24 @@ const Signup = () => {
   }, [user, navigate]);
 
   return (
-    <div className='pb-2'>
+    <div className='pb-4'>
       <Navbar />
       <div
-      className="flex items-end justify-end min-h-screen pe-10 pb-2 opacity-89"
+      className="flex items-end justify-end min-h-screen  pb-2 pe-2 opacity-89"
       style={{
         backgroundImage: `url(${myImage})`, // Only use the image without gradient
         backgroundSize: 'cover', // Ensure the image covers the entire div
         backgroundPosition: 'center', // Center the image
       }}
     >
-        <form
-          onSubmit={submitHandler}
-          className="w-full max-w-lg bg-blue-100 border border-gray-900 rounded-md  p-4 shadow-lg pb-10 mb-10 mt-10 pt-10"
-        >
+      <div className='w-full max-w-lg sm:max-w-md  p-1 me-1'> 
+
+      <form
+  onSubmit={submitHandler}
+  className="w-full max-w-lg sm:max-w-md bg-blue-100 border border-gray-900 mx-3 rounded-md p-4 sm:p-4 p-2 shadow-lg pb-10 mb-10 mt-10 pt-10"
+>
+
+
           <h1 className="font-bold text-xl sm:text-2xl mb-5 text-center">Sign Up</h1>
 
           <div className="my-3">
@@ -195,6 +202,7 @@ const Signup = () => {
             </Link>
           </span>
         </form>
+      </div>
       </div>
     </div>
   );

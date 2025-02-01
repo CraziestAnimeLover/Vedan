@@ -12,6 +12,12 @@ const EventCard = ({ event }) => {
           alt={event.title}
           className="w-full h-40 object-cover" // Fixed height and width
         />
+        <img
+  src={event.image}
+  
+  alt="Bottom Left"
+  className="absolute top-36 right-1 w-20 h-10 object-cover rounded-lg border-2 border-white shadow-md"
+/>
         <CardContent className="flex flex-col flex-grow p-4">
           <CardTitle className="text-xl font-semibold">{event.title}</CardTitle>
           <p className="text-gray-500">

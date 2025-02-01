@@ -3,6 +3,7 @@ import LostItemInput from "./LostItemInput";
 import LostItemDisplay from "./LostItemDisplay";
 import PostList from "./PostList";
 import Navbar from "../shared/Navbar";
+import LosProfile from "./LosProfile";
 
 const LostItem = () => {
   const [lostItemDetails, setLostItemDetails] = useState(null);
@@ -14,8 +15,9 @@ const LostItem = () => {
   return (
     <>
       <Navbar />
-      <div className="flex space-x-8 p-8">
+      {/* <div className="flex space-x-8 p-8"> */}
         {/* Left side: Input Form */}
+        
         {/* <div className="w-1/2">
           <LostItemInput onSubmit={handleItemDetails} />
         </div> */}
@@ -28,12 +30,14 @@ const LostItem = () => {
             <p className="text-gray-500">No item details submitted yet.</p>
           )}
         </div> */}
-      </div>
+      
 
-      <div>
-      <h1 className="text-center text-3xl font-bold my-6">Lost and Found</h1>
-      <PostList />
-    </div>
+      {/* <div> */}
+        <LosProfile/>
+      {/* <h1 className="text-center text-3xl font-bold my-6">Lost and Found</h1> */}
+      {/* <PostList /> */}
+{/*       
+    </div> */}
     </>
   );
 };

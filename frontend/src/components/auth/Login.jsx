@@ -26,58 +26,42 @@ const Login = () => {
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     }
+    
 
     const submitHandler = async (e) => {
         e.preventDefault();
-    
-        // Validate inputs
-        if (!input.email || !input.password) {
-            toast.error("Email and password are required.");
-            return;
-        }
-    
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(input.email)) {
-            toast.error("Please enter a valid email address.");
-            return;
-        }
+        console.log("Sending POST request to:", `${USER_API_END_POINT}/login`);
+        console.log("Payload:", input);  // Check the payload
     
         try {
-            dispatch(setLoading(true)); // Set loading state
+            dispatch(setLoading(true));
             const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-                headers: { 'Content-Type': "application/json" },
-                withCredentials: true,  // Add credentials if using cookies for token
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                withCredentials: true,
             });
     
             if (res.data.success) {
-                // Store token securely (e.g., via httpOnly cookie or sessionStorage)
-                sessionStorage.setItem('token', res.data.token); // You may want to use sessionStorage instead of localStorage for session-based login
-    
-                // Dispatch user data to Redux store
                 dispatch(setAuthUser(res.data.user));
-    
-                // Redirect to select page after successful login
-                navigate("/select");
-    
-                // Show success message
+                navigate("/");
                 toast.success(res.data.message);
-            } else {
-                // If success flag is false, handle appropriately
-                toast.error(res.data.message || "Login failed. Please try again.");
             }
         } catch (error) {
-            console.log(error);
-    
-            // Better error handling, check for network errors or response errors
-            if (!error.response) {
-                toast.error("Network error. Please try again later.");
+            if (error.response) {
+                console.log("Error Response:", error.response);
+                toast.error(error.response.data.message || "Something went wrong!");
             } else {
-                toast.error(error.response?.data?.message || "An error occurred.");
+                toast.error("Network error or invalid request.");
             }
         } finally {
-            dispatch(setLoading(false)); // Reset loading state
+            dispatch(setLoading(false));
         }
-    }
+    };
+    
+   
+    
+     
     
 
     useEffect(() => {

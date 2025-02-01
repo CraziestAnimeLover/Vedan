@@ -25,22 +25,19 @@ export const register = async (req, res) => {
         }
 
         // Hash password and create user
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // If no role provided, default to 'student'
-        const newRole = role || 'student';
-
-        await User.create({
-            fullname,
-            email,
-            phoneNumber,
-            password: hashedPassword,
-            role: newRole, // Assigning the role here
-            profile: {
-                mobile: phoneNumber,  // Set mobile as phoneNumber
-            },
-            vedannId: 'Not Assigned', // Default Vedan ID
-        });
+        const saltRounds = 10;const hashedPassword = await bcrypt.hash(password.trim(), 10);
+        
+await User.create({
+    fullname,
+    email,
+    phoneNumber,
+    password: hashedPassword, // Ensure this is being saved correctly
+    role,
+    profile: {
+        mobile: phoneNumber,
+    },
+    vedannId: 'Not Assigned',
+});
 
         return res.status(201).json({
             message: "Account created successfully.",
@@ -55,65 +52,59 @@ export const register = async (req, res) => {
 // Login Function
 export const login = async (req, res) => {
     try {
+        console.log("Request body:", req.body); // Log the incoming request body
+
         const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "Email and password are required",
                 success: false
             });
         }
 
-        let user = await User.findOne({ email });
+        const user = await User.findOne({ email });
+        console.log("User found in DB:", user); // Log the user object from the database
+
         if (!user) {
             return res.status(400).json({
-                message: "Incorrect email or password.",
+                message: "Incorrect email.",
                 success: false,
             });
         }
 
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        const isPasswordMatch = await bcrypt.compare(password.trim(), user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({
-                message: "Incorrect email or password.",
+                message: "Incorrect password.",
                 success: false,
             });
         }
-
-        // Generate JWT token with role and Vedan ID
+        console.log("Entered Password:", password); // Log the password entered by the user
+        console.log("Stored Hashed Password:", user.password); // Log the hashed password from the database
+        console.log("Password Match Result:", isPasswordMatch); // Log the result of bcrypt.compare
         const tokenData = {
-            userId: user._id,
-            role: user.role,
-            vedannId: user.vedannId,
+            userId: user._id
         };
+
         const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-        // Prepare user data
-        user = {
-            _id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            profile: user.profile,
-            role: user.role,
-            vedannId: user.vedannId,
-        };
+        res.status(200)
+            .cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' })
+            .json({
+                message: `Welcome back ${user.fullname}`,
+                user,
+                success: true
+            });
 
-        return res.status(200).cookie("token", token, { 
-            maxAge: 86400000, 
-            httpOnly: true, 
-            sameSite: 'None', 
-            secure: process.env.NODE_ENV === 'production' // Ensure cookies are only secure in production
-        }).json({
-            message: `Welcome back ${user.fullname}`,
-            user,
-            success: true
-        });
     } catch (error) {
-        console.error(error);
+        console.error("Error in login function:", error); // Log the error for debugging
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
+
+
 
 // Forgot Password Function
 export const forgotPassword = async (req, res) => {
