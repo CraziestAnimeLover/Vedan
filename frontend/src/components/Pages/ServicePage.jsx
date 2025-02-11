@@ -101,12 +101,12 @@ const serviceItems = {
     { title: "Book Rent", url: "/library/article1" },
   ],
   Exam: [
-    { title: "Fill Up", url: "/exam/papers" },
+    { title: "Fill Up", url: "/service/exam/apply" },
     { title: "Test Series", url: "/service/exam/testseries" },
     { title: "Scholarship Scheme", url: "/service/exam/scholarship" },
-    { title: "Result", url: "/exam/result" },
-    { title: "Admit Card", url: "/exam/admitcard" },
-    { title: "Study Center", url: "/exam/studycenter" },
+    { title: "Result", url: "/service/exam/result" },
+    { title: "Admit Card", url: "/service/exam/admitcard" },
+    { title: "Study Center", url: "/service/exam/studycenter" },
   ],
   Activity: [
     { title: "Sports", url: "/service/activity/sports" },

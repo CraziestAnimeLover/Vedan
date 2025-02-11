@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '@/redux/authSlice';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import myImage from '../../assets/signupback.jpeg';
+import CustomCard from './CustomCard';
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -202,6 +203,7 @@ const Signup = () => {
             </Link>
           </span>
         </form>
+        <CustomCard/>
       </div>
       </div>
     </div>

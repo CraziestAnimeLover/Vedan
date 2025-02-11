@@ -43,6 +43,10 @@ import Esports from './components/activity/esports/Esports'
 import Sports from './components/activity/sports/Sports'
 import Testseries from './components/exam/testseries/Testseries'
 import ScholarShip from './components/exam/scholarship/ScholarShip'
+import Apply from './components/exam/Apply'
+import Results from './components/exam/result/Results'
+import StudyCenter from './components/exam/studyCenter'
+import AdmitCard from './components/exam/AdmitCard'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -137,6 +141,18 @@ const approuter = createBrowserRouter([
   { path: '/service/exam/scholarship', 
    element: <ScholarShip/>
   },
+  { path: '/service/exam/apply', 
+    element: <Apply/>
+   },
+  { path: '/service/exam/result', 
+    element: <Results/>
+   },
+  { path: '/service/exam/studycenter', 
+    element: <StudyCenter/>
+   },
+  { path: '/service/exam/admitcard', 
+    element: <AdmitCard/>
+   },
    { path: '/service/student', 
     element: <StudentForm/>
    },

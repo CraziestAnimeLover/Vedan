@@ -68,7 +68,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
 
   return (
     <section className="font-medium rounded-2xl flex justify-start items-start px-1/2 py-1/2 h-fit">
-      <section className="w-48 bg-[#20354b] rounded-2xl mx-2 px-4 py-2 shadow-lg h-fit">
+      <section className="w-48 bg-[#20354b] rounded-2xl mx-2 px-4 py-1 shadow-lg h-fit">
         <div className="flex flex-col items-center">
           {isEditing ? (
             <>
@@ -82,30 +82,74 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
               {formErrors.name && <span className="text-red-500 text-xs">{formErrors.name}</span>}
             </>
           ) : (
-            <span className="text-2xl text-white">{name}</span>
+            <span className="text-2xl text-white"></span>
           )}
         </div>
 
-        <div className="mt-1 flex justify-center">
-          <Avatar className="h-24 w-24">
-            <AvatarImage src={image} alt="profile" />
-          </Avatar>
+        <div className="bg-[#20354b]  rounded-lg shadow-lg w-40 h-64 flex flex-col items-center justify-center  relative">
+          <div
+            style={{
+              fontSize: '18rem', // Adjust text size here
+              letterSpacing: '2px',
+              color: 'white',
+              position: 'relative',
+              marginBottom:"45px",
+            }}
+          >
+            व
+            <div
+              style={{
+                position: 'absolute',
+                inset: '0',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+              }}
+              onClick={() => document.getElementById('fileInput').click()}
+            >
+              {image ? (
+                <img
+                  src={image}
+                  alt="Profile"
+                  style={{
+                    width: '89px',
+                    height: '89px',
+                    marginTop: '42px',
+                    marginRight: '8px',
+                    borderRadius: '50%',
+                    border: '4px solid white',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '85px',
+                    height: '85px',
+                    marginTop: '42px',
+                    marginRight: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ccc',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    border: '4px solid white',
+                  }}
+                >
+                  +
+                </div>
+              )}
+            </div>
+            <input
+              type="file"
+              id="fileInput"
+              style={{ display: 'none' }}
+              onChange={handleProfilePictureChange}
+            />
+          </div>
         </div>
 
-        <div className="mt-1 text-center">
-          <label htmlFor="file-input" className="cursor-pointer text-yellow-500 underline">
-            Change Profile Picture
-          </label>
-          <input
-            id="file-input"
-            type="file"
-            accept="image/*"
-            onChange={handleProfilePictureChange}
-            className="hidden"
-          />
-        </div>
-
-        <div className="">
+        <div>
           {isEditing ? (
             <>
               <div className="flex items-center gap-3 ">
@@ -131,10 +175,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
         </div>
 
         <div className="mt-4 text-white">
-          <div className="flex items-center gap-3">
-            <Contact />
-            <span>{phoneNumber}</span>
-          </div>
+          
         </div>
 
         <div className="text-white text-sm">
@@ -173,7 +214,5 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
     </section>
   );
 };
-
-
 
 export default ProfileCard;
