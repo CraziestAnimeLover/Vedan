@@ -22,6 +22,7 @@ import { Attendance } from "./models/attendanceSchema.model.js";
 import admitCardRoutes from "./routes/admitCardRoutes.js";
 import FeeData from "./models/feeDataSchema.model.js"; // <-- Import the FeeData model
 import studyCenterRoutes from "./routes/studyCenterRoutes.js";
+import animalRoutes from "./routes/animal.route.js";
 import {
   isAuthenticated,
   isLibrarian,
@@ -75,7 +76,7 @@ app.use("/api/books", bookRoutes);
 app.use("/api/loans", loanRoutes);
 app.use(ticketRoutes);
 app.use('/api/events', eventRoutes);
-
+app.use("/api/animals", animalRoutes);
 // Use routes
 app.use('/api/student', studentRoutes);  // Ensure the student routes are included
 app.use('/api', seatRoutes);   // Ensure the seat booking routes are included
