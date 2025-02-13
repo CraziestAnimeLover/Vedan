@@ -242,26 +242,25 @@ const [examData, setExamData] = useState([]);
           <th className="py-2 px-4 border-b">Sr. No</th>
           <th className="py-2 px-4 border-b">Exam Name</th>
           <th className="py-2 px-4 border-b">Percentage</th>
-          <th className="py-2 px-4 border-b">Website</th>
+          <th className="py-2 px-4 border-b">Organizer</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td className="py-2 px-4 border-b">1</td>
-          <td className="py-2 px-4 border-b">SSC CGL</td>
-          <td className="py-2 px-4 border-b">55%</td>
-          <td className="py-2 px-4 border-b">
-            <a href="https://ssc.nic.in" className="text-yellow-400 hover:underline">ssc.nic.in</a>
-          </td>
-        </tr>
-        <tr>
-          <td className="py-2 px-4 border-b">2</td>
-          <td className="py-2 px-4 border-b">GATE</td>
-          <td className="py-2 px-4 border-b">78%</td>
-          <td className="py-2 px-4 border-b">
-            <a href="https://gate.iitk.ac.in" className="text-yellow-400 hover:underline">gate.iitk.ac.in</a>
-          </td>
-        </tr>
+      {examData.map((exam, index) => (
+  <tr key={exam.id}>
+    <td className="py-2 px-4 border-b">{index + 1}</td>
+    <td className="py-2 px-4 border-b">{exam.name}</td>
+    
+    <td className="py-2 px-4 border-b">98%</td>
+    <td className="py-2 px-4 border-b">
+      
+      {exam.university}
+    
+    </td>
+  </tr>
+))}
+        
+        
       </tbody>
     </table>
   </div>

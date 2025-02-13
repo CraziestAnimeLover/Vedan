@@ -39,8 +39,8 @@ export const getPostsByExam = async (req, res) => {
 
 export const createExam = async (req, res) => {
   try {
-    const { name, notificationDate, lastDate, examSite } = req.body;
-    const newExam = new Exam({ name, notificationDate, lastDate, examSite });
+    const { name, notificationDate, lastDate, examSite,university } = req.body;
+    const newExam = new Exam({ name, notificationDate, lastDate, examSite, university });
     await newExam.save();
     res.status(201).json(newExam);
   } catch (err) {

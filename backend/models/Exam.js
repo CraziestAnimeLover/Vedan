@@ -7,6 +7,7 @@ const examSchema = new Schema({
   notificationDate: { type: Date, required: true },
   lastDate: { type: Date, required: true },
   examSite: { type: String, required: true },
+  university: { type: String, required: true },
 });
 
 export default model('Exam', examSchema);
