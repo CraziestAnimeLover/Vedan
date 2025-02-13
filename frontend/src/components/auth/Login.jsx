@@ -31,16 +31,21 @@ const Login = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         console.log("Sending POST request to:", `${USER_API_END_POINT}/login`);
-        console.log("Payload:", input);  // Check the payload
+        console.log("Payload:", input);  // Check the payload before sending
+    
+        if (!input.email || !input.password) {
+            toast.error("Email and password are required!");
+            return;
+        }
     
         try {
             dispatch(setLoading(true));
             const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 withCredentials: true,
             });
+    
+            console.log("Server Response:", res.data);
     
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user));
@@ -48,9 +53,9 @@ const Login = () => {
                 toast.success(res.data.message);
             }
         } catch (error) {
+            console.log("Error Response:", error.response);
             if (error.response) {
-                console.log("Error Response:", error.response);
-                toast.error(error.response.data.message || "Something went wrong!");
+                toast.error(error.response.data.message || "Invalid credentials!");
             } else {
                 toast.error("Network error or invalid request.");
             }
@@ -58,6 +63,7 @@ const Login = () => {
             dispatch(setLoading(false));
         }
     };
+    
     
    
     

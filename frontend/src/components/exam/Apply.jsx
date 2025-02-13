@@ -20,7 +20,28 @@ const Apply = () => {
   const [isSubjectActive, setIsSubjectActive] = useState(false); // Track subject menu state
   const [selectedSubjectCategory, setSelectedSubjectCategory] = useState(""); // Track selected subject
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+  const [exams, setExams] = useState([]);
 
+const [examData, setExamData] = useState([]);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/exams");
+        const data = await response.json();
+        setExamData(data); 
+      } catch (error) {
+        console.error("Error fetching exam data:", error);
+      }
+    };
+  
+    fetchExams();
+  }, []);
+  
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   useEffect(() => {
     if (!loading && user === null) {
       navigate("/login"); 
@@ -187,11 +208,11 @@ const Apply = () => {
 
       <div className="flex-1 bg-[#071e34] p-6 w-full flex justify-start items-start overflow-auto">
         {activeForm === "" && (
-          <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg text-center">
-            <h2 className="text-white font-semibold text-3xl mb-4">
-              Apply
-            </h2>
-            <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
+          <div className=" min-w-full mt-4 bg-[#20354b] text-white rounded-lg shadow-lg overflow-auto text-center">
+          <h2 className="text-white font-semibold text-3xl mb-4 mt-4">
+            Apply
+          </h2>
+          <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
               <thead>
                 <tr>
                   <th className="py-2 px-4 border-b">Sr. No</th>
@@ -202,20 +223,20 @@ const Apply = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="py-2 px-4 border-b">1</td>
-                  <td className="py-2 px-4 border-b">Sample Exam 1</td>
-                  <td className="py-2 px-4 border-b">2025-02-01</td>
-                  <td className="py-2 px-4 border-b">2025-02-20</td>
-                  <td className="py-2 px-4 border-b">www.sampleexam1.com</td>
-                </tr>
-                <tr>
-                  <td className="py-2 px-4 border-b">2</td>
-                  <td className="py-2 px-4 border-b">Sample Exam 2</td>
-                  <td className="py-2 px-4 border-b">2025-02-05</td>
-                  <td className="py-2 px-4 border-b">2025-02-25</td>
-                  <td className="py-2 px-4 border-b">www.sampleexam2.com</td>
-                </tr>
+              {examData.map((exam, index) => (
+  <tr key={exam.id}>
+    <td className="py-2 px-4 border-b">{index + 1}</td>
+    <td className="py-2 px-4 border-b">{exam.name}</td>
+    <td className="py-2 px-4 border-b">{exam.notificationDate}</td>
+    <td className="py-2 px-4 border-b">{exam.lastDate}</td>
+    <td className="py-2 px-4 border-b">
+      <a href={exam.site} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
+        {exam.site}
+      </a>
+    </td>
+  </tr>
+))}
+               
               </tbody>
             </table>
           </div>

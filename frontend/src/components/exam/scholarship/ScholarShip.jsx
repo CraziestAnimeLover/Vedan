@@ -21,6 +21,21 @@ const ScholarShip = () => {
   const [isSubjectActive, setIsSubjectActive] = useState(false); // Track subject menu state
   const [selectedSubjectCategory, setSelectedSubjectCategory] = useState(""); // Track selected subject
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+  const [scholarships, setScholarships] = useState([]);
+
+  useEffect(() => {
+    const fetchScholarships = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/scholarships"); 
+        const data = await response.json();
+        setScholarships(data);
+      } catch (error) {
+        console.error("Error fetching scholarships:", error);
+      }
+    };
+
+    fetchScholarships();
+  }, []);
 
   useEffect(() => {
     if (!loading && user === null) {
@@ -177,11 +192,11 @@ const ScholarShip = () => {
 
       <div className="flex-1 bg-[#071e34] p-6 w-full flex justify-start items-start overflow-auto">
         {activeForm === "" && (
-          <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg text-center">
-            <h2 className="text-white font-semibold text-3xl mb-4">
-             Scholarship
-            </h2>
-            <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
+         <div className=" min-w-full mt-4 bg-[#20354b] text-white rounded-lg shadow-lg overflow-auto text-center">
+         <h2 className="text-white font-semibold text-3xl mb-4 mt-4">
+           Scholarship
+         </h2>
+         <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
               <thead>
                 <tr>
                   <th className="py-2 px-4 border-b">Sr. No</th>
@@ -192,13 +207,18 @@ const ScholarShip = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="py-2 px-4 border-b">1</td>
-                  <td className="py-2 px-4 border-b">Sample Exam 1</td>
-                  <td className="py-2 px-4 border-b">2025-02-01</td>
-                  
-                  <td className="py-2 px-4 border-b">www.sampleexam1.com</td>
-                </tr>
+              {scholarships.map((scholarship, index) => (
+            <tr key={scholarship._id}>
+              <td className="py-2 px-4 border-b">{index + 1}</td>
+              <td className="py-2 px-4 border-b">{scholarship.name}</td>
+              <td className="py-2 px-4 border-b">{scholarship.field}</td>
+              <td className="py-2 px-4 border-b">
+                <a href={scholarship.link} target="_blank" rel="noopener noreferrer">
+                  {scholarship.link}
+                </a>
+              </td>
+            </tr>
+          ))}
                 <tr>
                   <td className="py-2 px-4 border-b">2</td>
                   <td className="py-2 px-4 border-b">Sample Exam 2</td>

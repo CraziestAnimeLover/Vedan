@@ -8,20 +8,20 @@ import bookRoute from "./routes/book.routes.js";
 import userRoute from "./routes/user.route.js";
 import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
-
+import scholarshipRoutes from "./routes/scholarshipRoutes.js";
 import planRouter from "./routes/plan.routes.js";
 import bookRoutes from "./routes/book.routes.js";
 import eventRoutes from "./routes/eventRoutes.js";
-
+import examRoutes from './routes/examRoutes.js';
 import loanRoutes from "./routes/loan.routes.js"; // Ensure the path is correct
 import ticketRoutes from "./routes/ticketRoutes.js";
 import Library from "./models/library.model.js"; // <-- Import the Library model
 import studentRoutes from './routes/student.routes.js'; // Your student routes
 import seatRoutes from './routes/seat.routes.js'; // Your seat booking routes
 import { Attendance } from "./models/attendanceSchema.model.js";
-
+import admitCardRoutes from "./routes/admitCardRoutes.js";
 import FeeData from "./models/feeDataSchema.model.js"; // <-- Import the FeeData model
-
+import studyCenterRoutes from "./routes/studyCenterRoutes.js";
 import {
   isAuthenticated,
   isLibrarian,
@@ -79,9 +79,10 @@ app.use('/api/events', eventRoutes);
 // Use routes
 app.use('/api/student', studentRoutes);  // Ensure the student routes are included
 app.use('/api', seatRoutes);   // Ensure the seat booking routes are included
-
-
-
+app.use('/api', examRoutes);
+app.use("/api", scholarshipRoutes);
+app.use("/api/admitcards", admitCardRoutes);
+app.use("/api/study-centers", studyCenterRoutes);
 app.use('/api/v1/user/update-profile', userRoute);
 app.get("/api/v1/user/update-profile", async (req, res) => {
   try {

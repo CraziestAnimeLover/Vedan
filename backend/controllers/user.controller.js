@@ -25,7 +25,8 @@ export const register = async (req, res) => {
         }
 
         // Hash password and create user
-        const saltRounds = 10;const hashedPassword = await bcrypt.hash(password.trim(), 10);
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password.trim(), 10);
         
 await User.create({
     fullname,
@@ -52,11 +53,12 @@ await User.create({
 // Login Function
 export const login = async (req, res) => {
     try {
-        console.log("Request body:", req.body); // Log the incoming request body
+        console.log("Incoming Request Body:", req.body); // Log request body
 
         const { email, password } = req.body;
 
         if (!email || !password) {
+            console.log("Missing email or password");
             return res.status(400).json({
                 message: "Email and password are required",
                 success: false
@@ -64,44 +66,45 @@ export const login = async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        console.log("User found in DB:", user); // Log the user object from the database
+        console.log("User found in database:", user);  // Check if the user exists
 
         if (!user) {
+            console.log("User not found for email:", email);
             return res.status(400).json({
                 message: "Incorrect email.",
                 success: false,
             });
         }
 
+        console.log("Stored Hashed Password:", user.password);
+        console.log("Entered Password:", password);
+
         const isPasswordMatch = await bcrypt.compare(password.trim(), user.password);
+        console.log("Password Match Result:", isPasswordMatch);  // Log password comparison result
+
         if (!isPasswordMatch) {
             return res.status(400).json({
                 message: "Incorrect password.",
                 success: false,
             });
         }
-        console.log("Entered Password:", password); // Log the password entered by the user
-        console.log("Stored Hashed Password:", user.password); // Log the hashed password from the database
-        console.log("Password Match Result:", isPasswordMatch); // Log the result of bcrypt.compare
-        const tokenData = {
-            userId: user._id
-        };
 
-        const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         res.status(200)
-            .cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' })
+            .cookie("token", token, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true })
             .json({
-                message: `Welcome back ${user.fullname}`,
+                message: `Welcome back, ${user.fullname}`,
                 user,
                 success: true
             });
 
     } catch (error) {
-        console.error("Error in login function:", error); // Log the error for debugging
+        console.error("Login error:", error);
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
 
 
 
@@ -303,3 +306,18 @@ export const logout = async (req, res) => {
 };
 
 
+export const createLibrary = async (req, res) => {
+    try {
+        // Your logic for creating a library
+        res.status(201).json({
+            success: true,
+            message: "Library created successfully."
+        });
+    } catch (error) {
+        console.error("Error creating library:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server error."
+        });
+    }
+};

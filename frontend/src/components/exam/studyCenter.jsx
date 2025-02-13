@@ -9,12 +9,30 @@ const StudyCenter = () => {
 
   const [activeSection, setActiveSection] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [studyCenters, setStudyCenters] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     if (!loading && user === null) {
       navigate("/login");
     }
   }, [loading, user, navigate]);
+
+  // Fetch Study Centers from Backend
+  useEffect(() => {
+    if (activeSection === "studycenter") {
+      fetch("http://localhost:8000/api/study-centers") // Update this URL based on your backend
+        .then((response) => response.json())
+        .then((data) => {
+          setStudyCenters(data);
+          setLoadingData(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching study centers:", error);
+          setLoadingData(false);
+        });
+    }
+  }, [activeSection]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -58,37 +76,42 @@ const StudyCenter = () => {
         {activeSection === "studycenter" && (
           <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-4xl text-center">
             <h2 className="text-white font-semibold text-3xl mb-4">Study Center</h2>
-            <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">Sr. No</th>
-                  <th className="py-2 px-4 border-b">Exam Type</th>
-                  <th className="py-2 px-4 border-b">Coaching</th>
-                  <th className="py-2 px-4 border-b">Location</th>
-                  <th className="py-2 px-4 border-b">Website</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-2 px-4 border-b">1</td>
-                  <td className="py-2 px-4 border-b">SSC CGL</td>
-                  <td className="py-2 px-4 border-b">XYZ Coaching</td>
-                  <td className="py-2 px-4 border-b">Delhi</td>
-                  <td className="py-2 px-4 border-b">
-                    <a href="https://xyzcoaching.com" className="text-yellow-400 hover:underline">xyzcoaching.com</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 px-4 border-b">2</td>
-                  <td className="py-2 px-4 border-b">GATE</td>
-                  <td className="py-2 px-4 border-b">ABC Academy</td>
-                  <td className="py-2 px-4 border-b">Mumbai</td>
-                  <td className="py-2 px-4 border-b">
-                    <a href="https://abcacademy.com" className="text-yellow-400 hover:underline">abcacademy.com</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+
+            {loadingData ? (
+              <p className="text-white">Loading study centers...</p>
+            ) : (
+              <table className="min-w-full bg-[#20354b] text-white rounded-lg shadow-lg">
+                <thead>
+                  <tr>
+                    <th className="py-2 px-4 border-b">Sr. No</th>
+                    <th className="py-2 px-4 border-b">Exam Type</th>
+                    <th className="py-2 px-4 border-b">Coaching</th>
+                    <th className="py-2 px-4 border-b">Location</th>
+                    <th className="py-2 px-4 border-b">Website</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studyCenters.map((center, index) => (
+                    <tr key={center._id}>
+                      <td className="py-2 px-4 border-b">{index + 1}</td>
+                      <td className="py-2 px-4 border-b">{center.examType}</td>
+                      <td className="py-2 px-4 border-b">{center.coaching}</td>
+                      <td className="py-2 px-4 border-b">{center.location}</td>
+                      <td className="py-2 px-4 border-b">
+                        <a
+                          href={center.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-yellow-400 hover:underline"
+                        >
+                          {center.website}
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>
