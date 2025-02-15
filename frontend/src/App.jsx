@@ -47,6 +47,7 @@ import Apply from './components/exam/Apply'
 import Results from './components/exam/result/Results'
 import StudyCenter from './components/exam/studyCenter'
 import AdmitCard from './components/exam/AdmitCard'
+import Smriti from './components/library/studentLib/smritilib/Smriti'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -123,6 +124,9 @@ const approuter = createBrowserRouter([
     element: <FakeTicketEnquiry/>, // Pass filteredBooks as state or use context here
   },
   
+  { path: '/library/smriti', 
+   element: <Smriti/>
+  },
   { path: '/service', 
    element: <ServicePage/>
   },

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Contact, Mail } from 'lucide-react';
 import { updateProfile } from '../../../../redux/updateProfileSlice';
 
+
 const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
@@ -124,8 +125,8 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
               ) : (
                 <div
                   style={{
-                    width: '85px',
-                    height: '85px',
+                    width: '88px',
+                    height: '88px',
                     marginTop: '42px',
                     marginRight: '8px',
                     borderRadius: '50%',
@@ -136,7 +137,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
                     border: '4px solid white',
                   }}
                 >
-                  +
+                  
                 </div>
               )}
             </div>
@@ -211,6 +212,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
           </button>
         )}
       </section>
+      
     </section>
   );
 };

@@ -13,7 +13,7 @@ export const getAllBooks = async (req, res) => {
 // Controller function to add a new book
 export const addBook = async (req, res) => {
     try {
-        const { title, author, isbn, genre, year, format, language, price, quantity } = req.body;
+        const { title, author, isbn, genre, year, format, language, price, quantity, copies, pages } = req.body;
         const newBook = new Book({
             title,
             author,
@@ -23,7 +23,9 @@ export const addBook = async (req, res) => {
             format,
             language,
             price,
-            quantity
+            quantity,
+            copies,  // Add copies field
+            pages,
         });
         await newBook.save();
         res.status(201).json({ book: newBook });

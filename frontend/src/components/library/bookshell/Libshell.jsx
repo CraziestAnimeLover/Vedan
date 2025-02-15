@@ -36,7 +36,10 @@ const Libshell = () => {
       bookListRef.current.scrollTop += 100; // Adjust scroll amount as needed
     }
   };
-
+  useEffect(() => {
+    console.log(selectedBook); // Check if `copies` and `pages` are present
+  }, [selectedBook]);
+  
   // Close the form when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -109,24 +112,25 @@ const Libshell = () => {
 
             {/* Conditional Rendering */}
             {selectedBook && !showAddForm && (
-              <div
-                ref={detailsRef}
-                className="bg-white p-6 rounded-lg shadow-lg text-gray-800"
-              >
-                <h2 className="text-2xl font-bold mb-4">Title: {selectedBook.title}</h2>
-                <p className="mb-2"><strong>Author:</strong> {selectedBook.author}</p>
-                <p className="mb-2"><strong>Description:</strong> {selectedBook.description}</p>
-                <p className="text-gray-700 mb-2"><strong>Publisher:</strong> {selectedBook.publisher}</p>
-                <p className="text-gray-700 mb-2"><strong>Publisher Date:</strong> {selectedBook.publisherDate}</p>
-                <p className="text-gray-700 mb-2"><strong>ISBN:</strong> {selectedBook.isbn}</p>
-                <p className="text-gray-700 mb-2"><strong>Format:</strong> {selectedBook.format}</p>
-                <p className="text-gray-700 mb-2"><strong>Language:</strong> {selectedBook.language}</p>
-                <p className="text-gray-700 mb-2"><strong>Price:</strong> ${selectedBook.price}</p>
-                <p className="text-gray-700 mb-2"><strong>Copies:</strong> {selectedBook.copies}</p>
-                <p className="text-gray-700 mb-2"><strong>Pages:</strong> {selectedBook.pages}</p>
-                <p className="text-gray-700 mb-2"><strong>Book ID:</strong> {formatBookId(books.findIndex(b => b._id === selectedBook._id))}</p>
-              </div>
-            )}
+  <div
+    ref={detailsRef}
+    className="bg-white p-6 rounded-lg shadow-lg text-gray-800"
+  >
+    <h2 className="text-2xl font-bold mb-4">Title: {selectedBook.title}</h2>
+    <p className="mb-2"><strong>Author:</strong> {selectedBook.author}</p>
+    <p className="mb-2"><strong>Description:</strong> {selectedBook.description}</p>
+    <p className="text-gray-700 mb-2"><strong>Publisher:</strong> {selectedBook.publisher}</p>
+    <p className="text-gray-700 mb-2"><strong>Publisher Date:</strong> {selectedBook.publisherDate}</p>
+    <p className="text-gray-700 mb-2"><strong>ISBN:</strong> {selectedBook.isbn}</p>
+    <p className="text-gray-700 mb-2"><strong>Format:</strong> {selectedBook.format}</p>
+    <p className="text-gray-700 mb-2"><strong>Language:</strong> {selectedBook.language}</p>
+    <p className="text-gray-700 mb-2"><strong>Price:</strong> ${selectedBook.price}</p>
+    <p className="text-gray-700 mb-2"><strong>Copies:</strong> {selectedBook.copies}</p> {/* Ensure this field is shown */}
+    <p className="text-gray-700 mb-2"><strong>Pages:</strong> {selectedBook.pages}</p> {/* Ensure this field is shown */}
+    <p className="text-gray-700 mb-2"><strong>Book ID:</strong> {formatBookId(books.findIndex(b => b._id === selectedBook._id))}</p>
+  </div>
+)}
+
 
             {showAddForm && (
               <div

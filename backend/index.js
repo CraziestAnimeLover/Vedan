@@ -24,6 +24,7 @@ import FeeData from "./models/feeDataSchema.model.js"; // <-- Import the FeeData
 import studyCenterRoutes from "./routes/studyCenterRoutes.js";
 import animalRoutes from "./routes/animal.route.js";
 import humanRoutes from "./routes/humanBeingRoutes.js";
+import materialRoutes from "./routes/materialRoutes.js";
 import {
   isAuthenticated,
   isLibrarian,
@@ -79,6 +80,7 @@ app.use(ticketRoutes);
 app.use('/api/events', eventRoutes);
 app.use("/api/animals", animalRoutes);
 app.use("/api", humanRoutes);
+app.use("/api", materialRoutes);
 // Use routes
 app.use('/api/student', studentRoutes);  // Ensure the student routes are included
 app.use('/api', seatRoutes);   // Ensure the seat booking routes are included

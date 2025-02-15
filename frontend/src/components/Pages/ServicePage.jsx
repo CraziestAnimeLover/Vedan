@@ -95,7 +95,7 @@ const services = [
 // Define a mapping of services to their respective items
 const serviceItems = {
   Library: [
-    { title: "SeatNo", url: "/library/book1" },
+    { title: "Smriti", url: "/library/smriti" },
     { title: "Attendence", url: "/library/book2" },
     { title: "Fees", url: "/library/article1" },
     { title: "Book Rent", url: "/library/article1" },

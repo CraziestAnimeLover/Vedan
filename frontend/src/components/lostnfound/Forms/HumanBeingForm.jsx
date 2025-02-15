@@ -98,6 +98,30 @@ const HumanBeingForm = () => {
   
       if (response.ok) {
         alert("Form submitted successfully!");
+        
+        // ✅ Clear form after successful submission
+        setFormData({
+          lostLocation: "",
+          lostDate: "",
+          lostTime: "",
+          skinColor: "",
+          eyeColor: "",
+          hairColor: "",
+          height: "",
+          weight: "",
+          age: "",
+          gender: "",
+          name: "",
+          address: "",
+          guardianName: "",
+          guardianPhone: "",
+          guardianAddress: "",
+          image: null,
+        });
+        
+        // ✅ Reset file input (needed because React state alone won't clear it)
+        document.getElementById("imageInput").value = "";
+        
       } else {
         alert(result.message || "Error submitting form.");
       }
@@ -105,6 +129,7 @@ const HumanBeingForm = () => {
       console.error("Network error:", error);
     }
   };
+  
   
   
   
