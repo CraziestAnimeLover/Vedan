@@ -114,7 +114,7 @@ const serviceItems = {
   ],
   "Diet Chart": [
     { title: "Diet", url: "/diet" },
-    { title: "Lunch Ideas", url: "/diet/lunch" },
+   
   ],
   Placement: [
     { title: "Job Openings", url: "/placement/jobs" },
