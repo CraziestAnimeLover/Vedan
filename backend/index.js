@@ -28,6 +28,7 @@ import humanRoutes from "./routes/humanBeingRoutes.js";
 import  consultationRoutes from "./routes/consultationRoutes.js"
 import materialRoutes from "./routes/materialRoutes.js";
 import joinedRoutes from './routes/joinedRoutes.js';
+import reminderRoutes from './routes/reminderRoutes.js';
 import {
   isAuthenticated,
   isLibrarian,
@@ -70,6 +71,7 @@ app.get("/home", (req, res) => {
 });
 
 // Book Management Routes
+app.use('/api', reminderRoutes);
 app.use('/api', joinedRoutes);
 app.use('/api', searchRoutes);
 app.use("/api/v1/library/books", bookRoute);
