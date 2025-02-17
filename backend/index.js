@@ -22,9 +22,12 @@ import { Attendance } from "./models/attendanceSchema.model.js";
 import admitCardRoutes from "./routes/admitCardRoutes.js";
 import FeeData from "./models/feeDataSchema.model.js"; // <-- Import the FeeData model
 import studyCenterRoutes from "./routes/studyCenterRoutes.js";
+import searchRoutes from './routes/searchRoutes.js';
 import animalRoutes from "./routes/animal.route.js";
 import humanRoutes from "./routes/humanBeingRoutes.js";
+import  consultationRoutes from "./routes/consultationRoutes.js"
 import materialRoutes from "./routes/materialRoutes.js";
+import joinedRoutes from './routes/joinedRoutes.js';
 import {
   isAuthenticated,
   isLibrarian,
@@ -67,8 +70,10 @@ app.get("/home", (req, res) => {
 });
 
 // Book Management Routes
+app.use('/api', joinedRoutes);
+app.use('/api', searchRoutes);
 app.use("/api/v1/library/books", bookRoute);
-
+app.use('/api', consultationRoutes);
 // User, Company, and Job Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);

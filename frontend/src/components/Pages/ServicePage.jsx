@@ -96,9 +96,8 @@ const services = [
 const serviceItems = {
   Library: [
     { title: "Smriti", url: "/library/smriti" },
-    { title: "Attendence", url: "/library/book2" },
-    { title: "Fees", url: "/library/article1" },
-    { title: "Book Rent", url: "/library/article1" },
+    { title: "Full", url: "/library/full" },
+    
   ],
   Exam: [
     { title: "Fill Up", url: "/service/exam/apply" },
@@ -114,7 +113,7 @@ const serviceItems = {
     { title: "Competitions", url: "/service/activity/compition" },
   ],
   "Diet Chart": [
-    { title: "Breakfast Ideas", url: "/diet/breakfast" },
+    { title: "Diet", url: "/diet" },
     { title: "Lunch Ideas", url: "/diet/lunch" },
   ],
   Placement: [

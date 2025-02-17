@@ -48,6 +48,8 @@ import Results from './components/exam/result/Results'
 import StudyCenter from './components/exam/studyCenter'
 import AdmitCard from './components/exam/AdmitCard'
 import Smriti from './components/library/studentLib/smritilib/Smriti'
+import Full from './components/library/studentLib/full/Full'
+import DietChart from './components/diet/dietchart/DietChart'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -126,6 +128,12 @@ const approuter = createBrowserRouter([
   
   { path: '/library/smriti', 
    element: <Smriti/>
+  },
+  { path: '/library/full', 
+   element: <Full/>
+  },
+  { path: '/diet', 
+   element: <DietChart/>
   },
   { path: '/service', 
    element: <ServicePage/>
