@@ -30,6 +30,10 @@ import materialRoutes from "./routes/materialRoutes.js";
 import joinedRoutes from './routes/joinedRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
 import scheduleRoutes from  './routes/scheduleRoutes.js'
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+import path from 'path';
 import {
   isAuthenticated,
   isLibrarian,
@@ -39,7 +43,8 @@ import {
 dotenv.config();
 
 const app = express();
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -72,6 +77,7 @@ app.get("/home", (req, res) => {
 });
 
 // Book Management Routes
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api', reminderRoutes);
 app.use('/api', joinedRoutes);

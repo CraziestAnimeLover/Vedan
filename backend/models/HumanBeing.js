@@ -18,6 +18,8 @@ const humanSchema = new mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String }, // URL to uploaded image
   address: { type: String, required: true },
+  profession: { type: String, required: true },
+
 
   // Guardian Details
   guardianName: { type: String, required: true },

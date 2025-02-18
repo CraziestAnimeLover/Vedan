@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Avatar, AvatarImage } from '../../../ui/avatar';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import { Contact, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { updateProfile } from '../../../../redux/updateProfileSlice';
-
 
 const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
   const dispatch = useDispatch();
@@ -15,6 +13,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
     fullName = user?.fullname || '',
     email = user?.email || '',
     phoneNumber = user?.phoneNumber || '',
+    Name = user?.Name|| '',
     _id = 'Not Assigned',
   } = profile || {};
 
@@ -24,6 +23,26 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+
+const handleNameClick = () => {
+  setIsEditingName(true);
+};
+
+const handleNameChange = (e) => {
+  setName(e.target.value);
+};
+
+const handleNameBlur = () => {
+  setIsEditingName(false);
+};
+
+const handleNameKeyDown = (e) => {
+  if (e.key === "Enter") {
+    handleNameBlur();
+  }
+};
+
 
   const validateForm = () => {
     const errors = {};
@@ -34,6 +53,11 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
     return errors;
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setName(fullName); // Ensure the name is set when switching to edit mode
+  };
+  
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/') && file.size <= 2 * 1024 * 1024) {
@@ -74,27 +98,29 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
           {isEditing ? (
             <>
               <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="text-white bg-transparent border-b border-yellow-400 text-center font-bold text-xl tracking-wide outline-none p-1 mb-1"
-                placeholder="Full Name"
-              />
-              {formErrors.name && <span className="text-red-500 text-xs">{formErrors.name}</span>}
+      type="text"
+      value={name}
+      onChange={handleNameChange}
+      onBlur={handleNameBlur}
+      onKeyDown={handleNameKeyDown} // Press "Enter" to save
+      autoFocus
+      className="text-white bg-transparent border-b border-yellow-400 text-center font-bold text-xl tracking-wide outline-none p-1 mb-1"
+    />
+              {/* {formErrors.name && <span className="text-red-500 text-xs">{formErrors.name}</span>} */}
             </>
           ) : (
-            <span className="text-2xl text-white"></span>
+            <span className="text-2xl text-white">{name}</span> // ✅ Now displays the full name when not editing
           )}
         </div>
 
-        <div className="bg-[#20354b]  rounded-lg shadow-lg w-40 h-64 flex flex-col items-center justify-center  relative">
+        <div className="bg-[#20354b] rounded-lg shadow-lg w-40 h-64 flex flex-col items-center justify-center relative">
           <div
             style={{
               fontSize: '18rem', // Adjust text size here
               letterSpacing: '2px',
               color: 'white',
               position: 'relative',
-              marginBottom:"45px",
+              marginBottom: "45px",
             }}
           >
             व
@@ -136,9 +162,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
                     alignItems: 'center',
                     border: '4px solid white',
                   }}
-                >
-                  
-                </div>
+                ></div>
               )}
             </div>
             <input
@@ -153,7 +177,7 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
         <div>
           {isEditing ? (
             <>
-              <div className="flex items-center gap-3 ">
+              <div className="flex items-center gap-3">
                 <Mail className="text-yellow-500" />
                 <input
                   type="email"
@@ -163,23 +187,17 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
                   placeholder="Email Address"
                 />
               </div>
-              {formErrors.email && (
-                <span className="text-red-500 text-xs">{formErrors.email}</span>
-              )}
+              {formErrors.email && <span className="text-red-500 text-xs">{formErrors.email}</span>}
             </>
           ) : (
             <div className="flex items-center gap-1">
               <Mail />
-              <span className="text-xl text-white ">{emailAddress}</span>
+              <span className="text-xl text-white">{emailAddress}</span>
             </div>
           )}
         </div>
 
-        <div className="mt-4 text-white">
-          
-        </div>
-
-        <div className="text-white text-sm">
+        <div className="text-white text-sm mt-4">
           <span className="text-gray-400 font-semibold">Vedann ID:</span>
           <span> {_id}</span>
         </div>
@@ -195,24 +213,29 @@ const ProfileCard = ({ profile = { name: 'Default Name' } }) => {
           </motion.div>
         )}
 
-        {!isEditing ? (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-6 bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-yellow-600"
-          >
-            Edit Profile
-          </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            className="mt-6 bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-yellow-600"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </button>
-        )}
+<div className="flex flex-col items-center">
+  {isEditingName ? (
+    <input
+      type="text"
+      value={name}
+      onChange={handleNameChange}
+      onBlur={handleNameBlur}
+      onKeyDown={handleNameKeyDown} // Press "Enter" to save
+      autoFocus
+      className="text-white bg-transparent border-b border-yellow-400 text-center font-bold text-xl tracking-wide outline-none p-1 mb-1"
+    />
+  ) : (
+    <span
+      className="text-2xl text-white cursor-pointer"
+      onClick={handleNameClick} // Click to edit
+    >
+      {name || "Click to add name"}
+    </span>
+  )}
+</div>
+
+
       </section>
-      
     </section>
   );
 };

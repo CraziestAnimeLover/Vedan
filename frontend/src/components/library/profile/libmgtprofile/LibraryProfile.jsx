@@ -21,6 +21,7 @@ const LibraryProfile = () => {
     OTHERID: "",
     Name: "",
     VedanId: "",
+    BranchName:"",
   });
 
   const [errors, setErrors] = useState({});
@@ -38,6 +39,7 @@ const LibraryProfile = () => {
         OTHERID: user.profile.OTHERID || "",
         Name: user.profile.Name || "",
         VedanId: user.profile.VedanId || "",
+        BranchName: user.profile.BranchName || "",
       });
     }
   }, [user]);
@@ -211,9 +213,21 @@ const LibraryProfile = () => {
                 Edit Contact Details
               </h3>
               <form className="mt-4" onSubmit={handleSubmit}>
+              <div className="mb-4">
+                  <label className="text-gray-400">BranchName</label>
+        <input
+          type="text"
+          name="BranchName"
+          value={formData.BranchName}
+          onChange={handleFormChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          placeholder="Enter Branch Name"
+        />
+                  </div>
                 {/* Social Media Links */}
                 <div className="mb-4">
                   <label className="text-gray-400">Social Links</label>
+                
                   {Array.isArray(formData.social) &&
                     formData.social.map((link, index) => (
                       <div key={index} className="flex items-center mb-2">

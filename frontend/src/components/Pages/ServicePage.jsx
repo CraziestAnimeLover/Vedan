@@ -117,7 +117,7 @@ const serviceItems = {
    
   ],
   Placement: [
-    { title: "Job Openings", url: "/placement/jobs" },
+    { title: "Placement", url: "/placement" },
     { title: "Internships", url: "/placement/internships" },
   ],
 };

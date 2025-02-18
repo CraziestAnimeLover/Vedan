@@ -18,6 +18,7 @@ const HumanBeingForm = () => {
     guardianPhone: "",
     guardianAddress: "",
     image: null,
+    profession:"",
   });
 
   // Fetch existing data
@@ -117,6 +118,7 @@ const HumanBeingForm = () => {
           guardianPhone: "",
           guardianAddress: "",
           image: null,
+          profession:"",
         });
         
         // ✅ Reset file input (needed because React state alone won't clear it)
@@ -259,6 +261,15 @@ const HumanBeingForm = () => {
           type="text"
           name="address"
           value={formData.address}
+          onChange={handleChange}
+          className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
+          
+        />
+        <label className="text-gray-400 mt-2">Profession</label>
+        <input
+          type="text"
+          name="profession"
+          value={formData.profession}
           onChange={handleChange}
           className="w-full mt-2 p-2 rounded-md bg-[#071e34] text-white border border-gray-600"
           

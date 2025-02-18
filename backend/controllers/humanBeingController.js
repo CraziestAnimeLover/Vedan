@@ -1,4 +1,5 @@
 import HumanBeing from '../models/HumanBeing.js';
+import mongoose from 'mongoose';
 
 // Create a new human being entry
 export const createHumanBeing = async (req, res) => {
@@ -25,6 +26,7 @@ export const createHumanBeing = async (req, res) => {
       weight: req.body.weight,
       age: req.body.age,
       gender: req.body.gender,
+      profession: req.body.profession,
       name: req.body.name,
       address: req.body.address,
       guardianName: req.body.guardianName,
@@ -55,16 +57,32 @@ export async function getAllHumanBeings(req, res) {
 }
 
 // Get a single human being record by ID
-export async function getHumanBeingById(req, res) {
+
+
+export const getHumanBeingById = async (req, res) => {
+  const humanId = req.params.id;
+
+  // Validate the ObjectId format
+  if (!mongoose.Types.ObjectId.isValid(humanId)) {
+    return res.status(400).json({ success: false, message: 'Invalid ID format' });
+  }
+
   try {
-    const humanBeing = await HumanBeing.findById(req.params.id);
-    if (!humanBeing) return res.status(404).json({ success: false, message: 'Not found' });
+    const humanBeing = await HumanBeing.findById(humanId);
+    
+    if (!humanBeing) {
+      return res.status(404).json({ success: false, message: 'Human being not found' });
+    }
+    
     res.status(200).json({ success: true, humanBeing });
   } catch (error) {
-    console.error("Error in getHumanBeingById:", error.message);
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching human being:", error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-}
+};
+
+
+
 
 // Update a human being record by ID
 export async function updateHumanBeing(req, res) {

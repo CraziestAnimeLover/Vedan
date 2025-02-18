@@ -50,6 +50,7 @@ import AdmitCard from './components/exam/AdmitCard'
 import Smriti from './components/library/studentLib/smritilib/Smriti'
 import Full from './components/library/studentLib/full/Full'
 import DietChart from './components/diet/dietchart/DietChart'
+import Placement from './components/placement/Placementdash/Placement'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -134,6 +135,9 @@ const approuter = createBrowserRouter([
   },
   { path: '/diet', 
    element: <DietChart/>
+  },
+  { path: '/placement', 
+   element: <Placement/>
   },
   { path: '/service', 
    element: <ServicePage/>

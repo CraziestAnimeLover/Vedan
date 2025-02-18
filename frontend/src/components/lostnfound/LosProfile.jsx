@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 import HumanBeingForm from "./Forms/HumanBeingForm";
 import AnimalForm from "./Forms/AnimalForm";
 import MaterialForm from "./Forms/MaterialForm";
+import HumanCard from "./Cards/lostdetails/HumanCard";
+import MaterialCard from "./Cards/lostdetails/MaterialCard";
+import AnimalCard from "./Cards/lostdetails/AnimalCard";
+
+
 
 const LosProfile = () => {
   const { user, loading } = useSelector((store) => store.auth);
@@ -13,13 +18,13 @@ const LosProfile = () => {
   const [activeForm, setActiveForm] = useState("");
   const [isLostMenuOpen, setIsLostMenuOpen] = useState(false);
   const [selectedLostCategory, setSelectedLostCategory] = useState("");
-  const [isNikatVastuActive, setIsNikatVastuActive] = useState(false); // State for Nikat Vastu
-  const [selectedNikatCategory, setSelectedNikatCategory] = useState(""); // Track selected Nikat Vastu category
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar visibility for mobile
+  const [isNikatVastuActive, setIsNikatVastuActive] = useState(false);
+  const [selectedNikatCategory, setSelectedNikatCategory] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && user === null) {
-      navigate("/login"); // Navigate to login page if no user found
+      navigate("/login");
     }
   }, [loading, user, navigate]);
 
@@ -37,10 +42,20 @@ const LosProfile = () => {
       setActiveForm("lostCategory");
     } else if (type === "nikat") {
       setSelectedNikatCategory(category);
-      setIsNikatVastuActive(false);
-      setActiveForm("nikatVastu");
+      setIsNikatVastuActive(false); // Disable the "Nikat Vastu" toggle when selecting a category
+  
+      // Check which category is selected and show the corresponding card
+      if (category === "Human Being") {
+        setActiveForm("nikatVastuHuman"); // Trigger only HumanCard when Human Being is selected
+      } else if (category === "Animal") {
+        setActiveForm("nikatVastuAnimal"); // Trigger only AnimalCard when Animal is selected
+      } else if (category === "Material") {
+        setActiveForm("nikatVastuMaterial"); // Trigger only MaterialCard when Material is selected
+      }
     }
   };
+  
+  
 
   const renderCategoryForm = (category, type) => {
     switch (category) {
@@ -54,6 +69,20 @@ const LosProfile = () => {
         return <p className="text-white">Please select a category.</p>;
     }
   };
+  const renderCategoryCard = (category) => {
+    switch (category) {
+      case "Human Being":
+        return <HumanCard />; // Render only HumanCard when "Human Being" is selected
+      case "Animal":
+        return <AnimalCard />; // Render only AnimalCard when "Animal" is selected
+      case "Material":
+        return <MaterialCard />; // Render only MaterialCard when "Material" is selected
+      default:
+        return <p className="text-white"></p>;
+    }
+  };
+  ;
+  
 
   const renderCategoryOptions = (type) => {
     const categories = ["Human Being", "Animal", "Material"];
@@ -99,7 +128,7 @@ const LosProfile = () => {
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="text-white"
         >
-          {isSidebarOpen ? "×" : "☰"} {/* Hamburger or Close Icon */}
+          {isSidebarOpen ? "×" : "☰"}
         </button>
       </div>
 
@@ -111,7 +140,7 @@ const LosProfile = () => {
       >
         <ProfileCard profile={user?.profile} />
 
-        {/* Lost Menu with Dropdown */}
+        {/* Lost Menu */}
         <div>
           <div
             className="text-white cursor-pointer hover:text-yellow-500 mb-4"
@@ -121,13 +150,11 @@ const LosProfile = () => {
             Lost ▼
           </div>
           {isLostMenuOpen && (
-            <div className="ml-4">
-              {renderCategoryOptions("lost")}
-            </div>
+            <div className="ml-4">{renderCategoryOptions("lost")}</div>
           )}
         </div>
 
-        {/* Nikat Vastu Option with Dropdown */}
+        {/* Nikat Vastu Option */}
         <div
           className="text-white cursor-pointer hover:text-yellow-500 mb-4"
           onClick={() => setIsNikatVastuActive(!isNikatVastuActive)}
@@ -147,7 +174,7 @@ const LosProfile = () => {
         </div>
       </div>
 
-      {/* Profile Details Section */}
+      {/* Main Content */}
       <div className="flex-1 bg-[#071e34] p-6 flex justify-start items-start overflow-auto">
         {/* Default Message */}
         {activeForm === "" && (
@@ -159,17 +186,38 @@ const LosProfile = () => {
           </div>
         )}
 
-        {/* Form for Nikat Vastu Categories */}
-        {activeForm === "nikatVastu" && (
-          <div className="mt-6 bg-[#20354b] p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h3 className="text-white font-semibold text-lg">
-              {selectedNikatCategory} - Nikat Vastu Details
-            </h3>
-            {renderCategoryForm(selectedNikatCategory, "nikat")}
-          </div>
-        )}
+{/* Nikat Vastu Selected - Show Human Card if Human Being is Selected */}
+{activeForm === "nikatVastuHuman" && (
+  <div className="mt-6 w-full max-w-3xl">
+    {renderCategoryCard("Human Being")}
+  </div>
+)}
 
-        {/* Form for Lost Categories */}
+{/* Nikat Vastu Selected - Show Animal Card if Animal is Selected */}
+{activeForm === "nikatVastuAnimal" && (
+  <div className="mt-6 w-full max-w-3xl">
+    {renderCategoryCard("Animal")}
+  </div>
+)}
+
+{/* Nikat Vastu Selected - Show Material Card if Material is Selected */}
+{activeForm === "nikatVastuMaterial" && (
+  <div className="mt-6 w-full max-w-3xl">
+    {renderCategoryCard("Material")}
+  </div>
+)}
+
+{/* Nikat Vastu Selected - Show All Three Cards */}
+{activeForm === "nikatVastu" && (
+  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl">
+    {renderCategoryCard("Human Being")}
+    {renderCategoryCard("Material")}
+    {renderCategoryCard("Animal")}
+  </div>
+)}
+
+
+        {/* Lost Category Selected */}
         {activeForm === "lostCategory" && renderSelectedCategoryCard()}
       </div>
     </div>
