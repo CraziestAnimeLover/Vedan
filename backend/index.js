@@ -29,7 +29,8 @@ import  consultationRoutes from "./routes/consultationRoutes.js"
 import materialRoutes from "./routes/materialRoutes.js";
 import joinedRoutes from './routes/joinedRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
-import scheduleRoutes from  './routes/scheduleRoutes.js'
+import scheduleRoutes from  './routes/scheduleRoutes.js';
+import resumeRoutes from './routes/resume.routes.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -79,6 +80,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
+app.use('/api', resumeRoutes);
 app.use('/api', reminderRoutes);
 app.use('/api', joinedRoutes);
 app.use('/api', searchRoutes);
@@ -91,7 +93,7 @@ app.use("/api/v1/job", jobRoute);
 app.use("/plans", planRouter);
 app.use("/api/books", bookRoutes);
 app.use("/api/loans", loanRoutes);
-app.use(ticketRoutes);
+app.use("/",ticketRoutes);
 app.use('/api/events', eventRoutes);
 app.use("/api/animals", animalRoutes);
 app.use("/api", humanRoutes);

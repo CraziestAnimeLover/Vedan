@@ -1,21 +1,46 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import jsPDF from 'jspdf';
 
 const ResumePreview = ({ input }) => {
   const resumeRef = useRef();
+  const [isSaved, setIsSaved] = useState(false);
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF('p', 'pt', 'a4'); // Create a PDF in portrait mode
+  // Save resume data to backend
+  const handleSaveResume = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/resumes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
 
-    // Adjust styles for A4 page with bigger font
+      if (!response.ok) {
+        throw new Error('Failed to save resume');
+      }
+
+      setIsSaved(true);
+      alert('Resume saved successfully!');
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      alert('Failed to save resume. Please try again.');
+    }
+  };
+
+  // Generate PDF and download
+  const handleDownloadPDF = async () => {
+    if (!isSaved) {
+      await handleSaveResume(); // Ensure resume is saved before downloading
+    }
+
+    const doc = new jsPDF('p', 'pt', 'a4');
     doc.html(resumeRef.current, {
       callback: (pdf) => {
-        pdf.save(`${input.name || 'Resume'}.pdf`); // Save with the user's name or "Resume"
+        pdf.save(`${input.name || 'Resume'}.pdf`);
       },
-      x: 40, // Adjust horizontal margin for more space
-      y: 40, // Adjust vertical margin
-      width: 510, // A4 width with adjusted margins
-      windowWidth: 1024, // Ensure the page layout adapts to browser width
+      x: 40,
+      y: 40,
+      width: 510,
+      windowWidth: 1024,
     });
   };
 
@@ -26,9 +51,9 @@ const ResumePreview = ({ input }) => {
       <div
         ref={resumeRef}
         style={{
-          fontSize: '14px', // Increase font size for readability
-          lineHeight: '1.8', // Adjust line height for better spacing
-          padding: '30px', // Increase padding for more spacious layout
+          fontSize: '14px',
+          lineHeight: '1.8',
+          padding: '30px',
           backgroundColor: '#ffffff',
           color: '#000000',
           width: '100%',
@@ -112,13 +137,23 @@ const ResumePreview = ({ input }) => {
         </div>
       </div>
 
-      {/* Download Button */}
-      <button
-        onClick={handleDownloadPDF}
-        className="mt-8 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700"
-      >
-        Download PDF
-      </button>
+      {/* Save & Download Buttons */}
+      <div className="flex justify-center gap-4 mt-8">
+        <button
+          onClick={handleSaveResume}
+          className={`px-6 py-3 rounded-lg shadow-md ${isSaved ? 'bg-green-500' : 'bg-gray-600'} text-white`}
+          disabled={isSaved}
+        >
+          {isSaved ? 'Saved ✅' : 'Save Resume'}
+        </button>
+
+        <button
+          onClick={handleDownloadPDF}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700"
+        >
+          Download PDF
+        </button>
+      </div>
     </div>
   );
 };

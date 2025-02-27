@@ -1,61 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
+import { Link } from 'react-router-dom';
 import Profiles from "../../library/profile/libmgtprofile/Profiles";
-import Resume from '../Resume/Resume';
-import Opportunity from '../opportunity/Opportunity';
-import Selfrating from '../selfrating/Selfrating';
 
-// Navigation items array (without component)
-const navigationItems = [
-  { title: "Profile", url: "/profile" },
-  { title: "Resume", url: "/placement/resume" },
-  { title: "Opportunity", url: "/placement/opportunity" },
-  { title: "Self Rating", url: "/placement/selfrating" },
-];
+// ✅ Lazy load components
+const Profilesmain = lazy(() => import("../../Profilesmain"));
+const StudentForm = lazy(() => import("../../auth/StudentForm"));
 
 const Placement = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeView, setActiveView] = useState(navigationItems[0]); // Default to Profile
+  const [activeMenu, setActiveMenu] = useState(null);
+  const [selectedSection, setSelectedSection] = useState("Placement");
+  const [selectedComponent, setSelectedComponent] = useState(null); // ✅ Track component
 
-  // Function to get the correct component based on activeView
-  const renderContent = () => {
-    switch (activeView.url) {
-      case "/placement/resume":
-        return <Resume />;
-      case "/placement/opportunity":
-        return <Opportunity />;
-      case "/placement/selfrating":
-        return <Selfrating />;
-      default:
-        return <div>Profile Section</div>; // Default content
-    }
+  const toggleMenu = (menu) => {
+    setActiveMenu(activeMenu === menu ? null : menu);
   };
 
-  // Handle Navigation (Change State + Update URL)
-  const handleNavigation = (item) => {
-    setActiveView(item);
-    window.history.pushState({}, "", item.url);
+  const handleSectionChange = (title, component = null) => {
+    setSelectedSection(title);
+    setSelectedComponent(component); // ✅ Update component dynamically
   };
 
-  // Listen for Browser Back/Forward Navigation
-  useEffect(() => {
-    const updateActiveView = () => {
-      const path = window.location.pathname;
-      const foundItem = navigationItems.find((item) => item.url === path);
-      if (foundItem) {
-        setActiveView(foundItem);
-      }
-    };
-
-    // Run on first mount
-    updateActiveView();
-
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener("popstate", updateActiveView);
-
-    return () => {
-      window.removeEventListener("popstate", updateActiveView);
-    };
-  }, []);
+  const serviceItems = {
+    Profile: [
+      { title: "View Profile", component: <Profilesmain /> },
+      { title: "Edit Profile", url: "/profiles/edit" }
+    ],
+    Resume: [
+      { title: "Edit", component: <StudentForm /> }, // ✅ Show StudentForm dynamically
+      { title: "Saved", url: "/placement/resume/saved" }
+    ],
+    Opportunity: [
+      { title: "Enquiry", url: "/placement/opportunity/enquiry" },
+      { title: "Apply", url: "/placement/opportunity/apply" },
+      { title: "Response", url: "/placement/opportunity/response" }
+    ],
+    Selfrating: [
+      { title: "Interview", url: "/profiles" },
+      { title: "Working", url: "/profiles/edit" }
+    ],
+  };
 
   return (
     <div className="w-full h-screen fixed left-0 top-0 bg-white/20 backdrop-blur-lg shadow-lg flex">
@@ -74,15 +58,38 @@ const Placement = () => {
         <hr className="w-full border-gray-800 mt-2" />
 
         {/* Sidebar Navigation */}
-        <div className={`${!isSidebarOpen && "hidden"} flex flex-col space-y-4 mt-4 w-full px-4`}>
-          {navigationItems.map((item) => (
-            <button
-              key={item.url}
-              className={`p-3 w-full hover:bg-gray-200 rounded-md ${activeView.url === item.url ? "bg-gray-300" : ""}`}
-              onClick={() => handleNavigation(item)}
-            >
-              {item.title}
-            </button>
+        <div className={`flex flex-col space-y-4 mt-4 w-full px-4`}>
+          {Object.keys(serviceItems).map((menu) => (
+            <div key={menu}>
+              <button 
+                className="p-3 w-full hover:bg-gray-200 rounded-md text-left"
+                onClick={() => toggleMenu(menu)}
+              >
+                {menu}
+              </button>
+              {activeMenu === menu && (
+                <ul className="ml-4 mt-2">
+                  {serviceItems[menu].map((item) => (
+                    <li key={item.title}>
+                      {item.component ? (
+                        // ✅ Show StudentForm dynamically for "Edit"
+                        <button
+                          className="block text-blue-600 hover:text-blue-800 p-2 w-full text-left"
+                          onClick={() => handleSectionChange(item.title, item.component)}
+                        >
+                          {item.title}
+                        </button>
+                      ) : (
+                        // ✅ Navigate for other items
+                        <Link to={item.url} className="block text-blue-600 hover:text-blue-800 p-2">
+                          {item.title}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -92,15 +99,16 @@ const Placement = () => {
 
       {/* Main Content Area */}
       <div className="flex flex-col items-center w-full h-screen overflow-y-auto">
-        {/* Page Title */}
         <div className="flex flex-col items-center w-full sticky top-0 bg-white z-10 py-4">
-          <span className="text-4xl md:text-7xl font-semibold px-4">{activeView.title.toUpperCase()}</span>
+          <span className="text-4xl md:text-7xl font-semibold px-4">{selectedSection}</span>
           <hr className="w-full border-gray-800 mt-20 mb-4" />
         </div>
 
-        {/* Content Section */}
-        <div className="w-full md:w-3/4">
-          {renderContent()}
+        <div className="w-full md:w-3/4 p-4">
+          {/* ✅ Show component if selected, otherwise just section title */}
+          <Suspense fallback={<div>Loading...</div>}>
+            {selectedComponent ? selectedComponent : <div>{selectedSection}</div>}
+          </Suspense>
         </div>
       </div>
     </div>

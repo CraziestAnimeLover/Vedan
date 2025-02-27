@@ -85,6 +85,7 @@ const ServicePage = () => {
 };
 
 const services = [
+  { title: "Profile", url: "/profiles" },
   { title: "Placement", url: "/industry" },
   { title: "Library", url: "/library" },
   { title: "Exam", url: "/industry" },
@@ -118,6 +119,10 @@ const serviceItems = {
   ],
   Placement: [
     { title: "Placement", url: "/placement" },
+    { title: "Internships", url: "/placement/internships" },
+  ],
+  Profile: [
+    { title: "Profile", url: "/profiles" },
     { title: "Internships", url: "/placement/internships" },
   ],
 };

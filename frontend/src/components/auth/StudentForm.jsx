@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../shared/Navbar';
+
 import { useNavigate } from 'react-router-dom';
 
 const ResumeInput = () => {
@@ -88,9 +88,9 @@ const ResumeInput = () => {
 
   return (
     <>
-    <Navbar/>
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="flex flex-col md:flex-row max-w-4xl mx-4 md:mx-8 my-10 p-8 w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-2/3">
+   
+    <div className="flex  min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row max-w-4xl mx-4 md:mx-8 my-10 p-8 w-full sm:w-3/4 md:w-2/3 lg:w-full xl:w-2/3">
         <form className="bg-white shadow-xl rounded-lg p-12 w-full">
           <h1 className="font-bold text-3xl text-center mb-8 text-blue-600">Resume Input</h1>
           <div className="space-y-6">

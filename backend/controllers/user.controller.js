@@ -53,57 +53,44 @@ await User.create({
 // Login Function
 export const login = async (req, res) => {
     try {
-        console.log("Incoming Request Body:", req.body); // Log request body
+        console.log("Incoming Request Body:", req.body);
 
-        const { email, password } = req.body;
+        const email = req.body.email?.trim();
+        const password = req.body.password?.trim();
 
         if (!email || !password) {
             console.log("Missing email or password");
-            return res.status(400).json({
-                message: "Email and password are required",
-                success: false
-            });
+            return res.status(400).json({ message: "Email and password are required", success: false });
         }
 
         const user = await User.findOne({ email });
-        console.log("User found in database:", user);  // Check if the user exists
-
         if (!user) {
             console.log("User not found for email:", email);
-            return res.status(400).json({
-                message: "Incorrect email.",
-                success: false,
-            });
+            return res.status(400).json({ message: "Incorrect email.", success: false });
         }
 
         console.log("Stored Hashed Password:", user.password);
         console.log("Entered Password:", password);
 
-        const isPasswordMatch = await bcrypt.compare(password.trim(), user.password);
-        console.log("Password Match Result:", isPasswordMatch);  // Log password comparison result
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        console.log("Password Match Result:", isPasswordMatch);
 
         if (!isPasswordMatch) {
-            return res.status(400).json({
-                message: "Incorrect password.",
-                success: false,
-            });
+            return res.status(400).json({ message: "Incorrect password.", success: false });
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         res.status(200)
             .cookie("token", token, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true })
-            .json({
-                message: `Welcome back, ${user.fullname}`,
-                user,
-                success: true
-            });
+            .json({ message: `Welcome back, ${user.fullname}`, user, success: true });
 
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ message: "Server error", success: false });
     }
 };
+
 
 
 
