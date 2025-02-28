@@ -39,6 +39,7 @@ const Placement = () => {
       { title: "Interview", url: "/profiles" },
       { title: "Working", url: "/profiles/edit" }
     ],
+   
   };
 
   return (

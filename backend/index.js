@@ -88,6 +88,10 @@ app.use("/api/v1/library/books", bookRoute);
 app.use('/api', consultationRoutes);
 // User, Company, and Job Routes
 app.use("/api/v1/user", userRoute);
+app.get('/api/v1/user', (req, res) => {
+  res.json({ success: true, users: [] });
+});
+
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/plans", planRouter);

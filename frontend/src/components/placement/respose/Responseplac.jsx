@@ -63,6 +63,7 @@ const ResopsePlace = () => {
                     <th className="px-6 py-3">Post</th>
                     <th className="px-6 py-3">Decision</th>
                     <th className="px-6 py-3">Remark</th>
+                    <th className="px-6 py-3">Letter (pdf)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -82,6 +83,7 @@ const ResopsePlace = () => {
                       <td className="px-6 py-4">{companyAddress}</td>
                       <td className="px-6 py-4">{post}</td>
                       <td className="px-6 py-4">{decision}</td>
+                      <td className="px-6 py-4">{remark}</td>
                       <td className="px-6 py-4">{remark}</td>
                     </tr>
                   ))}
