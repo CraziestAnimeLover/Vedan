@@ -7,8 +7,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 import { Bar } from 'react-chartjs-2';
 
-
-
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Selfrating = () => {
@@ -46,22 +44,6 @@ const Selfrating = () => {
         </div>
 
         <hr className="w-full border-gray-800 mt-2" />
-
-        {/* Sidebar Navigation */}
-        {/* <div className={`${!isSidebarOpen && "hidden"} flex flex-col space-y-4 mt-4 w-full px-4`}>
-          <button
-            className={`p-3 w-full rounded-md ${activeSection === "edit" ? "bg-gray-300 font-bold" : "hover:bg-gray-200"}`}
-            onClick={() => handleSectionChange("edit")}
-          >
-            Interview
-          </button>
-          <button
-            className={`p-3 w-full rounded-md ${activeSection === "working" ? "bg-gray-300 font-bold" : "hover:bg-gray-200"}`}
-            onClick={() => handleSectionChange("saved")}
-          >
-           Working
-          </button>
-        </div> */}
       </div>
 
       {/* Vertical Divider */}
@@ -120,7 +102,6 @@ const Selfrating = () => {
                 <td className="border border-gray-300 px-4 py-2">7</td>
                 <td className="border border-gray-300 px-4 py-2">Interview</td>
               </tr>
-              
             </tbody>
           </table>
         </div>
@@ -129,6 +110,10 @@ const Selfrating = () => {
         <div className="w-full max-w-4xl mt-6">
           <h2 className="text-2xl font-semibold mb-4 text-center">Skills Chart</h2>
           <Bar data={chartData} />
+          <h1>Note</h1>
+          <p className="text-sm text-gray-600 mt-2">(1) Interview rating given by the company to the student (after both approved)<br/>
+          (2) This showcases in student profile<br/>
+          (3) Marks range from -10 to +10</p>
         </div>
 
         {/* StudentForm appears below the chart when Edit is active */}
@@ -139,9 +124,7 @@ const Selfrating = () => {
           </div>
         )}
       </div>
-      
     </div>
-    
   );
 };
 
