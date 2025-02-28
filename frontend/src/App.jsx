@@ -162,6 +162,9 @@ const approuter = createBrowserRouter([
   { path: '/placement/resume', 
    element: <Resume/>
   },
+  { path: '/placement/selfrating', 
+   element: <Selfrating/>
+  },
   { path: '/placement/resume/saved', 
    element: <ResumeList/>
   },

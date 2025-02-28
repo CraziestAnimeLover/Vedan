@@ -36,7 +36,7 @@ const Placement = () => {
       { title: "Response", url: "/placement/opportunity/response" }
     ],
     Selfrating: [
-      { title: "Interview", url: "/profiles" },
+      { title: "Selfrating", url: "/placement/selfrating" },
       { title: "Working", url: "/profiles/edit" }
     ],
    
