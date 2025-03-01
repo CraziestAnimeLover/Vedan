@@ -70,7 +70,7 @@ const services = [
   // { title: "Recriuters", url: "/service/recriuter" },
   { title: "Gym", url: "/" },
   { title: "Cake", url: "/service/recriuter" },
-  { title: "Industry", url: "/jobs" },
+  { title: "Industry", url: "/company" },
   { title: "Vijnan (Library)", url: "/mgtservice/mgtlibrary" },
   // { title: "Blood Help", url: "/blood-help" }, // Updated to a valid URL
   // { title: "Lost n Found", url: "/lostnfound" },

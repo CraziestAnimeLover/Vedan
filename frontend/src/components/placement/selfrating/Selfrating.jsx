@@ -108,7 +108,7 @@ const Selfrating = () => {
 
         {/* Chart */}
         <div className="w-full max-w-4xl mt-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Skills Chart</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center">Chart</h2>
           <Bar data={chartData} />
           <h1>Note</h1>
           <p className="text-sm text-gray-600 mt-2">(1) Interview rating given by the company to the student (after both approved)<br/>
