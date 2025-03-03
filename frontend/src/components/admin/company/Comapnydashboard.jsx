@@ -4,6 +4,8 @@ import Profiles from "../../library/profile/libmgtprofile/Profiles";
 import CompanyProfile from './companyprofile/CompanyProfile';
 import Product from './product/Product';
 import News from '../News&Events/News';
+import GraphCompany from './graphcompany/GraphCompany';
+import Sharelist from './sharelist/Sharelist';
 
 // ✅ Lazy load components for better performance
 const Profilesmain = lazy(() => import("../../Profilesmain"));
@@ -30,7 +32,7 @@ const Companydashboard = () => {
       { title: "Edit Profile", url: "/profiles/edit" }
     ],
     Placement: [
-      { title: "Edit", component: <StudentForm /> },
+      { title: "Placement",url: "/company/placement" },
       { title: "Saved", url: "/placement/resume/saved" }
     ],
     Product: [
@@ -43,8 +45,8 @@ const Companydashboard = () => {
      
     ],
     ShareMarket : [
-      { title: "Selfrating", url: "/placement/selfrating" },
-      { title: "Working", url: "/profiles/edit" }
+      { title: "Graphs", component: <GraphCompany /> },
+      { title: "Lists", component: <Sharelist /> }
     ],
     AccountReport : [
       { title: "Selfrating", url: "/placement/selfrating" },

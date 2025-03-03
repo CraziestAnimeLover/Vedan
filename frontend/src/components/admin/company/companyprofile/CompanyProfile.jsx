@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { FaUpload, FaPlus, FaTrash } from "react-icons/fa";
 const businessCertificates = [
     {
@@ -50,14 +50,25 @@ const CompanyProfile = () => {
 
   // Handle file upload
   const handleFileUpload = (id, file) => {
-    setUploadedFiles((prev) => ({ ...prev, [id]: file }));
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedFiles((prev) => ({
+          ...prev,
+          [id]: { file, preview: reader.result },
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
+  
 
   // Add new certificate manually
   const addCertificate = () => {
-    const newId = certificates.length + 1;
+    const newId = Date.now(); // Prevent duplicate IDs
     setCertificates([...certificates, { id: newId, name: "", file: null }]);
   };
+  
 
   // Remove a certificate
   const removeCertificate = (id) => {
@@ -95,7 +106,18 @@ const CompanyProfile = () => {
 
 
 
-   
+   // Close dropdown when clicking outside
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest(".dropdown")) {
+      setOpenDropdown(null);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
     
 
   // Handle changes in company and contact inputs
@@ -126,7 +148,56 @@ const CompanyProfile = () => {
     setCompany({ ...company, founders: updatedFounders });
   };
 
-  // Handle certificate name change
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+  
+    // Ensure no undefined or empty values are sent
+    const formData = new FormData();
+    formData.append("name", company.name || ""); 
+    formData.append("industry", company.industry && company.industry.trim() !== "" ? company.industry : "N/A"); 
+    formData.append("description", company.description && company.description.trim() !== "" ? company.description : "N/A"); 
+    formData.append("founders", JSON.stringify(company.founders || [])); 
+    formData.append("contact", JSON.stringify(contact || {}));
+  
+    if (uploadedFiles.length > 0) {
+      formData.append("image", uploadedFiles[0]); // ✅ Ensure an image is attached
+    }
+  
+    // Debugging Log
+    console.log("📤 Submitting FormData:");
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
+  
+    try {
+      const response = await fetch("http://localhost:8000/api/companies", {
+        method: "POST",
+        body: formData, // ✅ Do NOT manually set Content-Type
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Backend Error:", errorText);
+        throw new Error("Failed to submit company profile");
+      }
+  
+      const data = await response.json();
+      alert("🎉 Company profile submitted successfully!");
+      console.log(data);
+    } catch (error) {
+      console.error("Error submitting company profile:", error);
+    }
+  };
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
 
   return (
@@ -312,6 +383,13 @@ const CompanyProfile = () => {
           </tbody>
         </table>
       </div>
+      <button
+  onClick={handleSubmit}
+  className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+>
+  Submit Profile
+</button>
+
     </div>
   );
 };

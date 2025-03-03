@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import Profiles from "../../library/profile/libmgtprofile/Profiles";
 import StudentForm from "../../auth/StudentForm";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
 import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -13,17 +10,27 @@ const Selfrating = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState("placement"); // Tracks active section
 
-  // Function to handle section change
-  const handleSectionChange = (section) => {
-    setActiveSection(section);
+  // State to manage marks
+  const [marks, setMarks] = useState({
+    Technical: 8,
+    SkillTest: 7,
+    CompanyTest: 9,
+    Behaviour: 8,
+    Communication: 7
+  });
+
+  // Function to handle mark updates
+  const handleMarkChange = (skill, value) => {
+    setMarks((prev) => ({ ...prev, [skill]: value }));
   };
 
+  // Chart Data
   const chartData = {
-    labels: ["Technical", "Skill Test", "Company Test", "Behaviour", "Communication"],
+    labels: Object.keys(marks),
     datasets: [
       {
         label: "Given Marks",
-        data: [8, 7, 9, 8, 7],
+        data: Object.values(marks),
         backgroundColor: "rgba(54, 162, 235, 0.5)",
       },
     ],
@@ -72,36 +79,23 @@ const Selfrating = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">Technical</td>
-                <td className="border border-gray-300 px-4 py-2">10</td>
-                <td className="border border-gray-300 px-4 py-2">8</td>
-                <td className="border border-gray-300 px-4 py-2">CV DATA</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">Skill Test</td>
-                <td className="border border-gray-300 px-4 py-2">10</td>
-                <td className="border border-gray-300 px-4 py-2">7</td>
-                <td className="border border-gray-300 px-4 py-2">CV DATA</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">Company Test</td>
-                <td className="border border-gray-300 px-4 py-2">10</td>
-                <td className="border border-gray-300 px-4 py-2">7</td>
-                <td className="border border-gray-300 px-4 py-2">Company DATA</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">Behaviour</td>
-                <td className="border border-gray-300 px-4 py-2">10</td>
-                <td className="border border-gray-300 px-4 py-2">7</td>
-                <td className="border border-gray-300 px-4 py-2">Interview</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2">Communication</td>
-                <td className="border border-gray-300 px-4 py-2">10</td>
-                <td className="border border-gray-300 px-4 py-2">7</td>
-                <td className="border border-gray-300 px-4 py-2">Interview</td>
-              </tr>
+              {Object.keys(marks).map((skill) => (
+                <tr key={skill}>
+                  <td className="border border-gray-300 px-4 py-2">{skill}</td>
+                  <td className="border border-gray-300 px-4 py-2">10</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <input
+                      type="number"
+                      value={marks[skill]}
+                      min="-10"
+                      max="10"
+                      onChange={(e) => handleMarkChange(skill, Number(e.target.value))}
+                      className="w-16 p-1 text-center border border-gray-300"
+                    />
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">CV DATA</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -111,9 +105,11 @@ const Selfrating = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Chart</h2>
           <Bar data={chartData} />
           <h1>Note</h1>
-          <p className="text-sm text-gray-600 mt-2">(1) Interview rating given by the company to the student (after both approved)<br/>
-          (2) This showcases in student profile<br/>
-          (3) Marks range from -10 to +10</p>
+          <p className="text-sm text-gray-600 mt-2">
+            (1) Interview rating given by the company to the student (after both approved)<br />
+            (2) This showcases in student profile<br />
+            (3) Marks range from -10 to +10
+          </p>
         </div>
 
         {/* StudentForm appears below the chart when Edit is active */}

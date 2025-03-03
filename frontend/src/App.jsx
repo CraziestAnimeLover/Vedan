@@ -61,6 +61,7 @@ import ResopsePlace from './components/placement/respose/Responseplac'
 import ResumeList from './components/placement/Resume/ResumeList'
 import Company from './components/admin/company/Company'
 import Comapnydashboard from './components/admin/company/Comapnydashboard'
+import Companyplacement from './components/admin/company/compayplacement/Companyplacement'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -237,6 +238,9 @@ const approuter = createBrowserRouter([
    },
    { path: '/company', 
     element: <Comapnydashboard/>
+   },
+   { path: '/company/placement', 
+    element: <Companyplacement/>
    },
    { path: '/description/:id', 
     element: <JobDescription/>
