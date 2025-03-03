@@ -12,16 +12,56 @@ const Companyplacement = () => {
   const [selectedSection, setSelectedSection] = useState("Placement");
   const [selectedComponent, setSelectedComponent] = useState(null); // ✅ Track component
   const [jobDescriptions, setJobDescriptions] = useState({});
+  const [rows, setRows] = useState([
+    {
+      code: "XYZ123",
+      operator: "John Doe",
+      experience: "5 Years",
+      salary: "$50,000",
+      location: "New York",
+      description: null, // PDF Upload
+      date: "2025-03-03",
+      education: "Bachelor's Degree",
+    },
+  ]);
 
-  const handleFileUpload = (event, id) => {
+  // 📌 Add New Row
+  const addRow = () => {
+    setRows([...rows, {
+      code: "",
+      operator: "",
+      experience: "",
+      salary: "",
+      location: "",
+      description: null,
+      date: "",
+      education: "",
+    }]);
+  };
+
+  // 📌 Remove Row
+  const removeRow = (index) => {
+    setRows(rows.filter((_, i) => i !== index));
+  };
+
+  // 📌 Handle Input Change
+  const handleChange = (index, field, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index][field] = value;
+    setRows(updatedRows);
+  };
+
+  // 📌 Handle File Upload
+  const handleFileUpload = (event, index) => {
     const file = event.target.files[0];
-    if (file && file.type === "application/pdf") {
-      setJobDescriptions((prev) => ({
-        ...prev,
-        [id]: URL.createObjectURL(file),
-      }));
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      handleChange(index, "description", fileURL);
     }
   };
+
+
+ 
 
 
   const toggleMenu = (menu) => {
@@ -121,62 +161,122 @@ const Companyplacement = () => {
         </div>
 
         <div className="w-full md:w-3/4 p-4">
-      {/* ✅ Scrollable Table Section */}
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-800">
           <thead className="bg-gray-700 text-white">
             <tr>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Sr. No.</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Code</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">CSC Operator</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Experience</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Salary</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Location</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Description</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Date</th>
-              <th className="border border-gray-800 p-2 sticky top-0 bg-gray-700">Education</th>
+              <th className="border border-gray-800 p-2">Sr. No.</th>
+              <th className="border border-gray-800 p-2">Code</th>
+              <th className="border border-gray-800 p-2">Profile</th>
+              <th className="border border-gray-800 p-2">Experience</th>
+              <th className="border border-gray-800 p-2">Salary</th>
+              <th className="border border-gray-800 p-2">Location</th>
+              <th className="border border-gray-800 p-2">Description</th>
+              <th className="border border-gray-800 p-2">Date</th>
+              <th className="border border-gray-800 p-2">Education</th>
+              <th className="border border-gray-800 p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {/* Example Row */}
-            <tr className="bg-white hover:bg-gray-100 transition">
-              <td className="border border-gray-800 p-2">1</td>
-              <td className="border border-gray-800 p-2">XYZ123</td>
-              <td className="border border-gray-800 p-2">John Doe</td>
-              <td className="border border-gray-800 p-2">5 Years</td>
-              <td className="border border-gray-800 p-2">$50,000</td>
-              <td className="border border-gray-800 p-2">New York</td>
-
-              {/* ✅ PDF Upload Section */}
-              <td className="border border-gray-800 p-2">
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) => handleFileUpload(e, "job1")}
-                  className="block w-full text-sm text-gray-600
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100"
-                />
-                {jobDescriptions["job1"] && (
-                  <a
-                    href={jobDescriptions["job1"]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block mt-2 text-blue-600 hover:underline"
+            {rows.map((row, index) => (
+              <tr key={index} className="bg-white hover:bg-gray-100 transition">
+                <td className="border border-gray-800 p-2">{index + 1}</td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.code}
+                    onChange={(e) => handleChange(index, "code", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.operator}
+                    onChange={(e) => handleChange(index, "operator", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.experience}
+                    onChange={(e) => handleChange(index, "experience", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.salary}
+                    onChange={(e) => handleChange(index, "salary", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.location}
+                    onChange={(e) => handleChange(index, "location", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => handleFileUpload(e, index)}
+                    className="block w-full text-sm text-gray-600"
+                  />
+                  {row.description && (
+                    <a
+                      href={row.description}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block mt-2 text-blue-600 hover:underline"
+                    >
+                      View PDF
+                    </a>
+                  )}
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="date"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.date}
+                    onChange={(e) => handleChange(index, "date", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-400 rounded"
+                    value={row.education}
+                    onChange={(e) => handleChange(index, "education", e.target.value)}
+                  />
+                </td>
+                <td className="border border-gray-800 p-2">
+                  <button
+                    onClick={() => removeRow(index)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
-                    View PDF
-                  </a>
-                )}
-              </td>
-
-              <td className="border border-gray-800 p-2">2025-03-03</td>
-              <td className="border border-gray-800 p-2">Bachelor's Degree</td>
-            </tr>
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
+      </div>
+
+      {/* ✅ Add Row Button */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={addRow}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Add Row
+        </button>
       </div>
     </div>
 

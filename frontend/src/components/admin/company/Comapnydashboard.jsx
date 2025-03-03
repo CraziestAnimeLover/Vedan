@@ -6,6 +6,8 @@ import Product from './product/Product';
 import News from '../News&Events/News';
 import GraphCompany from './graphcompany/GraphCompany';
 import Sharelist from './sharelist/Sharelist';
+import CompanyAccounts from './companyaccounts/CompanyAccounts';
+import ComapntBalancesheet from './companyaccounts/ComapntBalancesheet';
 
 // ✅ Lazy load components for better performance
 const Profilesmain = lazy(() => import("../../Profilesmain"));
@@ -33,7 +35,7 @@ const Companydashboard = () => {
     ],
     Placement: [
       { title: "Placement",url: "/company/placement" },
-      { title: "Saved", url: "/placement/resume/saved" }
+     
     ],
     Product: [
       { title: "Product", component: <Product/>},
@@ -48,9 +50,9 @@ const Companydashboard = () => {
       { title: "Graphs", component: <GraphCompany /> },
       { title: "Lists", component: <Sharelist /> }
     ],
-    AccountReport : [
-      { title: "Selfrating", url: "/placement/selfrating" },
-      { title: "Working", url: "/profiles/edit" }
+    Account : [
+      { title: "Financial Report", component: <CompanyAccounts /> },
+      { title: "Balance Sheet", component: <ComapntBalancesheet /> }
     ],
     Rating : [
       { title: "Selfrating", url: "/placement/selfrating" },
