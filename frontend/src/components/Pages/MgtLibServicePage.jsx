@@ -68,7 +68,7 @@ const ServiceButton = ({ title }) => (
 const services = [
   // { title: "NewsFeed", url: "/newsfeed" },
   // { title: "Recriuters", url: "/service/recriuter" },
-  { title: "Gym", url: "/" },
+  { title: "Gym", url: "/gym" },
   { title: "Cake", url: "/service/recriuter" },
   { title: "Industry", url: "/company" },
   { title: "Vijnan (Library)", url: "/mgtservice/mgtlibrary" },
