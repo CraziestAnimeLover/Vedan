@@ -1,14 +1,20 @@
-import { Router } from "express";
-const router = Router();
-import { getBalanceSheets, getBalanceSheetById, createBalanceSheet, updateBalanceSheet, deleteBalanceSheet,getLatestBalanceSheet } from "../controllers/balanceSheetController.js";
+import express from "express";
+import { 
+    getBalanceSheets, 
+    getBalanceSheetById, 
+    createBalanceSheet, 
+    updateBalanceSheet, 
+    deleteBalanceSheet,
+    getLatestBalanceSheet
+} from "../controllers/balanceSheetController.js";
+
+const router = express.Router();
 
 router.get("/", getBalanceSheets);
 router.get("/:id", getBalanceSheetById);
+router.get("/latest", getLatestBalanceSheet);
 router.post("/", createBalanceSheet);
-router.put("/:id", updateBalanceSheet);
+router.put("/", updateBalanceSheet);
 router.delete("/:id", deleteBalanceSheet);
-router.post("/update", updateBalanceSheet);
-// ✅ Fetch latest balance sheet
-router.get("/latest", getLatestBalanceSheet)
 
 export default router;

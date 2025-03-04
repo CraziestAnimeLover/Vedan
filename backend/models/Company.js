@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 
 const CompanySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  industry: { type: String, required: true },
-  description: { type: String, required: true },
+  industry: { type: String, default: "N/A" },
+  description: { type: String, default: "N/A" },
+  
   founders: { type: [String], required: true },
   contact: {
     phone: { type: String, required: true },

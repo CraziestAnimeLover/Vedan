@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from "react";
 import { FaUpload, FaPlus, FaTrash } from "react-icons/fa";
+import { useSelector } from "react-redux";
 const businessCertificates = [
     {
       category: "General Business",
@@ -36,6 +37,10 @@ const CompanyProfile = () => {
   const [certificates, setCertificates] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [openDropdown, setOpenDropdown] = useState(null);
+const {token, currentUser} = useSelector(store => store.auth);
+
+console.log("User:", currentUser);
+console.log("Token:", token);
 
   // Handle category selection
   const handleCategoryChange = (category) => {
@@ -151,12 +156,20 @@ useEffect(() => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    // Ensure no undefined or empty values are sent
+    // 🔥 FIX: Ensure user is logged in before proceeding
+    if (!currentUser || !currentUser.id) {
+      alert("User not logged in! Please log in first.");
+      return;
+    }
+  
+    const userId = currentUser.id; // ✅ Ensure it's a valid MongoDB ObjectId
+  
     const formData = new FormData();
-    formData.append("name", company.name || ""); 
-    formData.append("industry", company.industry && company.industry.trim() !== "" ? company.industry : "N/A"); 
-    formData.append("description", company.description && company.description.trim() !== "" ? company.description : "N/A"); 
-    formData.append("founders", JSON.stringify(company.founders || [])); 
+    formData.append("userId", userId); // ✅ Correctly attach userId
+    formData.append("name", company.name || "");
+    formData.append("industry", company.industry && company.industry.trim() !== "" ? company.industry : "N/A");
+    formData.append("description", company.description && company.description.trim() !== "" ? company.description : "N/A");
+    formData.append("founders", JSON.stringify(company.founders || []));
     formData.append("contact", JSON.stringify(contact || {}));
   
     if (uploadedFiles.length > 0) {
@@ -188,6 +201,8 @@ useEffect(() => {
       console.error("Error submitting company profile:", error);
     }
   };
+  
+  
   
   
   

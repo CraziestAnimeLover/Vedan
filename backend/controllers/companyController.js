@@ -1,58 +1,28 @@
 import Company from "../models/Company.js";
 import { singleUpload } from "../middlewares/mutler.js"; // ✅ Removed extra semicolon
 
+
 export const createCompany = async (req, res) => {
-    console.log("📥 Incoming Request Body:", req.body);
-    console.log("📷 Incoming File:", req.file);
-  
-    try {
-      const { name, industry, description } = req.body;
-      
-      // ✅ Fix potential JSON parsing errors
-      let founders = [];
-      let contact = {};
-  
-      try {
-        founders = req.body.founders ? JSON.parse(req.body.founders) : [];
-        contact = req.body.contact ? JSON.parse(req.body.contact) : {};
-      } catch (error) {
-        console.error("🚨 JSON Parsing Error:", error.message);
-        return res.status(400).json({ error: "Invalid JSON format in founders or contact" });
-      }
-  
-      // ✅ Validation: Ensure all required fields are present
-      if (!name || !industry || !description || !founders.length || !contact.phone) {
-        console.error("🚨 Validation Failed:", { name, industry, description, founders, contact });
-        return res.status(400).json({ error: "All fields are required" });
-      }
-  
-      // ✅ Handle file upload (Check if an image is uploaded)
-      const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-  
-      // ✅ Save to database
-      const newCompany = new Company({
-        name,
-        industry,
-        description,
-        founders,
-        contact,
-        imageUrl,
-      });
-  
-      await newCompany.save();
-      res.status(201).json({ message: "Company created successfully", company: newCompany });
-    } catch (error) {
-      console.error("🚨 Internal Server Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+  try {
+    console.log("Received Data:", req.body); // ✅ Debug userId
+
+    // Ensure userId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.body.userId)) {
+      return res.status(400).json({ error: "Invalid userId format" });
     }
-  };
+
+    const newCompany = new Company(req.body);
+    await newCompany.save();
+
+    res.status(201).json({ message: "Company created successfully!" });
+  } catch (error) {
+    console.error("Error creating company:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
   
-  
-  
-  
-  
-  
-  
+
 
 export async function getCompanies(req, res) {
   try {
