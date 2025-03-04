@@ -13,6 +13,7 @@ const ComapntBalancesheet = () => {
   const [selectedSection, setSelectedSection] = useState("Placement");
   const [selectedComponent, setSelectedComponent] = useState(null); // ✅ Track component
   const [balanceSheetId, setBalanceSheetId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [assets, setAssets] = useState([
     { type: "Current Assets", rupees: 0 },
@@ -65,15 +66,16 @@ const ComapntBalancesheet = () => {
   
         if (data && data._id) {
           setBalanceSheetId(data._id);
-          setAssets(data.assets || assets); // ✅ Update assets
-          setLiabilities(data.liabilities || liabilities); // ✅ Update liabilities
-          setEquity(data.equity || equity); // ✅ Update equity
+          setAssets(data.assets || []);
+          setLiabilities(data.liabilities || []);
+          setEquity(data.equity || 0);
         } else {
           console.error("Balance sheet ID not found in response");
         }
       })
       .catch((err) => console.error("Error fetching balance sheet:", err));
   }, []);
+  
   
   
   

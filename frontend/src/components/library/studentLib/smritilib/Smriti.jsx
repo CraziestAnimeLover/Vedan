@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dashboard from "../dashboard";
+import Dashboard from "../Dashboard";
 import ProfileCard from '../../profile/libmgtprofile/ProfileCard'
 import Profiles from "../../profile/libmgtprofile/Profiles";
 
