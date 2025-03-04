@@ -4,6 +4,11 @@ import Profiles from "../../library/profile/libmgtprofile/Profiles";
 import { LucideReceiptPoundSterling, LucideUser, LucideFileText, LucidePackage, LucideUtensils, LucideSettings, LucideClipboardList, LucideVideo, LucideCalendar, LucideBox } from 'lucide-react';
 import Notice from '../userpanel/notice/Notice';
 import Member from '../userpanel/member/Member';
+import Batch  from '../userpanel/batch/Batch';
+import Trainer from '../userpanel/trainer/Trainer';
+import User from '../userpanel/user/User';
+import Fees from '../account/fee/Fees';
+import Package from '../package/Package';
 
 // ✅ Lazy load components
 const Profilesmain = lazy(() => import("../../Profilesmain"));
@@ -32,10 +37,10 @@ const Gymdashboard = () => {
     Accounts: [
       { title: "Bill", url: "/gym/bills", icon: <LucideReceiptPoundSterling size={20} /> },
       { title: "Financial Report", url: "/placement/resume/saved", icon: <LucideFileText size={20} /> },
-      { title: "Fees Maintenance", url: "/placement/resume/saved", icon: <LucideFileText size={20} /> }
+      { title: "Fees Maintenance", component: <Fees />, icon: <LucideFileText size={20} /> }
     ],
     Package: [
-      { title: "Package", component: <StudentForm />, icon: <LucidePackage size={20} /> },
+      { title: "Package", component: <Package/>, icon: <LucidePackage size={20} /> },
       { title: "Saved", url: "/placement/resume/saved", icon: <LucidePackage size={20} /> }
     ],
     Nutrition: [
@@ -62,10 +67,10 @@ const Gymdashboard = () => {
     ],
     "User Panel": [
       { title: "Notice",  component: <Notice />, icon: <LucideBox size={20} /> },
-      { title: "Batch", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
+      { title: "Batch", component: <Batch />, icon: <LucideBox size={20} /> },
       { title: "Member",  component: <Member />, icon: <LucideBox size={20} /> },
-      { title: "Trainer", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
-      { title: "User", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
+      { title: "Trainer", component: <Trainer />, icon: <LucideBox size={20} /> },
+      { title: "User",  component: <User />, icon: <LucideBox size={20} /> },
     ],
   };
 
@@ -132,7 +137,7 @@ const Gymdashboard = () => {
           <hr className="w-full border-gray-800 mt-20 mb-4" />
         </div>
 
-        <div className="w-full md:w-3/4 p-4">
+        <div className="w-full md:w-3/3 p-1">
           <Suspense fallback={<div>Loading...</div>}>
             {selectedComponent ? selectedComponent : <div>{selectedSection}</div>}
           </Suspense>
