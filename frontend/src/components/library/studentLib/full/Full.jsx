@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Dashboard from "../dashboard";
+
 import Profiles from "../../profile/libmgtprofile/Profiles";
 import { useNavigate } from "react-router-dom";
 import SearchPop from "./fulldashboard/SearchPop";
-import Fulldashboard from "./fulldashboard/Fulldashboard";
+
 import SearchCard from "./fulldashboard/SearchCard"; // Import SearchCard component
 import Joined from "./fulldashboard/Joined"; // Import the Joined component
 
