@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Dashboard from "../Dashboard";
-s
+
 import Profiles from "../../profile/libmgtprofile/Profiles";
 
 const Smriti = () => {
