@@ -64,6 +64,7 @@ import Comapnydashboard from './components/admin/company/Comapnydashboard'
 import Companyplacement from './components/admin/company/compayplacement/Companyplacement'
 import Gymdashboard from './components/gym/gymdashboard/Gymdashboard'
 import Bills from './components/gym/bills/Bills'
+import Trainingdashboard from './components/gym/vayayam/training/trainingdashboard/Trainingdashboard'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -280,6 +281,10 @@ const approuter = createBrowserRouter([
    },
    { path: '/gym/bills', 
     element: <Bills/>
+   },
+   
+   { path: '/gym/vayayam/training', 
+    element: <Trainingdashboard />
    },
    
    
