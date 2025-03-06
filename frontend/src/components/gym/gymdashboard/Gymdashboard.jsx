@@ -23,6 +23,7 @@ import DietPlane from '../nutrition/DietPlane';
 import DietPlan from '../nutrition/DietPlane';
 import Corrective from '../machinemaintance/corrective/Corrective';
 import Preventive from '../machinemaintance/preventive/Preventive';
+import Live from '../livesession/Live';
 
 const Profilesmain = lazy(() => import("../../Profilesmain"));
 const StudentForm = lazy(() => import("../../auth/StudentForm"));
@@ -73,7 +74,7 @@ const toggleMenu = (menu) => {
       { title: "Fees", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> }
     ],
     "Live Session": [
-      { title: "Link", url: "/placement/opportunity/enquiry", icon: <LucideVideo size={20} /> },
+      { title: "Live", component: <Live />, icon: <LucideVideo size={20} /> },
       { title: "Own Space", url: "/placement/opportunity/apply", icon: <LucideVideo size={20} /> }
     ],
     Events: [
