@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { FiEdit, FiCheck, FiSave, FiTrash } from 'react-icons/fi';
 
@@ -114,7 +115,7 @@ const ExerciseCard = ({ index, exercise, onDelete, onUpdate }) => {
   );
 };
 
-const Back = () => {
+const LowerBody = () => {
   const [exercises, setExercises] = useState([]);
 
   const addExercise = () => {
@@ -155,4 +156,4 @@ const Back = () => {
   );
 };
 
-export default Back;
+export default LowerBody;

@@ -16,6 +16,13 @@ import Package from '../package/Package';
 import Workout from '../vayayam/workout/Workout';
 import Multiple from './admin/multiple/Multiple';
 import Trainingdashboard from '../vayayam/training/trainingdashboard/Trainingdashboard';
+import Demo from '../enquiry/Demo'
+import OnlineList from '../enquiry/OnlineList';
+import ProductView from '../nutrition/ProductView';
+import DietPlane from '../nutrition/DietPlane';
+import DietPlan from '../nutrition/DietPlane';
+import Corrective from '../machinemaintance/corrective/Corrective';
+import Preventive from '../machinemaintance/preventive/Preventive';
 
 const Profilesmain = lazy(() => import("../../Profilesmain"));
 const StudentForm = lazy(() => import("../../auth/StudentForm"));
@@ -49,16 +56,16 @@ const toggleMenu = (menu) => {
     ],
    
     Nutrition: [
-      { title: "Diet", url: "/placement/opportunity/enquiry", icon: <LucideUtensils size={20} /> },
-      { title: "Product View", url: "/placement/opportunity/apply", icon: <LucideUtensils size={20} /> }
+      { title: "Diet", component: <DietPlan />, icon: <LucideUtensils size={20} /> },
+      { title: "Product View",component: <ProductView />, icon: <LucideUtensils size={20} /> }
     ],
     "Machine Maintenance": [
-      { title: "Preventive", url: "/placement/selfrating", icon: <LucideSettings size={20} /> },
-      { title: "Breakdown", url: "/profiles/edit", icon: <LucideSettings size={20} /> }
+      { title: "Preventive",component: <Preventive />  , icon: <LucideSettings size={20} /> },
+      { title: "Correct", component: <Corrective />, icon: <LucideSettings size={20} /> }
     ],
     Enquiry: [
-      { title: "Attendance", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
-      { title: "Fees", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
+      { title: "Demo", component: <Demo />, icon: <LucideClipboardList size={20} /> },
+      { title: "Online List", component: <OnlineList />, icon: <LucideClipboardList size={20} /> },
       { title: "ID", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
     ],
     "Lekh (Record)": [
@@ -89,7 +96,7 @@ const toggleMenu = (menu) => {
     "User Panel": [
      
       { title: "Member",  component: <Member />, icon: <LucideBox size={20} /> },
-      { title: "Trainer", component: <Trainer />, icon: <LucideBox size={20} /> },
+      { title: "Training", component: <Trainingdashboard />, icon: <LucideBox size={20} /> },
       { title: "User",  component: <User />, icon: <LucideBox size={20} /> },
     ],
     Vayayam: [
