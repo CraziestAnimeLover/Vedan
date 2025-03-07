@@ -27,6 +27,7 @@ import Live from '../livesession/Live';
 import Inventory from '../inventory/Inventory';
 import Gymprofile from '../gymprofile/Gymprofile';
 import IDMem from '../lekh(record)/IDMem';
+import GymFees from '../attendence/fees/GymFees';
 
 const Profilesmain = lazy(() => import("../../Profilesmain"));
 const StudentForm = lazy(() => import("../../auth/StudentForm"));
@@ -73,9 +74,9 @@ const toggleMenu = (menu) => {
       { title: "ID", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
     ],
     "Lekh (Record)": [
-      { title: "Attendance", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
+      { title: "Attendance", url: "/gym/attendence", icon: <LucideClipboardList size={20} /> },
       { title: "Id", component: <IDMem />, icon: <LucideClipboardList size={20} /> },
-      { title: "Fees", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> }
+      { title: "Fees", component: <GymFees />, icon: <LucideClipboardList size={20} /> }
     ],
     "Live Session": [
       { title: "Live", component: <Live />, icon: <LucideVideo size={20} /> },
