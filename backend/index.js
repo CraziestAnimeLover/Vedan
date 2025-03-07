@@ -33,6 +33,7 @@ import scheduleRoutes from  './routes/scheduleRoutes.js';
 import resumeRoutes from './routes/resume.routes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import balanceSheetRoutes from './routes/balanceSheetRoutes.js';
+import enquiryRoutes from './routes/gymenquiryRoutes.js'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -82,6 +83,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
+app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/balancesheet", balanceSheetRoutes);
 app.use('/api', resumeRoutes);

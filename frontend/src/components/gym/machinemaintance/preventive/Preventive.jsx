@@ -87,11 +87,21 @@ const Preventive = () => {
             <th className="border p-2">Sr. No</th>
             <th className="border p-2">Name</th>
             {columns.map((col, index) => (
-              <th key={index} className="border p-2">
-                {col}
-                <button onClick={() => deleteColumn(index)} className="ml-2 text-red-500 text-xl">🗑️</button>
-              </th>
-            ))}
+  <th key={index} className="border p-2">
+    <input
+      type="text"
+      value={col}
+      onChange={(e) => {
+        const updatedColumns = [...columns];
+        updatedColumns[index] = e.target.value;
+        setColumns(updatedColumns);
+      }}
+      className="border p-1 rounded text-center w-20"
+    />
+    <button onClick={() => deleteColumn(index)} className="ml-2 text-red-500 text-xl">🗑️</button>
+  </th>
+))}
+
             <th className="border p-2">Actions</th>
           </tr>
         </thead>
@@ -112,19 +122,33 @@ const Preventive = () => {
                 />
               </td>
               {columns.map((day) => (
-                <td key={day} className="border p-2 text-center">
-                  <button
-                    onClick={() => toggleStatus(row.id, day)}
-                    className="px-2 py-1 rounded"
-                  >
-                    {row.days[day] === "Right" ? (
-                      <span className="text-green-500 text-xl">✅</span>
-                    ) : (
-                      <span className="text-red-500 text-xl">❌</span>
-                    )}
-                  </button>
-                </td>
-              ))}
+  <td key={day} className="border p-2 text-center">
+    {day === "Mon" || day === "Tues" ? (
+      <input
+        type="text"
+        value={row.days[day] || ""}
+        onChange={(e) => {
+          const updatedRows = [...rows];
+          updatedRows[index].days[day] = e.target.value;
+          setRows(updatedRows);
+        }}
+        className="border p-1 rounded w-full"
+      />
+    ) : (
+      <button
+        onClick={() => toggleStatus(row.id, day)}
+        className="px-2 py-1 rounded"
+      >
+        {row.days[day] === "Right" ? (
+          <span className="text-green-500 text-xl">✅</span>
+        ) : (
+          <span className="text-red-500 text-xl">❌</span>
+        )}
+      </button>
+    )}
+  </td>
+))}
+
               <td className="border p-2 text-center">
                 <button
                   onClick={() => deleteRow(index)}
