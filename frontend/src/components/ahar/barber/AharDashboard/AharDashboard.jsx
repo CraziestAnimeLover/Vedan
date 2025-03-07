@@ -1,21 +1,21 @@
 
 import React, { useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
-import Profiles from "../../library/profile/libmgtprofile/Profiles";
+import Profiles from "../../../library/profile/libmgtprofile/Profiles";
 import { 
   LucideReceiptPoundSterling, LucideUser, LucideFileText, LucidePackage, 
   LucideUtensils, LucideSettings, LucideClipboardList, LucideVideo, 
   LucideCalendar, LucideBox ,UserCog
 } from 'lucide-react';
+import Bills from '../aharaccount/bills/Bills';
 
 
-const Profilesmain = lazy(() => import("../../Profilesmain"));
-const StudentForm = lazy(() => import("../../auth/StudentForm"));
 
-const BarbarDashboard = () => {
+
+const AharDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [hoveredMenu, setHoveredMenu] = useState(null);
-  const [selectedSection, setSelectedSection] = useState("Barber");
+  const [selectedSection, setSelectedSection] = useState("AHAR");
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
 
@@ -34,7 +34,7 @@ const toggleMenu = (menu) => {
       { title: "Edit Profile", url: "/profiles/edit", icon: <LucideUser size={20} /> }
     ],
     Accounts: [
-      { title: "Bill", url: "/gym/bills", icon: <LucideReceiptPoundSterling size={20} /> },
+      { title: "Bill", url: "/ahar/bill", icon: <LucideReceiptPoundSterling size={20} /> },
       { title: "Financial Report", url: "/placement/resume/saved", icon: <LucideFileText size={20} /> },
       
       { title: "Balance Sheet", component: "<Fees />", icon: <LucideFileText size={20} /> }
@@ -67,13 +67,29 @@ const toggleMenu = (menu) => {
     ],
     "User Panel": [
         
-        { title: "Member",  component: '<Member />', icon: <LucideBox size={20} /> },
-        { title: "Training", component: '<Trainingdashboard />', icon: <LucideBox size={20} /> },
-        { title: "User",  component: '<User />', icon: <LucideBox size={20} /> },
+        { title: "User",  component: '<Member />', icon: <LucideBox size={20} /> },
+        { title: "Staff", component: '<Trainingdashboard />', icon: <LucideBox size={20} /> },
+        { title: "Regular Member",  component: '<User />', icon: <LucideBox size={20} /> },
     ],
     
     Inventory: [
       { title: "Inventory", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+    Dainik: [
+      { title: "Dainik", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+    Demand: [
+      { title: "Own", component: "<Inventory />", icon: <LucideBox size={20} /> },
+      { title: "Market", component: "<Inventory />", icon: <LucideBox size={20} /> },
+    ],
+    Reuse: [
+      { title: "Reuse", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+    List: [
+      { title: "List", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+    Rating: [
+      { title: "Rating", component: "<Inventory />", icon: <LucideBox size={20} /> }
     ],
   };
 
@@ -159,4 +175,4 @@ const toggleMenu = (menu) => {
   );
 };
 
-export default BarbarDashboard;
+export default AharDashboard;

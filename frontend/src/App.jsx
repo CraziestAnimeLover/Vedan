@@ -67,6 +67,9 @@ import Bills from './components/gym/bills/Bills'
 import Trainingdashboard from './components/gym/vayayam/training/trainingdashboard/Trainingdashboard'
 import GymAttendence from './components/gym/attendence/GymAttendence'
 import BarbarDashboard from './components/barber/barbardashboard/BarbarDashboard'
+import BarberAttendence from './components/barber/baberattendence/attendence/Barber/BarberAttendence'
+import AharDashboard from './components/ahar/barber/AharDashboard/AharDashboard'
+import Bills from './components/ahar/barber/aharaccount/bills/Bills'
 // import EnquiryCard from './components/library/enquiry/Enquiry'
 
 // import BookListSection from './components/library/bookshell/books/BookListSection'
@@ -293,6 +296,15 @@ const approuter = createBrowserRouter([
    },
    { path: '/barber', 
     element: <BarbarDashboard />
+   },
+   { path: '/barber/attendence', 
+    element: <BarberAttendence />
+   },
+   { path: '/ahar', 
+    element: <AharDashboard/>
+   },
+   { path: '/ahar/bill', 
+    element: <Bills/>
    },
    
    

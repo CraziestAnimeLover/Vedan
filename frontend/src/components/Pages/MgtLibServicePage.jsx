@@ -69,7 +69,7 @@ const services = [
   // { title: "NewsFeed", url: "/newsfeed" },
   // { title: "Recriuters", url: "/service/recriuter" },
   { title: "Gym", url: "/gym" },
-  { title: "AHAR", url: "/service/recriuter" },
+  { title: "AHAR", url: "/ahar" },
   { title: "Industry", url: "/company" },
   { title: "Vijnan (Library)", url: "/mgtservice/mgtlibrary" },
   { title: "Barber", url: "/barber" },
