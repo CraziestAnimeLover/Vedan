@@ -69,9 +69,10 @@ const services = [
   // { title: "NewsFeed", url: "/newsfeed" },
   // { title: "Recriuters", url: "/service/recriuter" },
   { title: "Gym", url: "/gym" },
-  { title: "Cake", url: "/service/recriuter" },
+  { title: "AHAR", url: "/service/recriuter" },
   { title: "Industry", url: "/company" },
   { title: "Vijnan (Library)", url: "/mgtservice/mgtlibrary" },
+  { title: "Barber", url: "/barber" },
   // { title: "Blood Help", url: "/blood-help" }, // Updated to a valid URL
   // { title: "Lost n Found", url: "/lostnfound" },
 ];
