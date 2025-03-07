@@ -34,6 +34,7 @@ import resumeRoutes from './routes/resume.routes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import balanceSheetRoutes from './routes/balanceSheetRoutes.js';
 import enquiryRoutes from './routes/gymenquiryRoutes.js'
+import exerciseRoutes from './routes/gymexerciseRoutes.js'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -84,6 +85,7 @@ app.get("/home", (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
 app.use("/api/enquiries", enquiryRoutes);
+app.use("/api/exercises", exerciseRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/balancesheet", balanceSheetRoutes);
 app.use('/api', resumeRoutes);

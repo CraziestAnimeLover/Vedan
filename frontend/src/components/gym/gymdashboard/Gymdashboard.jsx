@@ -19,11 +19,14 @@ import Trainingdashboard from '../vayayam/training/trainingdashboard/Trainingdas
 import Demo from '../enquiry/Demo'
 import OnlineList from '../enquiry/OnlineList';
 import ProductView from '../nutrition/ProductView';
-import DietPlane from '../nutrition/DietPlane';
+
 import DietPlan from '../nutrition/DietPlane';
 import Corrective from '../machinemaintance/corrective/Corrective';
 import Preventive from '../machinemaintance/preventive/Preventive';
 import Live from '../livesession/Live';
+import Inventory from '../inventory/Inventory';
+import Gymprofile from '../gymprofile/Gymprofile';
+import IDMem from '../lekh(record)/IDMem';
 
 const Profilesmain = lazy(() => import("../../Profilesmain"));
 const StudentForm = lazy(() => import("../../auth/StudentForm"));
@@ -46,7 +49,7 @@ const toggleMenu = (menu) => {
 
   const serviceItems = {
     Profile: [
-      { title: "View Profile", component: <Profilesmain />, icon: <LucideUser size={20} /> },
+      { title: "View Profile", component: <Gymprofile />, icon: <LucideUser size={20} /> },
       { title: "Edit Profile", url: "/profiles/edit", icon: <LucideUser size={20} /> }
     ],
     Accounts: [
@@ -71,6 +74,7 @@ const toggleMenu = (menu) => {
     ],
     "Lekh (Record)": [
       { title: "Attendance", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
+      { title: "Id", component: <IDMem />, icon: <LucideClipboardList size={20} /> },
       { title: "Fees", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> }
     ],
     "Live Session": [
@@ -81,13 +85,9 @@ const toggleMenu = (menu) => {
       { title: "Events", url: "/placement/opportunity/enquiry", icon: <LucideCalendar size={20} /> }
     ],
     Inventory: [
-      { title: "Inventory", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> }
+      { title: "Inventory", component: <Inventory />, icon: <LucideBox size={20} /> }
     ],
-    Panel: [
-      { title: "User", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
-      { title: "Staff(Trainer)", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
-      { title: "Member", url: "/placement/opportunity/enquiry", icon: <LucideBox size={20} /> },
-    ],
+    
     "SUTRIN (ADMIN)": [
       { title: "Multiple",  component: <Multiple />, icon: <UserCog size={20} /> },
       { title: "Notice",  component: <Notice />, icon: <UserCog size={20} /> },
