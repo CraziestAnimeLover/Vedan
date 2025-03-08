@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-const Notice = () => {
+const AharNotice = () => {
   const [showForm, setShowForm] = useState(false);
   const [notices, setNotices] = useState([]);
-  const [editIndex, setEditIndex] = useState(null); // Track index of the notice being edited
+  const [editIndex, setEditIndex] = useState(null); // Track editing notice
   const [formData, setFormData] = useState({
     notice: "",
     startDate: "",
@@ -17,6 +17,7 @@ const Notice = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (editIndex !== null) {
       // Update existing notice
       const updatedNotices = [...notices];
@@ -33,14 +34,14 @@ const Notice = () => {
     setShowForm(false);
   };
 
-  const editNotice = (index) => {
-    setFormData(notices[index]); // Load existing notice into form
-    setEditIndex(index); // Track index being edited
-    setShowForm(true);
-  };
-
   const removeNotice = (index) => {
     setNotices(notices.filter((_, i) => i !== index));
+  };
+
+  const editNotice = (index) => {
+    setFormData(notices[index]); // Load existing data into form
+    setEditIndex(index); // Track editing index
+    setShowForm(true);
   };
 
   return (
@@ -49,7 +50,7 @@ const Notice = () => {
       <button
         onClick={() => {
           setShowForm(!showForm);
-          setEditIndex(null); // Reset edit index when adding new
+          setEditIndex(null); // Reset edit index when opening form
         }}
         className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded shadow-md"
       >
@@ -60,9 +61,7 @@ const Notice = () => {
 
       {showForm ? (
         <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">
-            {editIndex !== null ? "Edit Notice" : "Create Notice"}
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">{editIndex !== null ? "Edit Notice" : "Create Notice"}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block font-medium">Notice</label>
@@ -105,13 +104,14 @@ const Notice = () => {
               >
                 <option value="User">User</option>
                 <option value="Member">Member</option>
+                <option value="Staff">Staff</option>
               </select>
             </div>
             <button
               type="submit"
               className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
             >
-              {editIndex !== null ? "Save Changes" : "Submit"}
+              {editIndex !== null ? "Update Notice" : "Submit"}
             </button>
           </form>
         </div>
@@ -128,17 +128,19 @@ const Notice = () => {
                 <div>
                   <h3 className="text-lg font-semibold">{notice.notice}</h3>
                   <p className="text-sm text-gray-600">
-                    <strong>Start:</strong> {notice.startDate || "--"} |{" "}
-                    <strong>End:</strong> {notice.endDate || "--"}
+                    <strong>Start:</strong> {notice.startDate || "--"} | <strong>End:</strong>{" "}
+                    {notice.endDate || "--"}
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  {/* Edit Button */}
                   <button
                     onClick={() => editNotice(index)}
                     className="text-blue-600 font-bold text-lg"
                   >
-                    ✎
+                    ✏️
                   </button>
+                  {/* Delete Button */}
                   <button
                     onClick={() => removeNotice(index)}
                     className="text-red-600 font-bold text-lg"
@@ -155,4 +157,4 @@ const Notice = () => {
   );
 };
 
-export default Notice;
+export default AharNotice;

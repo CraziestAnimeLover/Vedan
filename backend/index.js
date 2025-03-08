@@ -35,6 +35,9 @@ import companyRoutes from './routes/companyRoutes.js';
 import balanceSheetRoutes from './routes/balanceSheetRoutes.js';
 import enquiryRoutes from './routes/gymenquiryRoutes.js'
 import exerciseRoutes from './routes/gymexerciseRoutes.js'
+import machineMaintenanceRoutes from './routes/aharmachineMaintenanceRoutes.js'
+import productMaintenanceRoutes from './routes/aharproductMaintenanceRoutes.js'
+
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -84,6 +87,8 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
+app.use("/api/machine-maintenance", machineMaintenanceRoutes);
+app.use("/api/product-maintenance", productMaintenanceRoutes);
 app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/companies", companyRoutes);

@@ -7,6 +7,8 @@ import {
   LucideUtensils, LucideSettings, LucideClipboardList, LucideVideo, 
   LucideCalendar, LucideBox ,UserCog
 } from 'lucide-react';
+import BarberPreventive from '../machinemaintance/preventive/BarberPreventive';
+import BarberCorrective from '../machinemaintance/corrective/BarberCorrective';
 
 
 const Profilesmain = lazy(() => import("../../Profilesmain"));
@@ -41,39 +43,46 @@ const toggleMenu = (menu) => {
     ],
    
    
+    "Product View": [
+      { title: "Product View",component: "<Preventive />"  , icon: <LucideSettings size={20} /> },
+      
+    ],
     "Machine Maintenance": [
-      { title: "Preventive",component: "<Preventive />"  , icon: <LucideSettings size={20} /> },
-      { title: "Correct", component: "<Corrective />", icon: <LucideSettings size={20} /> }
+      { title: "Preventive",component: <BarberPreventive/>  , icon: <LucideSettings size={20} /> },
+      { title: "Correct", component: <BarberCorrective/>, icon: <LucideSettings size={20} /> }
     ],
     Enquiry: [
-      { title: "Demo", component: "<Demo />", icon: <LucideClipboardList size={20} /> },
-      { title: "Online List", component: "<OnlineList />", icon: <LucideClipboardList size={20} /> },
-      { title: "ID", url: "/placement/opportunity/enquiry", icon: <LucideClipboardList size={20} /> },
+      { title: "Enquiry", component: "<Demo />", icon: <LucideClipboardList size={20} /> },
+     
     ],
     "Lekh (Record)": [
       { title: "Attendance", url: "/barber/attendence", icon: <LucideClipboardList size={20} /> },
-      { title: "Id", component: "<IDMem />", icon: <LucideClipboardList size={20} /> },
-
-       
+      { title: "Id", component: "<IDMem />", icon: <LucideClipboardList size={20} /> },  
     ],
-    
-   
-    
     "SUTRIN (ADMIN)": [
         { title: "Multiple",  component: "<Multiple />", icon: <UserCog size={20} /> },
         { title: "Notice",  component: '<Notice />', icon: <UserCog size={20} /> },
        
         { title: "Package", component: '<Package/>', icon: <LucidePackage size={20} /> },
     ],
-    "User Panel": [
+    " Panel": [
         
-        { title: "Member",  component: '<Member />', icon: <LucideBox size={20} /> },
-        { title: "Training", component: '<Trainingdashboard />', icon: <LucideBox size={20} /> },
-        { title: "User",  component: '<User />', icon: <LucideBox size={20} /> },
+      { title: "User",  component: '<User />', icon: <LucideBox size={20} /> },
+        { title: "Staff", component: '<Trainingdashboard />', icon: <LucideBox size={20} /> },
     ],
     
     Inventory: [
       { title: "Inventory", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+    Dainik: [
+      { title: "Dainik", component: "<Inventory />", icon: <LucideBox size={20} /> }
+    ],
+"Token System": [
+      { title: "Token System", component: "<Inventory />", icon: <LucideBox size={20} /> },
+      
+    ],
+Rating: [
+      { title: "Rating", component: "<Inventory />", icon: <LucideBox size={20} /> }
     ],
   };
 

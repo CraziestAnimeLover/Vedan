@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Trainer = () => {
+const Staff = () => {
   const [showForm, setShowForm] = useState(false);
   const [trainers, setTrainers] = useState([]);
   const [formData, setFormData] = useState({
@@ -58,14 +58,14 @@ const Trainer = () => {
         onClick={() => setShowForm(!showForm)}
         className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded shadow-md"
       >
-        {showForm ? "Show Trainers" : "Add Trainer"}
+        {showForm ? "Show Staff" : "Add Staff"}
       </button>
 
-      <h2 className="text-lg font-semibold mb-4">Trainer Management</h2>
+      <h2 className="text-lg font-semibold mb-4">Staff Management</h2>
 
       {showForm ? (
         <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Add Trainer</h2>
+          <h2 className="text-lg font-semibold mb-4">Add Staff</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Image Upload */}
             <div>
@@ -274,7 +274,7 @@ const Trainer = () => {
           onClick={() => removeTrainer(index)}
           className="mt-2 text-red-600 font-bold text-sm"
         >
-          Remove Trainer
+          Remove Staff
         </button>
       </div>
     ))
@@ -287,4 +287,4 @@ const Trainer = () => {
   );
 };
 
-export default Trainer;
+export default Staff;
