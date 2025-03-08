@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 
 const StaffSmpurn = () => {
   const [selectedMonth, setSelectedMonth] = useState("January");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [rows, setRows] = useState([
     {
-      id: 1,
+      id: "60c72b2f9d1e8b2d88f2e5d7",  // MongoDB ObjectId here
       name: "John Doe",
       data: Array(31).fill("-"),
       totalDays: 0,
@@ -15,37 +16,33 @@ const StaffSmpurn = () => {
   ]);
 
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December"
   ];
 
   const years = Array.from(
     { length: 10 },
     (_, i) => new Date().getFullYear() - i
   );
-  const daysInMonth = new Date(
-    selectedYear,
-    months.indexOf(selectedMonth) + 1,
-    0
-  ).getDate();
+
+  const daysInMonth = new Date(selectedYear, months.indexOf(selectedMonth) + 1, 0).getDate();
+
+  useEffect(() => {
+    // Recalculate the days when the month or year changes
+    const updatedRows = [...rows];
+    updatedRows.forEach((row, rowIndex) => {
+      updatedRows[rowIndex].data = Array(daysInMonth).fill("-");  // Update days
+    });
+    setRows(updatedRows);
+  }, [selectedMonth, selectedYear]);
 
   const addRow = () => {
     setRows([
       ...rows,
       {
-        id: rows.length + 1,
+        id: rows.length + 1, // Use unique id generation
         name: "",
-        data: Array(31).fill("-"),
+        data: Array(daysInMonth).fill("-"),
         totalDays: 0,
         performedTotalP: 0,
         remark: "-",
@@ -79,8 +76,57 @@ const StaffSmpurn = () => {
     setRows(updatedRows);
   };
 
-  const updateRow = (rowIndex) => {
-    console.log("Updated row:", rows[rowIndex]);
+  const updateRow = async (rowIndex) => {
+    const rowData = rows[rowIndex];
+
+    if (typeof rowData.id !== 'string' || rowData.id.length !== 24) {
+      console.error("Error: Invalid ID or ID length not 24 characters");
+      return;
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:8000/api/aharattendance/${rowData.id}`, {
+        studentName: rowData.name,
+        year: selectedYear,
+        month: selectedMonth,
+        attendanceData: rowData.data.slice(0, daysInMonth),
+        totalDays: rowData.totalDays,
+        performedTotalP: rowData.performedTotalP,
+        remark: rowData.remark,
+      });
+
+      if (response.status === 200) {
+        console.log("Attendance data sent successfully!");
+      } else {
+        console.error("Failed to send attendance data");
+      }
+    } catch (error) {
+      console.error("Error sending data:", error);
+    }
+  };
+
+  const submitData = async () => {
+    try {
+      for (const row of rows) {
+        const response = await axios.post('http://localhost:8000/api/aharattendance', {
+          studentName: row.name,
+          year: selectedYear,
+          month: selectedMonth,
+          attendanceData: row.data,
+          totalDays: row.totalDays,
+          performedTotalP: row.performedTotalP,
+          remark: row.remark,
+        });
+
+        if (response.status === 200) {
+          console.log('Attendance data submitted successfully');
+        } else {
+          console.error('Failed to submit data for row', row.name);
+        }
+      }
+    } catch (error) {
+      console.error('Error during submission:', error);
+    }
   };
 
   return (
@@ -166,7 +212,7 @@ const StaffSmpurn = () => {
                       updatedRows[rowIndex].remark = e.target.value;
                       setRows(updatedRows);
                     }}
-                    className="border p-1  w-full"
+                    className="border p-1 w-full"
                   />
                 </td>
                 <td className="border px-2 py-1">
@@ -193,6 +239,13 @@ const StaffSmpurn = () => {
         className="mt-4 px-3 py-2 bg-green-500 text-white rounded"
       >
         Add Row
+      </button>
+
+      <button
+        onClick={submitData}
+        className="mt-4 px-3 py-2 bg-blue-500 text-white rounded"
+      >
+        Submit All Data
       </button>
     </div>
   );

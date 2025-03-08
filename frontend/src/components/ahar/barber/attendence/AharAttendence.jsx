@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { motion } from "framer-motion";
-
 import Profiles from "../../../library/profile/libmgtprofile/Profiles";
 import Daily from "./daily/StaffDaily";
-
 import StaffDaily from "./daily/StaffDaily";
 import StaffSmpurn from "./sampurn/StaffSmpurn";
 

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
+import axios from "axios";
 
 const StaffDaily = () => {
   const [attendanceData, setAttendanceData] = useState([
@@ -10,6 +11,7 @@ const StaffDaily = () => {
       timeOut: "03:00 PM",
       sign: "✔",
       remark: "Present",
+      isEditing: false,
     },
     {
       srNo: 2,
@@ -19,6 +21,7 @@ const StaffDaily = () => {
       timeOut: "03:00 PM",
       sign: "✔",
       remark: "Present",
+      isEditing: false,
     },
     {
       srNo: 3,
@@ -28,20 +31,52 @@ const StaffDaily = () => {
       timeOut: "",
       sign: "✖",
       remark: "Absent",
+      isEditing: false,
     },
   ]);
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/attendance")
+      .then((response) => {
+        console.log("Fetched Data:", response.data);
+        setAttendanceData(response.data);
+      })
+      .catch((error) => console.error("Error fetching attendance data:", error));
+  }, []);
+
+  const updateAttendance = (id, updatedRecord) => {
+  console.log("Updating:", id, updatedRecord);
+  axios
+    .put(`http://localhost:8000/api/attendance/${id}`, updatedRecord)
+    .then((response) => {
+      console.log("Updated successfully:", response.data);
+      // Update the local state
+      setAttendanceData(prevData =>
+        prevData.map(item => (item._id === id ? response.data : item))
+      );
+    })
+    .catch((error) => console.error("Error updating record:", error));
+};
+
+
+    // Edit Function
   const handleEdit = (index, field, value) => {
     const updatedData = [...attendanceData];
     updatedData[index][field] = value;
     setAttendanceData(updatedData);
   };
 
-  const handleDelete = (index) => {
-    const updatedData = attendanceData
-      .filter((_, i) => i !== index)
-      .map((student, i) => ({ ...student, srNo: i + 1 }));
+  const toggleEditMode = (index) => {
+    const updatedData = [...attendanceData];
+    updatedData[index].isEditing = !updatedData[index].isEditing;
     setAttendanceData(updatedData);
+  };
+
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:8000/api/attendance/${id}`)
+      .then(() => setAttendanceData(attendanceData.filter(item => item._id !== id)))
+      .catch(error => console.error("Error deleting record:", error));
   };
 
   const toggleSign = (index) => {
@@ -61,10 +96,19 @@ const StaffDaily = () => {
       timeOut: "",
       sign: "✖",
       remark: "Absent",
+      isEditing: true,
     };
     setAttendanceData([...attendanceData, newRow]);
   };
 
+  const handleSubmit = () => {
+    Promise.all(attendanceData.map(record =>
+      axios.post("http://localhost:8000/api/attendance", record)
+    ))
+      .then(() => alert("Attendance Submitted Successfully!"))
+      .catch(error => console.error("Error submitting attendance:", error));
+  };
+  
   const totalStudents = attendanceData.length;
   const presentCount = attendanceData.filter(
     (student) => student.remark === "Present"
@@ -98,49 +142,86 @@ const StaffDaily = () => {
             <tr key={index} className="text-center">
               <td className="border p-2">{student.srNo}</td>
               <td className="border p-2">
-                <input
-                  type="text"
-                  value={student.studentName}
-                  onChange={(e) =>
-                    handleEdit(index, "studentName", e.target.value)
-                  }
-                  className="border p-1 w-full"
-                />
+                {student.isEditing ? (
+                  <input
+                    type="text"
+                    value={student.studentName}
+                    onChange={(e) =>
+                      handleEdit(index, "studentName", e.target.value)
+                    }
+                    className="border p-1 w-full"
+                  />
+                ) : (
+                  student.studentName
+                )}
               </td>
               <td className="border p-2">{student.id}</td>
               <td className="border p-2">
-                <input
-                  type="text"
-                  value={student.timeIn}
-                  onChange={(e) => handleEdit(index, "timeIn", e.target.value)}
-                  className="border p-1 w-full"
-                />
+                {student.isEditing ? (
+                  <input
+                    type="text"
+                    value={student.timeIn}
+                    onChange={(e) => handleEdit(index, "timeIn", e.target.value)}
+                    className="border p-1 w-full"
+                  />
+                ) : (
+                  student.timeIn
+                )}
               </td>
               <td className="border p-2">
-                <input
-                  type="text"
-                  value={student.timeOut}
-                  onChange={(e) => handleEdit(index, "timeOut", e.target.value)}
-                  className="border p-1 w-full"
-                />
+                {student.isEditing ? (
+                  <input
+                    type="text"
+                    value={student.timeOut}
+                    onChange={(e) => handleEdit(index, "timeOut", e.target.value)}
+                    className="border p-1 w-full"
+                  />
+                ) : (
+                  student.timeOut
+                )}
               </td>
               <td className="border p-2">
                 <button
                   onClick={() => toggleSign(index)}
                   className="p-1 w-full border bg-gray-100"
+                  disabled={!student.isEditing}
                 >
                   {student.sign}
                 </button>
               </td>
               <td className="border p-2">
-                <input
-                  type="text"
-                  value={student.remark}
-                  onChange={(e) => handleEdit(index, "remark", e.target.value)}
-                  className="border p-1 w-full"
-                />
+                {student.isEditing ? (
+                  <input
+                    type="text"
+                    value={student.remark}
+                    onChange={(e) => handleEdit(index, "remark", e.target.value)}
+                    className="border p-1 w-full"
+                  />
+                ) : (
+                  student.remark
+                )}
               </td>
-              <td className="border p-2">
+              <td className="border p-2 flex justify-center gap-2">
+                {student.isEditing ? (
+                  <button
+                    onClick={() =>{toggleEditMode(index)
+                      updateAttendance(student._id, student);
+                    } 
+                     
+                    }
+                    
+                    className="bg-green-500 text-white p-1 rounded"
+                  >
+                    Update
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => toggleEditMode(index)}
+                    className="bg-yellow-500 text-white p-1 rounded"
+                  >
+                    Edit
+                  </button>
+                )}
                 <button
                   onClick={() => handleDelete(index)}
                   className="bg-red-500 text-white p-1 rounded"
@@ -168,6 +249,12 @@ const StaffDaily = () => {
           </tr>
         </tbody>
       </table>
+      <button
+        onClick={handleSubmit}
+        className="mt-4 bg-green-500 text-white p-2 rounded w-full"
+      >
+        Submit Attendance
+      </button>
     </div>
   );
 };
