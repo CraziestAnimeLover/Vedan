@@ -24,6 +24,9 @@ import StaffID from "../lekh(record)/StaffID";
 import Enquiry from "../enquiry/Enquiry";
 import ProductMaintaince from "../machinemaintance/corrective/Productmaintance";
 import Productmaintance from "../machinemaintance/corrective/Productmaintance";
+import Suchishowroom from "../Suchi/suchishowroom/Suchishowroom";
+import Reuse from "../reuse/Reuse";
+import Dainik from "../dainik/Dainik";
 
 const AharDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -133,7 +136,7 @@ const AharDashboard = () => {
     Dainik: [
       {
         title: "Dainik",
-        component: "<Inventory />",
+        component: <Dainik/>,
         icon: <LucideBox size={20} />,
       },
     ],
@@ -152,14 +155,19 @@ const AharDashboard = () => {
     Reuse: [
       {
         title: "Reuse",
-        component: "<Inventory />",
+        component:<Reuse/>,
         icon: <LucideBox size={20} />,
       },
     ],
-    List: [
+    "List (Suchi)": [
       {
-        title: "List",
-        component: "<Inventory />",
+        title: "Suchi (Showroom)",
+        component: <Suchishowroom/>,
+        icon: <LucideBox size={20} />,
+      },
+      {
+        title: "Suchi (Warehouse) ",
+        component: <Suchishowroom/>,
         icon: <LucideBox size={20} />,
       },
     ],

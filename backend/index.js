@@ -39,9 +39,10 @@ import machineMaintenanceRoutes from './routes/aharmachineMaintenanceRoutes.js'
 import productMaintenanceRoutes from './routes/aharproductMaintenanceRoutes.js'
 import staffAttendanceRoutes from './routes/staffAttendanceRoutes.js'
 import aharsmpurnattendanceRoutes from './routes/aharsmpurnattendanceRoutes.js';
-
+import inventoryRoutes from './routes/aharinventoryRoutes.js'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import multer from "multer";
 
 import path from 'path';
 import {
@@ -55,6 +56,7 @@ dotenv.config();
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const upload = multer({ dest: "uploads/" });
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -91,6 +93,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
 app.use("/api/machine-maintenance", machineMaintenanceRoutes);
 app.use("/api/product-maintenance", productMaintenanceRoutes);
+app.use("/api/inventory", inventoryRoutes);
 app.use("/api/attendance", staffAttendanceRoutes);
 app.use("/api", aharsmpurnattendanceRoutes);
 app.use("/api/enquiries", enquiryRoutes);
@@ -127,6 +130,17 @@ app.use("/api", scholarshipRoutes);
 app.use("/api/admitcards", admitCardRoutes);
 app.use("/api/study-centers", studyCenterRoutes);
 app.use('/api/v1/user/update-profile', userRoute);
+app.post("/api/inventory", upload.single("description"), (req, res) => {
+  console.log("Received body:", req.body);
+  console.log("Received files:", req.file || req.files);
+
+  if (!req.body.items) {
+    return res.status(400).json({ error: "Missing inventory data" });
+  }
+
+  res.status(200).json({ message: "Inventory saved!" });
+});
+
 app.get("/api/v1/user/update-profile", async (req, res) => {
   try {
     const { userId } = req.query; // Get the userId from the query parameters

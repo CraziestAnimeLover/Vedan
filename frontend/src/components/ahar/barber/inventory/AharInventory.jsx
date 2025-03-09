@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FiPlus, FiTrash, FiUpload, FiEdit, FiSave } from "react-icons/fi";
-
+import axios from "axios";
 const AharInventory = () => {
   const [columns, setColumns] = useState([
     { key: "Item Name", name: "Item Name", editable: false },
@@ -24,13 +24,13 @@ const AharInventory = () => {
 
   const handleFileUpload = (id, file) => {
     if (file && file.type === "application/pdf") {
-      const fileURL = URL.createObjectURL(file);
-      handleChange(id, "description", fileURL);
+      handleChange(id, "description", file); // Store the actual file object
     } else {
       alert("Please upload a valid PDF file.");
     }
   };
-
+  
+  
   const addRow = () => {
     const newRow = { id: inventory.length + 1 };
     columns.forEach((col) => (newRow[col.key] = col.isFile ? null : ""));
@@ -56,7 +56,38 @@ const AharInventory = () => {
       return rest;
     }));
   };
+  const handleSaveAll = async () => {
+    try {
+      for (const item of inventory) {
+        const formData = new FormData();
+  
+        formData.append("itemName", item["Item Name"]);
+        formData.append("quantity", Number(item.quantity)); // Convert to Number
+        formData.append("condition", item.condition);
+        formData.append("remark", item.remark || "");
+  
+        if (item.description && item.description instanceof File) {
+          formData.append("description", item.description);
+        }
+  
+        const response = await axios.post("http://localhost:8000/api/inventory", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+  
+        console.log("Success:", response.data);
+      }
+  
+      alert("All items saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error.response?.data || error.message);
+      alert("Failed to save some data.");
+    }
+  };
+  
+  
+  
 
+  
   return (
     <div className="p-4 max-w-5xl mx-auto">
       
@@ -150,12 +181,13 @@ const AharInventory = () => {
               ))}
               <td className="border p-2">
                 {editingRow === item.id ? (
-                  <button
-                    onClick={() => setEditingRow(null)}
-                    className="text-green-500 mx-2"
-                  >
-                    <FiSave />
-                  </button>
+               <button
+               onClick={handleSaveAll}
+               className="bg-green-500 text-white px-4 py-2 rounded mt-4 flex items-center gap-2"
+             >
+               <FiSave /> Save All
+             </button>
+             
                 ) : (
                   <button
                     onClick={() => setEditingRow(item.id)}
