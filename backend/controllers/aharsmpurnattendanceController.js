@@ -35,29 +35,29 @@ export const getAttendanceById = async (req, res) => {
 
 // Add a new attendance record
 export const addAttendance = async (req, res) => {
-    try {
-      const { studentName, year, month, attendanceData, totalDays, performedTotalP, remark } = req.body;
-  
-      if (!studentName || !year || !month || !attendanceData || !totalDays || !performedTotalP || !remark) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-  
-      if (!Array.isArray(attendanceData) || attendanceData.length !== 31) {
-        return res.status(400).json({ error: "Attendance data must be an array of 31 values" });
-      }
-  
-      const newRecord = new Attendance(req.body);
-      const savedRecord = await newRecord.save();
-      res.status(201).json(savedRecord);
-  
-    } catch (error) {
-      console.error("Error adding attendance:", error);
-      if (error.name === "ValidationError") {
-        return res.status(400).json({ error: "Validation error", details: error.errors });
-      }
-      res.status(400).json({ error: error.message });
+  try {
+    console.log("Received Data:", req.body); // 🔍 Log incoming request data
+    
+    const { id, name, timeIn, timeOut, studentName, year, month, attendanceData, totalDays, performedTotalP, remark } = req.body;
+
+    // Validate if all fields exist
+    if (!id || !name || !timeIn || !timeOut || !studentName || !year || !month || !attendanceData || totalDays === undefined || performedTotalP === undefined || !remark) {
+      return res.status(400).json({
+        error: "All fields are required",
+        missingFields: { id, name, timeIn, timeOut, studentName, year, month, attendanceData, totalDays, performedTotalP, remark }
+      });
     }
-  };
+
+    const newRecord = new Attendance(req.body);
+    const savedRecord = await newRecord.save();
+    res.status(201).json(savedRecord);
+  } catch (error) {
+    console.error("Validation Error Details:", error);
+    res.status(400).json({ error: "Validation error", details: error.errors || error.message });
+  }
+};
+
+
   
 
 // Update an attendance record

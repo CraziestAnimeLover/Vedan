@@ -108,26 +108,36 @@ const StaffSmpurn = () => {
   const submitData = async () => {
     try {
       for (const row of rows) {
-        const response = await axios.post('http://localhost:8000/api/aharattendance', {
-          studentName: row.name,
+        const requestData = {
+          id: row.id || new Date().getTime().toString(), // Ensure a unique ID if missing
+          name: row.name || "Unknown", // Default name if empty
+          timeIn: row.timeIn || "00:00", // Default time if empty
+          timeOut: row.timeOut || "00:00", // Default time if empty
+          studentName: row.studentName,
           year: selectedYear,
           month: selectedMonth,
           attendanceData: row.data,
-          totalDays: row.totalDays,
-          performedTotalP: row.performedTotalP,
-          remark: row.remark,
-        });
-
-        if (response.status === 200) {
-          console.log('Attendance data submitted successfully');
-        } else {
-          console.error('Failed to submit data for row', row.name);
-        }
+          totalDays: row.totalDays ?? 0,
+          performedTotalP: row.performedTotalP ?? 0,
+          remark: row.remark || "-", 
+        };
+        
+        
+  
+        console.log("Sending Data:", requestData); // Log the request data
+  
+        const response = await axios.post("http://localhost:8000/api/aharattendance", requestData);
+  
+        console.log("Response:", response.data);
       }
     } catch (error) {
-      console.error('Error during submission:', error);
+      console.error("Error during submission:", error.response?.data || error);
     }
   };
+  
+  
+  
+  
 
   return (
     <div className="p-4 h-full overflow-auto">

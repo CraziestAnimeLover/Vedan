@@ -1,14 +1,18 @@
-import express from 'express';
-import { getAttendance, getAttendanceById, addAttendance,  updateAttendance, deleteAttendance } from '../controllers/aharsmpurnattendanceController.js';
+import express from "express";
+import {
+  getAttendance,
+  getAttendanceById,
+  addAttendance,
+  updateAttendance,
+  deleteAttendance
+} from "../controllers/aharsmpurnattendanceController.js"; // Import named exports
 
 const router = express.Router();
 
-// Define the routes
-router.get('/aharattendance', getAttendance); // Get all attendance records
-router.get('/aharattendance/:id', getAttendanceById); // Get a single attendance by ID
-router.post('/aharattendance', addAttendance); // Add new attendance record
-router.put('/aharattendance/:id', updateAttendance); // Update attendance record by ID
-
-router.delete('/aharattendance/:id', deleteAttendance); // Delete an attendance record
+router.get("/aharattendance", getAttendance);
+router.get("/aharattendance/:id", getAttendanceById);
+router.post("/aharattendance", addAttendance);
+router.put("/aharattendance/:id", updateAttendance);
+router.delete("/aharattendance/:id", deleteAttendance);
 
 export default router;
