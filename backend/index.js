@@ -42,7 +42,7 @@ import aharsmpurnattendanceRoutes from './routes/aharsmpurnattendanceRoutes.js';
 import inventoryRoutes from './routes/aharinventoryRoutes.js'
 import  demandinventoryRoutes from './routes/DemandinventoryRoutes.js'
 import reuseinventoryRoutes from './routes/ReuseinventoryRoutes.js'
-
+import organizationRoutes from './routes/aharorganizationRoutes.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -94,6 +94,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
+app.use('/api', organizationRoutes);
 app.use("/api/demandinventory", demandinventoryRoutes);
 app.use('/api/reuse', reuseinventoryRoutes);
 app.use('/api', inventoryRoutes);

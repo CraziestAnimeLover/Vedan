@@ -61,6 +61,7 @@ const Reuse = () => {
       const formData = new FormData();
   
       inventory.forEach((item, index) => {
+        console.log(`Appending item ${index}:`, item);
         formData.append(`inventory[${index}][name]`, item.name);
         formData.append(`inventory[${index}][category]`, item.category);
         formData.append(`inventory[${index}][expireDate]`, item.expireDate);
@@ -72,11 +73,11 @@ const Reuse = () => {
         formData.append(`inventory[${index}][description]`, item.description);
   
         if (item.pic) {
-          formData.append(`inventory[${index}][pic]`, item.pic); // Append pic for each item
+          formData.append(`inventory[${index}][pic]`, item.pic);
         }
   
         if (item.descriptionFile) {
-          formData.append(`inventory[${index}][description]`, item.descriptionFile); // Append description file
+          formData.append(`inventory[${index}][description]`, item.descriptionFile);
         }
       });
   
@@ -88,6 +89,7 @@ const Reuse = () => {
       if (!response.ok) {
         const errorResponse = await response.json();
         console.error("Error Response:", errorResponse);
+        alert(errorResponse.message || "Inventory submission failed.");
         throw new Error("Inventory submission failed.");
       }
   
