@@ -1,52 +1,93 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AharNotice = () => {
   const [showForm, setShowForm] = useState(false);
   const [notices, setNotices] = useState([]);
-  const [editIndex, setEditIndex] = useState(null); // Track editing notice
+  const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState({
     notice: "",
     startDate: "",
     endDate: "",
     visibleTo: "User",
   });
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // Fetch notices on component mount
+    const fetchNotices = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:8000/api/notices");
+        setNotices(response.data);
+      } catch (error) {
+        console.error("Error fetching notices:", error);
+        setErrorMessage("Failed to load notices.");
+      }
+      setLoading(false);
+    };
+
+    fetchNotices();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editIndex !== null) {
-      // Update existing notice
-      const updatedNotices = [...notices];
-      updatedNotices[editIndex] = formData;
-      setNotices(updatedNotices);
-      setEditIndex(null);
-    } else {
-      // Add new notice
-      setNotices([...notices, formData]);
+    if (new Date(formData.startDate) > new Date(formData.endDate)) {
+      setErrorMessage("End date must be later than the start date.");
+      return;
     }
 
-    // Reset form
-    setFormData({ notice: "", startDate: "", endDate: "", visibleTo: "User" });
-    setShowForm(false);
+    setLoading(true);
+    try {
+      if (editIndex !== null) {
+        await axios.put(
+          `http://localhost:8000/api/notices/${notices[editIndex]._id}`,
+          formData
+        );
+        const updatedNotices = [...notices];
+        updatedNotices[editIndex] = formData;
+        setNotices(updatedNotices);
+        setEditIndex(null);
+      } else {
+        const response = await axios.post("http://localhost:8000/api/notices", formData);
+        setNotices([...notices, response.data]);
+      }
+
+      // Reset form and close it
+      setFormData({ notice: "", startDate: "", endDate: "", visibleTo: "User" });
+      setShowForm(false);
+      setErrorMessage(""); // Reset error message after successful submission
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setErrorMessage("Failed to submit notice.");
+    }
+    setLoading(false);
   };
 
-  const removeNotice = (index) => {
-    setNotices(notices.filter((_, i) => i !== index));
+  const removeNotice = async (index) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/notices/${notices[index]._id}`);
+      setNotices(notices.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error("Error deleting notice:", error);
+      setErrorMessage("Failed to delete notice.");
+    }
   };
 
   const editNotice = (index) => {
-    setFormData(notices[index]); // Load existing data into form
-    setEditIndex(index); // Track editing index
+    setFormData(notices[index]);
+    setEditIndex(index);
     setShowForm(true);
   };
 
   return (
     <div className="p-4 flex flex-col items-center w-full relative">
-      {/* Toggle Button */}
       <button
         onClick={() => {
           setShowForm(!showForm);
@@ -58,6 +99,12 @@ const AharNotice = () => {
       </button>
 
       <h2 className="text-lg font-semibold mb-4">Notice Board</h2>
+
+      {errorMessage && (
+        <div className="bg-red-500 text-white p-2 rounded mb-4">
+          {errorMessage}
+        </div>
+      )}
 
       {showForm ? (
         <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
@@ -110,14 +157,17 @@ const AharNotice = () => {
             <button
               type="submit"
               className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+              disabled={loading}
             >
-              {editIndex !== null ? "Update Notice" : "Submit"}
+              {loading ? "Submitting..." : editIndex !== null ? "Update Notice" : "Submit"}
             </button>
           </form>
         </div>
       ) : (
         <div className="w-full max-w-md">
-          {notices.length === 0 ? (
+          {loading ? (
+            <p className="text-center">Loading notices...</p>
+          ) : notices.length === 0 ? (
             <p className="text-gray-500 text-center">No notices added yet.</p>
           ) : (
             notices.map((notice, index) => (
