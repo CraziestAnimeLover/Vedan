@@ -11,6 +11,7 @@ import {
   UserCog,
 } from "lucide-react";
 
+import AharUser from "../aharuser/AharUser"; // Adjust the path according to your project structure
 
 
 import AharMember from "../member/AharMember";
