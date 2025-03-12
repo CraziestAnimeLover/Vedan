@@ -48,6 +48,7 @@ const Login = () => {
             console.log("Server Response:", res.data);
     
             if (res.data.success) {
+                localStorage.setItem("token", res.data.token); // ✅ Store token
                 dispatch(setAuthUser(res.data.user));
                 navigate("/");
                 toast.success(res.data.message);
@@ -63,6 +64,7 @@ const Login = () => {
             dispatch(setLoading(false));
         }
     };
+    
     
     
   

@@ -18,9 +18,13 @@ const Reuse = () => {
   };
 
   const handleFileUpload = (id, field, file) => {
-    handleChange(id, field, file);
+    setInventory((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, [field]: file, total: item.price * (item.quantityNumber + item.quantityKgL) } : item
+      )
+    );
   };
-
+  
   const addRow = () => {
     setInventory([...inventory, { id: Date.now(), name: "", pic: null, category: "", expireDate: "", price: "", manufacturing: "", quantityNumber: 0, quantityKgL: 0, offer: 0, total: 0, description: null }]);
   };
@@ -34,10 +38,72 @@ const Reuse = () => {
     setShowCategoryPopup(null);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting Inventory Data:", inventory);
-    alert("Inventory submitted successfully!");
+  const handleSubmit = async () => {
+    // Validate inventory data
+    const validateInventory = () => {
+      return inventory.every(
+        (item) =>
+          item.name &&
+          item.category &&
+          item.expireDate &&
+          item.price &&
+          item.quantityNumber >= 0 &&
+          item.quantityKgL >= 0
+      );
+    };
+  
+    if (!validateInventory()) {
+      alert("Please fill in all required fields for each item.");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+  
+      inventory.forEach((item, index) => {
+        formData.append(`inventory[${index}][name]`, item.name);
+        formData.append(`inventory[${index}][category]`, item.category);
+        formData.append(`inventory[${index}][expireDate]`, item.expireDate);
+        formData.append(`inventory[${index}][price]`, item.price);
+        formData.append(`inventory[${index}][manufacturing]`, item.manufacturing);
+        formData.append(`inventory[${index}][quantityNumber]`, item.quantityNumber);
+        formData.append(`inventory[${index}][quantityKgL]`, item.quantityKgL);
+        formData.append(`inventory[${index}][offer]`, item.offer);
+        formData.append(`inventory[${index}][description]`, item.description);
+  
+        if (item.pic) {
+          formData.append(`inventory[${index}][pic]`, item.pic); // Append pic for each item
+        }
+  
+        if (item.descriptionFile) {
+          formData.append(`inventory[${index}][description]`, item.descriptionFile); // Append description file
+        }
+      });
+  
+      const response = await fetch("http://localhost:8000/api/reuse", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Error Response:", errorResponse);
+        throw new Error("Inventory submission failed.");
+      }
+  
+      const result = await response.json();
+      alert(result.message || "Inventory submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting inventory:", error);
+      alert("Failed to submit inventory.");
+    }
   };
+  
+  
+  
+  
+  
+  
 
   const handleUpdate = (id) => {
     setEditMode(id);
@@ -85,7 +151,7 @@ const Reuse = () => {
                 />
               </td>
               <td className="border p-2">
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(item.id, "pic", e.target.files[0])} />
+                <input type="file" accept="image" onChange={(e) => handleFileUpload(item.id, "pic", e.target.files[0])} />
               </td>
               <td className="border p-2 relative">
                 <button

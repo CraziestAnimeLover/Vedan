@@ -22,11 +22,16 @@ import AharMultiple from "../sutrin(admin)/multiple/AharMultiple";
 import AharNotice from "../sutrin(admin)/notice/AharNotice";
 import StaffID from "../lekh(record)/StaffID";
 import Enquiry from "../enquiry/Enquiry";
-import ProductMaintaince from "../machinemaintance/corrective/Productmaintance";
 import Productmaintance from "../machinemaintance/corrective/Productmaintance";
 import Suchishowroom from "../Suchi/suchishowroom/Suchishowroom";
 import Reuse from "../reuse/Reuse";
 import Dainik from "../dainik/Dainik";
+import AddedItemsTable from "../dainik/AddedItemsTable";
+import Rating from '../Rating/Rating'
+import Review from "../Rating/Review";
+import Own from "../demand/Own";
+import MarketTrends from "../demand/MarketTrends";
+import InventoryPage from "../dainik/InventoryPage";
 
 const AharDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -135,20 +140,25 @@ const AharDashboard = () => {
     ],
     Dainik: [
       {
-        title: "Dainik",
+        title: "Add",
         component: <Dainik/>,
+        icon: <LucideBox size={20} />,
+      },
+      {
+        title: "Full",
+        component: <InventoryPage/>,
         icon: <LucideBox size={20} />,
       },
     ],
     Demand: [
       {
         title: "Own",
-        component: "<Inventory />",
+        component: <Own/>,
         icon: <LucideBox size={20} />,
       },
       {
         title: "Market",
-        component: "<Inventory />",
+        component: <MarketTrends/>,
         icon: <LucideBox size={20} />,
       },
     ],
@@ -174,7 +184,12 @@ const AharDashboard = () => {
     Rating: [
       {
         title: "Rating",
-        component: "<Inventory />",
+        component:<Rating/>,
+        icon: <LucideBox size={20} />,
+      },
+      {
+        title: "Review",
+        component:<Review/>,
         icon: <LucideBox size={20} />,
       },
     ],
