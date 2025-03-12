@@ -178,7 +178,7 @@ const AharNotice = () => {
                 <div>
                   <h3 className="text-lg font-semibold">{notice.notice}</h3>
                   <p className="text-sm text-gray-600">
-                    <strong>Start:</strong> {notice.startDate || "--"} | <strong>End:</strong>{" "}
+                    <strong>Starts:</strong> {notice.startDate || "--"} | <strong>End:</strong>{" "}
                     {notice.endDate || "--"}
                   </p>
                 </div>
