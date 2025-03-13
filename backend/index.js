@@ -48,6 +48,7 @@ import aharuserRoutes from "./routes/aharuserRoutes.js";
 import aharstaffRoutes from "./routes/aharstaffRoutes.js";
 import AharMemberRoutes from "./routes/aharMemberRoutes.js";
 import aharratingRoutes from "./routes/aharratingRoutes.js";
+import aharShowroomRoutes from "./routes/aharshowroomRoutes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -119,6 +120,7 @@ app.get("/home", (req, res) => {
 
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/api/aharshowroom', aharShowroomRoutes);
 app.use("/ratings", aharratingRoutes);
 app.use("/api/members", AharMemberRoutes);
 app.use('/api/schedules', scheduleRoutes);
