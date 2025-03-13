@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   BarChart,
   Bar,
@@ -10,44 +11,74 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const API_URL = "http://localhost:8000/ratings";
+
 const Rating = () => {
   const [data, setData] = useState([]);
   const [keyPoint, setKeyPoint] = useState("");
   const [number, setNumber] = useState("");
-  const [editIndex, setEditIndex] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [sortBy, setSortBy] = useState(null);
 
-  const handleAddOrUpdate = () => {
+  // ✅ Fetch data from backend
+  const fetchRatings = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching ratings:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRatings();
+  }, []);
+
+  // ✅ Add or update rating
+  const handleAddOrUpdate = async () => {
     if (!keyPoint || !number) {
       alert("Please enter Key Point and Number!");
       return;
     }
 
-    const newData = [...data];
-
-    if (editIndex !== null) {
-      newData[editIndex] = { keyPoint, number: parseInt(number, 10) };
-      setEditIndex(null);
-    } else {
-      // Add new entry to the TOP of the table
-      newData.unshift({ keyPoint, number: parseInt(number, 10) });
+    try {
+      if (editId) {
+        // Update existing rating
+        await axios.put(`${API_URL}/${editId}`, { keyPoint, number: parseInt(number, 10) });
+      } else {
+        // Add new rating
+        await axios.post(API_URL, { keyPoint, number: parseInt(number, 10) });
+      }
+      fetchRatings();
+      setKeyPoint("");
+      setNumber("");
+      setEditId(null);
+    } catch (error) {
+      console.error("Error saving rating:", error);
     }
-
-    setData(newData);
-    setKeyPoint("");
-    setNumber("");
   };
 
-  const handleEdit = (index) => {
-    setKeyPoint(data[index].keyPoint);
-    setNumber(data[index].number);
-    setEditIndex(index);
+  // ✅ Edit rating
+  const handleEdit = (id) => {
+    const selectedRating = data.find((item) => item._id === id);
+    if (selectedRating) {
+      setKeyPoint(selectedRating.keyPoint);
+      setNumber(selectedRating.number);
+      setEditId(id);
+    }
   };
 
-  const handleDelete = (index) => {
-    setData(data.filter((_, i) => i !== index));
+  // ✅ Delete rating
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      fetchRatings();
+    } catch (error) {
+      console.error("Error deleting rating:", error);
+    }
   };
 
+  // ✅ Sort ratings
   const handleSort = (key) => {
     setSortBy(key);
     setData([...data].sort((a, b) => (a[key] > b[key] ? 1 : -1)));
@@ -57,8 +88,6 @@ const Rating = () => {
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
-      
-
       <table className="w-full border-collapse border border-gray-300 mb-6">
         <thead>
           <tr className="bg-gray-200">
@@ -96,27 +125,21 @@ const Rating = () => {
             </td>
             <td className="border p-2 text-center">
               <button onClick={handleAddOrUpdate} className="bg-blue-500 text-white px-4 py-2 rounded">
-                {editIndex !== null ? "Update" : "Add"}
+                {editId ? "Update" : "Add"}
               </button>
             </td>
           </tr>
 
           {data.map((item, index) => (
-            <tr key={index} className={`border-b ${item.number === maxNumber ? "bg-green-100" : ""}`}>
+            <tr key={item._id} className={`border-b ${item.number === maxNumber ? "bg-green-100" : ""}`}>
               <td className="border p-2 text-center">{index + 1}</td>
               <td className="border p-2">{item.keyPoint}</td>
               <td className="border p-2 text-center">{item.number}</td>
               <td className="border p-2 text-center space-x-2">
-                <button
-                  onClick={() => handleEdit(index)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded"
-                >
+                <button onClick={() => handleEdit(item._id)} className="bg-yellow-500 text-white px-2 py-1 rounded">
                   Edit
                 </button>
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
+                <button onClick={() => handleDelete(item._id)} className="bg-red-500 text-white px-2 py-1 rounded">
                   Delete
                 </button>
               </td>
