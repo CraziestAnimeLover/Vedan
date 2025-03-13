@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ProfileMem from "./AharProfileMem";
 import IDCard from "./AharIDCard";
 import Attendance from "./AharAttendance";
-const AharMember = () => {
 
+const API_BASE_URL = "http://localhost:8000/api/members"; // Change to your backend URL
+
+const AharMember = () => {
   const [showForm, setShowForm] = useState(false);
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-
+  const [selectedComponent, setSelectedComponent] = useState(null);
 
   const [formData, setFormData] = useState({
     memberId: "",
@@ -27,7 +30,17 @@ const AharMember = () => {
     
     profileImage: null,
   });
-  const [selectedComponent, setSelectedComponent] = useState(null);
+
+  const handleComponentSelection = (component, member) => {
+    if (selectedComponent === component && selectedMember === member) {
+      setSelectedComponent(null);
+      setSelectedMember(null);
+    } else {
+      setSelectedComponent(component);
+      setSelectedMember(member);
+    }
+  };
+  
   const renderComponent = () => {
     if (!selectedComponent || !selectedMember) return null;
   
@@ -43,26 +56,20 @@ const AharMember = () => {
     }
   };
   
-  
-  const handleComponentSelection = (component, member) => {
-    if (selectedComponent === component && selectedMember === member) {
-      setSelectedComponent(null);
-      setSelectedMember(null);
-    } else {
-      setSelectedComponent(component);
-      setSelectedMember(member);
-    }
-  };
-  
-  
+
+  // 🔄 Fetch members from backend
+  useEffect(() => {
+    axios.get(API_BASE_URL)
+      .then(response => setMembers(response.data))
+      .catch(error => console.error("Error fetching members:", error));
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, document: e.target.files[0] });
-  };
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -75,46 +82,51 @@ const AharMember = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  // 🚀 Submit form to backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMembers([...members, formData]); // Correctly adding formData to members array
+    try {
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
   
-    setFormData({  // Reset form data instead of members
-      memberId: "",
-      name: "",
-      address: "",
-      gender: "male",
-      mobile: "",
-      email: "",
-      dateOfBirth: "",
-      
-      caseOf: "",
-      remarks: "",
-      document: "today plan",
-   
-      joinDate: "",
-   
-      
-      profileImage: null,
-    });
+      const response = await axios.post(API_BASE_URL, formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
   
-    setShowForm(false);
+      setMembers([...members, response.data]);
+      setShowForm(false);
+      setFormData({
+        memberId: "",
+        name: "",
+        address: "",
+        gender: "male",
+        mobile: "",
+        email: "",
+        dateOfBirth: "",
+        caseOf: "",
+        remarks: "",
+        document: "today plan",
+        joinDate: "",
+        profileImage: null,
+      });
+    } catch (error) {
+      console.error("Error adding member:", error);
+    }
   };
   
-  // Update handleChange for checkboxes
-const handleCheckboxChange = (e) => {
-  const { name, value, checked } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: checked
-      ? [...prev[name], value] // Add to array if checked
-      : prev[name].filter((item) => item !== value), // Remove if unchecked
-  }));
-};
 
-  const removeMember = (index) => {
-    setMembers(members.filter((_, i) => i !== index));
+  // ❌ Remove member from backend
+  const removeMember = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/${id}`);
+      setMembers(members.filter((member) => member._id !== id));
+    } catch (error) {
+      console.error("Error deleting member:", error);
+    }
   };
+  
 
   return (
     <div className="p-4 max-w-lg mx-auto bg-white shadow-md rounded-lg relative">
