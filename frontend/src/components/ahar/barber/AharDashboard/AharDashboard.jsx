@@ -23,8 +23,9 @@ import AharNotice from "../sutrin(admin)/notice/AharNotice";
 import StaffID from "../lekh(record)/StaffID";
 import Enquiry from "../enquiry/Enquiry";
 import Productmaintance from "../machinemaintance/corrective/Productmaintance";
-import Suchishowroom from "../Suchi/suchishowroom/Suchishowroom";
 import Reuse from "../reuse/Reuse";
+import Suchishowroom from "../Suchi/suchishowroom/Suchishowroom";
+import Suchigodown from "../Suchi/suchigodown/Suchigodown";
 import Dainik from "../dainik/Dainik";
 
 import Rating from '../Rating/Rating'
@@ -177,7 +178,7 @@ const AharDashboard = () => {
       },
       {
         title: "Suchi (Warehouse) ",
-        component: <Suchishowroom/>,
+        component: <Suchigodown/>,
         icon: <LucideBox size={20} />,
       },
     ],
