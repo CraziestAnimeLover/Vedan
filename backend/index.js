@@ -45,6 +45,7 @@ import reuseinventoryRoutes from './routes/ReuseinventoryRoutes.js'
 import organizationRoutes from './routes/aharorganizationRoutes.js';
 import noticeRoutes from "./routes/aharnoticeRoutes.js";
 import aharuserRoutes from "./routes/aharuserRoutes.js";
+import aharstaffRoutes from "./routes/aharstaffRoutes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -57,6 +58,7 @@ import {
 } from "./middlewares/isAuthenticated.js";
 
 dotenv.config();
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -85,6 +87,26 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Serve uploaded images statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Routes
 app.get("/home", (req, res) => {
   return res.status(200).json({
@@ -96,6 +118,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/schedules', scheduleRoutes);
+app.use("/api/ahar/staff", aharstaffRoutes);
 app.use("/api/ahar", aharuserRoutes);
 app.use('/api/notices', noticeRoutes); 
 app.use('/api', organizationRoutes);
