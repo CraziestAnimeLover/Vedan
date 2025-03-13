@@ -33,6 +33,7 @@ import Review from "../Rating/Review";
 import Own from "../demand/Own";
 import MarketTrends from "../demand/MarketTrends";
 import InventoryPage from "../dainik/InventoryPage";
+import ComapanyBalancesheet from "../balacesheet/ComapntBalancesheet";
 
 const AharDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -73,7 +74,7 @@ const AharDashboard = () => {
 
       {
         title: "Balance Sheet",
-        component: "<Fees />",
+        component:<ComapanyBalancesheet/>,
         icon: <LucideFileText size={20} />,
       },
     ],
