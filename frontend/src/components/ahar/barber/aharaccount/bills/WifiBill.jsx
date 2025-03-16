@@ -70,31 +70,16 @@ const WifiBill = () => {
       console.error("Error updating WiFi bill", error);
     }
   };
-
   const submitAllBills = async () => {
     try {
-      const payload = {
-        bills: [
-          {
-            billingFrom: "2024-03-01",
-            billingTo: "2024-03-31",
-            wifiPackagePrice: 50, // ✅ Ensure this is NOT missing
-            validity: "30 days",
-            remark: "Paid",
-            billingDate: "2024-03-01",
-            currency: "USD"
-          }
-        ]
-      };
-  
-      console.log("Sending payload:", payload); // ✅ Debug payload
-  
-      const response = await axios.post("http://localhost:8000/api/wifibills/bulk", payload);
+      const payload = { bills: wifiBills };
+      const response = await axios.post(`${API_URL}/bulk`, payload);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error submitting all bills:", error.response?.data || error);
     }
   };
+  
   
   
 

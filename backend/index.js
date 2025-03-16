@@ -51,6 +51,9 @@ import aharratingRoutes from "./routes/aharratingRoutes.js";
 import aharShowroomRoutes from "./routes/aharshowroomRoutes.js";
 import suchiGodownRoutes from "./routes/suchigodown.routes.js";
 import aharwifiBillRoutes from "./routes/aharwifiBillRoutes.js"
+import aharelectricityBillRoutes from "./routes/aharelectricityBillRoutes.js";
+import aharEquipmentBillRoutes from "./routes/aharequipmentBillRoutes.js";
+import aharwaterBillRoutes from "./routes/aharwaterBillRoutes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -61,6 +64,7 @@ import {
   isLibrarian,
   isStudent,
 } from "./middlewares/isAuthenticated.js";
+import AharWaterBill from "./models/AharWaterBill.js";
 
 dotenv.config();
 
@@ -122,7 +126,10 @@ app.get("/home", (req, res) => {
 
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/electricitybills", aharelectricityBillRoutes); 
+app.use("/api/aharequipmentbills", aharEquipmentBillRoutes);  
 app.use("/api/wifibills", aharwifiBillRoutes);
+app.use("/api/water", aharwaterBillRoutes);
 app.use("/api/suchigodown", suchiGodownRoutes);
 app.use('/api/aharshowroom', aharShowroomRoutes);
 app.use("/ratings", aharratingRoutes);
