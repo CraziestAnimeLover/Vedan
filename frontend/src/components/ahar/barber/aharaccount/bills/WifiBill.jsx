@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { LucideCoins } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { DollarSign, Euro, PoundSterling, IndianRupee, JapaneseYen } from "lucide-react";
+
+const API_URL = "http://localhost:8000/api/wifibills";
 
 const currencies = {
   USD: { rate: 1, icon: <DollarSign size={16} /> },
@@ -11,27 +13,37 @@ const currencies = {
 };
 
 const WifiBill = () => {
-  const [wifiBills, setWifiBills] = useState([
-    { id: 1, billingFrom: "", billingTo: "", wifiPackagePrice: "", validity: "", remark: "", billingDate: "", currency: "USD" },
-  ]);
+  const [wifiBills, setWifiBills] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
 
-  const [showCurrencyList, setShowCurrencyList] = useState(null);
-  
+  useEffect(() => {
+    fetchBills();
+  }, []);
 
-  const handleCurrencyChange = (index, newCurrency) => {
-    setWifiBills((prev) =>
-      prev.map((row, i) => {
-        if (i === index) {
-          const newAmount =
-            (row.wifiPackagePrice / currencies[row.currency].rate) * currencies[newCurrency].rate;
-          return { ...row, currency: newCurrency, wifiPackagePrice: newAmount.toFixed(2) };
-        }
-        return row;
-      })
-    );
-    setShowCurrencyList(null);
+  const fetchBills = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setWifiBills(response.data);
+    } catch (error) {
+      console.error("Error fetching WiFi bills", error);
+    }
   };
-  
+
+  const addWifiBill = () => {
+    setWifiBills([
+      ...wifiBills,
+      {
+        id: Date.now(),
+        billingFrom: "",
+        billingTo: "",
+        wifiPackagePrice: "",
+        validity: "",
+        remark: "",
+        billingDate: "",
+        currency: "USD",
+      },
+    ]);
+  };
 
   const handleBillChange = (index, field, value) => {
     setWifiBills((prev) =>
@@ -39,47 +51,72 @@ const WifiBill = () => {
     );
   };
 
-  const addWifiBill = () => {
-    setWifiBills([
-      ...wifiBills,
-      {
-        id: wifiBills.length + 1,
-        billingFrom: "",
-        billingTo: "",
-        wifiPackagePrice: "",
-        validity: "",
-        remark: "",
-        billingDate: "",
-      },
-    ]);
+  const removeWifiBill = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setWifiBills(wifiBills.filter((bill) => bill.id !== id));
+    } catch (error) {
+      console.error("Error deleting bill", error);
+    }
   };
 
-  const removeWifiBill = (index) => {
-    setWifiBills(wifiBills.filter((_, i) => i !== index));
+  const updateWifiBill = async (index) => {
+    const bill = wifiBills[index];
+    try {
+      await axios.put(`${API_URL}/${bill.id}`, bill);
+      setEditingIndex(null);
+      fetchBills();
+    } catch (error) {
+      console.error("Error updating WiFi bill", error);
+    }
   };
+
+  const submitAllBills = async () => {
+    try {
+      const payload = {
+        bills: [
+          {
+            billingFrom: "2024-03-01",
+            billingTo: "2024-03-31",
+            wifiPackagePrice: 50, // ✅ Ensure this is NOT missing
+            validity: "30 days",
+            remark: "Paid",
+            billingDate: "2024-03-01",
+            currency: "USD"
+          }
+        ]
+      };
+  
+      console.log("Sending payload:", payload); // ✅ Debug payload
+  
+      const response = await axios.post("http://localhost:8000/api/wifibills/bulk", payload);
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error submitting all bills:", error.response?.data || error);
+    }
+  };
+  
+  
 
   return (
     <div className="p-4 flex flex-col items-center w-full">
       <div className="w-full max-w-4xl">
         <h2 className="text-lg font-semibold mb-2 text-center">WiFi Bills</h2>
-        
+
         <div className="overflow-x-auto max-h-96">
           <table className="w-full table-fixed border-collapse border border-gray-300">
-          <thead>
-  <tr className="bg-gray-200">
-    <th className="border p-2 w-1/12" rowSpan={2}>Sr. No</th>
-    <th className="border p-2 w-1/3" colSpan={2}>Bill Time</th>
-    <th className="border p-2 w-1/6" rowSpan={2}>WiFi Package Price</th>
-    <th className="border p-2 w-1/6" rowSpan={2}>Validity</th>
-    <th className="border p-2 w-1/6" rowSpan={2}>Remark</th>
-    <th className="border p-2 w-1/6" rowSpan={2}>Billing Date</th>
-    <th className="border p-2 w-1/12" rowSpan={2}>Actions</th>
-  </tr>
-  <tr className="bg-gray-200">
-    <th className="border p-2 w-1/6">From</th>
-    <th className="border p-2 w-1/6">To</th>
-  </tr>
-</thead>
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border p-2 w-1/12">Sr. No</th>
+                <th className="border p-2 w-1/6">Billing From</th>
+                <th className="border p-2 w-1/6">Billing To</th>
+                <th className="border p-2 w-1/6">WiFi Package Price</th>
+                <th className="border p-2 w-1/6">Validity</th>
+                <th className="border p-2 w-1/6">Remark</th>
+                <th className="border p-2 w-1/6">Billing Date</th>
+                <th className="border p-2 w-1/6">Actions</th>
+              </tr>
+            </thead>
 
             <tbody>
               {wifiBills.map((row, index) => (
@@ -91,6 +128,7 @@ const WifiBill = () => {
                       value={row.billingFrom}
                       onChange={(e) => handleBillChange(index, "billingFrom", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
                   </td>
                   <td className="border p-2">
@@ -99,32 +137,17 @@ const WifiBill = () => {
                       value={row.billingTo}
                       onChange={(e) => handleBillChange(index, "billingTo", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
                   </td>
                   <td className="border p-2">
-                  
                     <input
                       type="number"
                       value={row.wifiPackagePrice}
                       onChange={(e) => handleBillChange(index, "wifiPackagePrice", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
-                   <button onClick={() => setShowCurrencyList(index)} className="p-1 border rounded">
-                        {currencies[row.currency].icon}
-                      </button>
-                      {showCurrencyList === index && (
-                        <div className="absolute bg-white border rounded shadow-lg p-2 mt-10 z-10">
-                          {Object.keys(currencies).map((currency) => (
-                            <button
-                              key={currency}
-                              onClick={() => handleCurrencyChange(index, currency)}
-                              className="block w-full text-left px-2 py-1 hover:bg-gray-100"
-                            >
-                              {currencies[currency].icon} {currency}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                   </td>
                   <td className="border p-2">
                     <input
@@ -132,6 +155,7 @@ const WifiBill = () => {
                       value={row.validity}
                       onChange={(e) => handleBillChange(index, "validity", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
                   </td>
                   <td className="border p-2">
@@ -140,6 +164,7 @@ const WifiBill = () => {
                       value={row.remark}
                       onChange={(e) => handleBillChange(index, "remark", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
                   </td>
                   <td className="border p-2">
@@ -148,10 +173,31 @@ const WifiBill = () => {
                       value={row.billingDate}
                       onChange={(e) => handleBillChange(index, "billingDate", e.target.value)}
                       className="border p-1 w-full"
+                      disabled={editingIndex !== index}
                     />
                   </td>
                   <td className="border p-2 text-center">
-                    <button onClick={() => removeWifiBill(index)} className="text-red-600 font-bold">✖</button>
+                    {editingIndex === index ? (
+                      <button
+                        onClick={() => updateWifiBill(index)}
+                        className="text-green-600 font-bold mr-2"
+                      >
+                        🔄 Update
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setEditingIndex(index)}
+                        className="text-blue-600 font-bold mr-2"
+                      >
+                        ✏️ Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => removeWifiBill(row.id)}
+                      className="text-red-600 font-bold"
+                    >
+                      ✖
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -159,9 +205,14 @@ const WifiBill = () => {
           </table>
         </div>
 
-        <button onClick={addWifiBill} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded">
-          ➕ Add Row
-        </button>
+        <div className="flex justify-between mt-4">
+          <button onClick={addWifiBill} className="px-3 py-1 bg-blue-500 text-white rounded">
+            ➕ Add Row
+          </button>
+          <button onClick={submitAllBills} className="px-3 py-1 bg-green-500 text-white rounded">
+            🚀 Submit All
+          </button>
+        </div>
       </div>
     </div>
   );
