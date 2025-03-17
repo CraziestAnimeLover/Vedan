@@ -57,88 +57,106 @@ const ComapntBalancesheet = () => {
       }));
     }
   };
+  useEffect(() => {
+    if (balanceSheetId) {
+      console.log("✅ Balance Sheet ID is now available:", balanceSheetId);
+    }
+  }, [balanceSheetId]);  // ✅ Runs when `balanceSheetId` updates
+  
+  
 
-useEffect(() => {
-  const fetchBalanceSheet = async () => {
-    const token = localStorage.getItem("token");
+  useEffect(() => {
+    const fetchBalanceSheet = async () => {
+      const token = localStorage.getItem("token");
+  
+      try {
+        const response = await fetch("http://localhost:8000/aharbalancesheet/latest", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log("📄 API Response in Frontend:", data);
+  
+        if (data && data._id) {
+          console.log("✅ Setting Balance Sheet ID:", data._id);
+          setBalanceSheetId(data._id); // ✅ Update state
+          setAssets(data.assets || []);
+          setLiabilities(data.liabilities || []);
+          setEquity(data.equity || 0);
+        } else {
+          console.warn("⚠️ No balance sheet found in response!");
+        }
+      } catch (err) {
+        console.error("❌ Error fetching balance sheet:", err);
+      } finally {
+        setIsLoading(false); // Ensure loading is finished once data is fetched
+      }
+    };
+  
+    fetchBalanceSheet();
+  }, []);
+  
+  
+  
+  
+  
 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Ensure balance sheet ID is available before submitting
+    if (!balanceSheetId) {
+      console.error("🚨 Error: Balance sheet ID is missing before submit!");
+      alert("Error: Balance sheet ID is required!");
+      return;
+    }
+  
+    // Ensure data is not loading before submitting
+    if (isLoading) {
+      alert("Please wait, data is still loading...");
+      return;
+    }
+  
+    const requestData = {
+      id: balanceSheetId,
+      assets,
+      liabilities,
+      equity,
+    };
+  
+    console.log("📤 Submitting Data:", requestData);
+  
     try {
-      const response = await fetch("http://localhost:8000/balancesheet/latest", {
-        headers: { "Authorization": `Bearer ${token}` },
+      const response = await fetch("http://localhost:8000/aharbalancesheet/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
+  
       const data = await response.json();
-      console.log("📄 API Response in Frontend:", data);
-
-      if (data && data._id) {
-        console.log("✅ Setting Balance Sheet ID:", data._id);
-        setBalanceSheetId(data._id); // ✅ Update state
-        setAssets(data.assets || []);
-        setLiabilities(data.liabilities || []);
-        setEquity(data.equity || 0);
+      console.log("✅ Server Response:", data);
+  
+      if (response.ok) {
+        alert("Balance Sheet Updated Successfully!");
       } else {
-        console.error("❌ Missing Balance Sheet ID in response!");
+        console.error("❌ Server Error:", data.message);
+        alert(`Error: ${data.message}`);
       }
-    } catch (err) {
-      console.error("❌ Error fetching balance sheet:", err);
-    } finally {
-      setIsLoading(false); // ✅ Ensure loading state updates
+    } catch (error) {
+      console.error("🔥 Error updating balance sheet:", error);
+      alert("Something went wrong! Please try again.");
     }
   };
-
-  fetchBalanceSheet();
-}, []);
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  console.log("Balance Sheet ID before submit:", balanceSheetId);
-
-  if (!balanceSheetId) {
-    alert("Error: Balance sheet ID is required!");
-    return;
-  }
-
-  if (isLoading) {
-    alert("Please wait, data is still loading...");
-    return;
-  }
-
-  const requestData = {
-    id: balanceSheetId,
-    assets,
-    liabilities,
-    equity,
-  };
-
-  console.log("📤 Submitting Data:", requestData);
-
-  try {
-    const response = await fetch("http://localhost:8000/balancesheet/update", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
-    });
-
-    const data = await response.json();
-    console.log("✅ Server Response:", data);
-
-    if (response.ok) {
-      alert("Balance Sheet Updated Successfully!");
-    } else {
-      console.error("❌ Server Error:", data.message);
-      alert(`Error: ${data.message}`);
-    }
-  } catch (error) {
-    console.error("🔥 Error updating balance sheet:", error);
-    alert("Something went wrong! Please try again.");
-  }
-};
+  
+  
+  
+  
+  
 
   const toggleMenu = (menu) => {
     setActiveMenu(activeMenu === menu ? null : menu);
