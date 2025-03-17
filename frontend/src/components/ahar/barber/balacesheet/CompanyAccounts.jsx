@@ -1,23 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
+
+const API_URL = "http://localhost:8000/api/financial-data"; // Update with your backend URL
 
 const months = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
 
-const Table = ({ title, data, setData }) => {
-  const addRow = () => {
-    setData([...data, { time: "January", value: 0 }]);
-  };
-
-  const deleteRow = (index) => {
-    if (data.length > 1) {
-      setData(data.filter((_, i) => i !== index));
-    }
-  };
+const Table = ({ title, keyName, data, setData, updateRow }) => {
+  const addRow = () => setData([...data, { time: "January", value: 0 }]);
+  const deleteRow = (index) => setData(data.filter((_, i) => i !== index));
 
   const updateTime = (index, newTime) => {
     const updatedData = [...data];
@@ -54,9 +49,7 @@ const Table = ({ title, data, setData }) => {
                   onChange={(e) => updateTime(index, e.target.value)}
                 >
                   {months.map((month) => (
-                    <option key={month} value={month}>
-                      {month}
-                    </option>
+                    <option key={month} value={month}>{month}</option>
                   ))}
                 </select>
               </td>
@@ -68,8 +61,14 @@ const Table = ({ title, data, setData }) => {
                   onChange={(e) => updateValue(index, parseFloat(e.target.value) || 0)}
                 /> Cr
               </td>
-              <td className="border border-gray-800 p-2 text-center">
-                <button
+              <td className="border border-gray-800 p-2 flex gap-2 justify-center">
+                <button 
+                  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                  onClick={() => updateRow(keyName, index, item)}
+                >
+                  🔄 Update
+                </button>
+                <button 
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                   onClick={() => deleteRow(index)}
                 >
@@ -80,10 +79,8 @@ const Table = ({ title, data, setData }) => {
           ))}
         </tbody>
       </table>
-      <button
-        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        onClick={addRow}
-      >
+      <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        onClick={addRow}>
         ➕ Add Row
       </button>
     </div>
@@ -107,40 +104,116 @@ const Chart = ({ title, data, color }) => (
 );
 
 const CompanyAccounts = () => {
-  const [revenueData, setRevenueData] = useState([
-    { time: "January", value: 5 },
-    { time: "February", value: 7 },
-    { time: "March", value: 6.5 },
-    { time: "April", value: 8 },
-  ]);
+  const [financialData, setFinancialData] = useState({
+    revenue: [],
+    profit: [],
+    networth: [],
+  });
+  const [documentId, setDocumentId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
-  const [profitData, setProfitData] = useState([
-    { time: "January", value: 1.2 },
-    { time: "February", value: 1.5 },
-    { time: "March", value: 1.4 },
-    { time: "April", value: 1.8 },
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  
+        const data = await response.json();
+        console.log("🔍 API Response:", data); // ✅ Debug log
+  
+        if (!data || !data._id) {
+          console.error("⚠️ Document ID (_id) is missing in response:", data);
+          return;
+        }
+  
+        setFinancialData({
+          revenue: data.revenue || [],
+          profit: data.profit || [],
+          networth: data.networth || [],
+        });
+  
+        setDocumentId(data._id); // ✅ Ensure Document ID is saved
+        console.log("✅ Document ID set:", data._id);
+      } catch (error) {
+        console.error("❌ Error fetching financial data:", error.message);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  
+  
+  
 
-  const [networthData, setNetworthData] = useState([
-    { time: "January", value: 20 },
-    { time: "February", value: 23 },
-    { time: "March", value: 22 },
-    { time: "April", value: 25 },
-  ]);
+  const updateRow = async (key, index, rowData) => {
+    if (!documentId) {
+      console.error("Document ID is missing! Cannot update data.");
+      return;
+    }
+  
+    try {
+      const updatedData = [...financialData[key]];
+      updatedData[index] = rowData;
+  
+      console.log("Sending update request with:", JSON.stringify({ [key]: updatedData }, null, 2));
+  
+      const response = await fetch(`${API_URL}/${documentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: updatedData }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log("Update success:", result);
+  
+      setMessage(`${key} row updated successfully!`);
+      setFinancialData((prev) => ({ ...prev, [key]: updatedData }));
+  
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      console.error(`Error updating ${key}:`, error.message);
+      setMessage(`Error updating ${key}`);
+    }
+  };
+  
+  if (loading) return <p className="text-center text-lg font-bold">Loading financial data...</p>;
 
   return (
     <div className="flex flex-wrap">
-      {/* Revenue Section */}
-      <Table title="(1) Revenue " data={revenueData} setData={setRevenueData} />
-      <Chart title="Revenue " data={revenueData} color="#4A90E2" />
+      {message && <p className="w-full text-center text-green-600 font-bold">{message}</p>}
 
-      {/* Profit Section */}
-      <Table title="(2) Profit " data={profitData} setData={setProfitData} />
-      <Chart title="Profit " data={profitData} color="#50C878" />
+      <Table 
+        title="(1) Revenue" 
+        keyName="revenue"
+        data={financialData.revenue} 
+        setData={(data) => setFinancialData((prev) => ({ ...prev, revenue: data }))}
+        updateRow={updateRow}
+      />
+      <Chart title="Revenue" data={financialData.revenue} color="#4A90E2" />
 
-      {/* Net Worth Section */}
-      <Table title="(3) Net Worth " data={networthData} setData={setNetworthData} />
-      <Chart title="Net Worth " data={networthData} color="#E94E77" />
+      <Table 
+        title="(2) Profit" 
+        keyName="profit"
+        data={financialData.profit} 
+        setData={(data) => setFinancialData((prev) => ({ ...prev, profit: data }))}
+        updateRow={updateRow}
+      />
+      <Chart title="Profit" data={financialData.profit} color="#50C878" />
+
+      <Table 
+        title="(3) Net Worth" 
+        keyName="networth"
+        data={financialData.networth} 
+        setData={(data) => setFinancialData((prev) => ({ ...prev, networth: data }))}
+        updateRow={updateRow}
+      />
+      <Chart title="Net Worth" data={financialData.networth} color="#E94E77" />
     </div>
   );
 };

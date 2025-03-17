@@ -56,6 +56,7 @@ import aharEquipmentBillRoutes from "./routes/aharequipmentBillRoutes.js";
 import aharwaterBillRoutes from "./routes/aharwaterBillRoutes.js";
 import aharrentBillRoutes from "./routes/aharratingRoutes.js";
 import aharbalanceSheetRoutes from "./routes/aharbalancesheetRoutes.js";
+import aharfinancialRoutes from "./routes/aharfinancialRoutes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -129,6 +130,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
+app.use("/api/financial-data", aharfinancialRoutes);
 app.use("/electricitybills", aharelectricityBillRoutes); 
 app.use("/api/aharequipmentbills", aharEquipmentBillRoutes);  
 app.use("/api/wifibills", aharwifiBillRoutes);

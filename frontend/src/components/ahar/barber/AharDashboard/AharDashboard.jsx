@@ -243,7 +243,7 @@ const AharDashboard = () => {
                       <div key={item.title}>
                         {item.component ? (
                           <button
-                            className="block text-blue-600 hover:text-blue-800 p-2 w-full text-left flex items-center gap-3"
+                            className=" text-blue-600 hover:text-blue-800 p-2 w-full text-left flex items-center gap-3"
                             onClick={() =>
                               handleSectionChange(item.title, item.component)
                             }
@@ -253,7 +253,7 @@ const AharDashboard = () => {
                         ) : (
                           <Link
                             to={item.url}
-                            className="block text-blue-600 hover:text-blue-800 p-2 flex items-center gap-3"
+                            className=" text-blue-600 hover:text-blue-800 p-2 flex items-center gap-3"
                           >
                             {item.icon} {item.title}
                           </Link>
