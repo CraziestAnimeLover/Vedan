@@ -34,6 +34,8 @@ import Own from "../demand/Own";
 import MarketTrends from "../demand/MarketTrends";
 import InventoryPage from "../dainik/InventoryPage";
 import ComapanyBalancesheet from "../balacesheet/ComapntBalancesheet";
+import CompanyAccounts from "../balacesheet/CompanyAccounts";
+import AharProfile from "../aharuser/AharProfile";
 
 const AharDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -53,7 +55,7 @@ const AharDashboard = () => {
 
   const serviceItems = {
     Profile: [
-      { title: "View Profile", component: "", icon: <LucideUser size={20} /> },
+      { title: "View Profile", component: <AharProfile/>, icon: <LucideUser size={20} /> },
       {
         title: "Edit Profile",
         url: "/profiles/edit",
@@ -68,7 +70,7 @@ const AharDashboard = () => {
       },
       {
         title: "Financial Report",
-        url: "/placement/resume/saved",
+        component:<CompanyAccounts/>,
         icon: <LucideFileText size={20} />,
       },
 
