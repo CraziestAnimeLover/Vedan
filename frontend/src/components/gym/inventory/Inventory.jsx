@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { FiPlus, FiTrash, FiUpload, FiEdit, FiSave } from "react-icons/fi";
-
+import axios from "axios";
 const Inventory = () => {
   const [columns, setColumns] = useState([
-    { key: "equipment", name: "Equipment", editable: false },
+    { key: "Item Name", name: "Item Name", editable: false },
     { key: "quantity", name: "Quantity", editable: false },
     { key: "condition", name: "Condition", editable: false },
-    { key: "reconditioning", name: "Reconditioning", editable: false },
+    { key: "remark", name: "Remark", editable: false },
     { key: "description", name: "Description (PDF)", editable: false, isFile: true },
   ]);
 
   const [inventory, setInventory] = useState([
-    { id: 1, equipment: "Dumbbell", quantity: 10, condition: "Good", reconditioning: "No", description: null },
+    { id: 1, "Item Name": "Dumbbell", quantity: 10, condition: "Good", remark: "No", description: null },
   ]);
 
   const [editingRow, setEditingRow] = useState(null);
@@ -24,13 +24,13 @@ const Inventory = () => {
 
   const handleFileUpload = (id, file) => {
     if (file && file.type === "application/pdf") {
-      const fileURL = URL.createObjectURL(file);
-      handleChange(id, "description", fileURL);
+      handleChange(id, "description", file); // Store the actual file object
     } else {
       alert("Please upload a valid PDF file.");
     }
   };
-
+  
+  
   const addRow = () => {
     const newRow = { id: inventory.length + 1 };
     columns.forEach((col) => (newRow[col.key] = col.isFile ? null : ""));
@@ -56,7 +56,38 @@ const Inventory = () => {
       return rest;
     }));
   };
+  const handleSaveAll = async () => {
+    try {
+      for (const item of inventory) {
+        const formData = new FormData();
+  
+        formData.append("itemName", item["Item Name"]);
+        formData.append("quantity", Number(item.quantity)); // Convert to Number
+        formData.append("condition", item.condition);
+        formData.append("remark", item.remark || "");
+  
+        if (item.description && item.description instanceof File) {
+          formData.append("description", item.description);
+        }
+  
+        const response = await axios.post("http://localhost:8000/api/gym/inventory", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+  
+        console.log("Success:", response.data);
+      }
+  
+      alert("All items saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error.response?.data || error.message);
+      alert("Failed to save some data.");
+    }
+  };
+  
+  
+  
 
+  
   return (
     <div className="p-4 max-w-5xl mx-auto">
       
@@ -150,12 +181,13 @@ const Inventory = () => {
               ))}
               <td className="border p-2">
                 {editingRow === item.id ? (
-                  <button
-                    onClick={() => setEditingRow(null)}
-                    className="text-green-500 mx-2"
-                  >
-                    <FiSave />
-                  </button>
+               <button
+               onClick={handleSaveAll}
+               className="bg-green-500 text-white px-4 py-2 rounded mt-4 flex items-center gap-2"
+             >
+               <FiSave /> Save All
+             </button>
+             
                 ) : (
                   <button
                     onClick={() => setEditingRow(item.id)}

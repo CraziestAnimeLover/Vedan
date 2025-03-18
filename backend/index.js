@@ -59,6 +59,8 @@ import aharrentBillRoutes from "./routes/aharratingRoutes.js";
 import aharbalanceSheetRoutes from "./routes/aharbalancesheetRoutes.js";
 import aharfinancialRoutes from "./routes/aharfinancialRoutes.js";
 import gymbatchRoutes from "./routes/gymbatchRoutes.js"; 
+import gympackageRoutes from "./routes/gympackageRoutes.js"; 
+import gyminventoryRoutes from "./routes/gyminventoryRoutes.js"; 
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -133,6 +135,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
+app.use("/api/gym/packages", gympackageRoutes);
 app.use("/api/gym/batches", gymbatchRoutes);
 app.use("/api/financial-data", aharfinancialRoutes);
 app.use("/electricitybills", aharelectricityBillRoutes); 
@@ -155,6 +158,7 @@ app.use('/api', inventoryRoutes);
 app.use("/api/machine-maintenance", machineMaintenanceRoutes);
 app.use("/api/product-maintenance", productMaintenanceRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/gym/inventory", gyminventoryRoutes);
 app.use("/api/attendance", staffAttendanceRoutes);
 app.use("/api", aharsmpurnattendanceRoutes);
 app.use("/api/enquiries", enquiryRoutes);
