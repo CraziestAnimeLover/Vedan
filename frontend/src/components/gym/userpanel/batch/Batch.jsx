@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const API_URL = "http://localhost:8000/api/gym/batches";
 
 const Batch = () => {
   const [formData, setFormData] = useState({
@@ -10,30 +13,53 @@ const Batch = () => {
 
   const [batches, setBatches] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch batches from backend
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(API_URL);
+        setBatches(response.data);
+      } catch (error) {
+        console.error("Error fetching batches:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBatches();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    setBatches([...batches, formData]);
-
-    setFormData({
-      batchName: "",
-      batchLimit: "",
-      batchOpenTime: "",
-      batchCloseTime: "",
-    });
-
-    setShowForm(false);
+  
+    try {
+      const response = await axios.post(API_URL, formData);
+      setBatches([...batches, response.data]); // ✅ Append new batch to state
+      setFormData({
+        batchName: "",
+        batchLimit: "",
+        batchOpenTime: "",
+        batchCloseTime: "",
+      });
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error adding batch:", error.response?.data || error.message);
+    }
   };
-
-  const handleDelete = (index) => {
-    const updatedBatches = batches.filter((_, i) => i !== index);
-    setBatches(updatedBatches);
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setBatches(batches.filter((batch) => batch._id !== id)); // Remove from state
+    } catch (error) {
+      console.error("Error deleting batch:", error);
+    }
   };
 
   return (
@@ -114,39 +140,39 @@ const Batch = () => {
 
       {/* Batch Cards */}
       <div className="mt-6">
-  {batches.length === 0 ? (
-    <p className="text-gray-500 text-center">No batches added yet.</p>
-  ) : (
-    batches.map((batch, index) => (
-      <div
-        key={index}
-        className="bg-gray-100 p-4 rounded-lg shadow-sm flex justify-between items-center mb-2"
-      >
-        {/* Left Section (Batch Details) */}
-        <div className="w-full">
-          {/* Batch Name (Full Width) */}
-          <h3 className="text-lg font-semibold">{batch.batchName}</h3>
-          
-          {/* Row with Available Limit & Batch Time */}
-          <div className="flex justify-between mt-1 text-sm text-gray-600">
-            <p><strong>Available Limit:</strong> {batch.batchLimit}</p>
-            <p><strong>Time:</strong> {batch.batchOpenTime} - {batch.batchCloseTime}</p>
-          </div>
-        </div>
+        {loading ? (
+          <p className="text-gray-500 text-center">Loading batches...</p>
+        ) : batches.length === 0 ? (
+          <p className="text-gray-500 text-center">No batches added yet.</p>
+        ) : (
+          batches.map((batch) => (
+            <div
+              key={batch._id}
+              className="bg-gray-100 p-4 rounded-lg shadow-sm flex justify-between items-center mb-2"
+            >
+              {/* Left Section (Batch Details) */}
+              <div className="w-full">
+                {/* Batch Name (Full Width) */}
+                <h3 className="text-lg font-semibold">{batch.batchName}</h3>
 
-        {/* Delete Button (Far Right) */}
-        <button
-          onClick={() => handleDelete(index)}
-          className="text-red-600 font-bold text-lg ml-4"
-        >
-          ❌
-        </button>
+                {/* Row with Available Limit & Batch Time */}
+                <div className="flex justify-between mt-1 text-sm text-gray-600">
+                  <p><strong>Available Limit:</strong> {batch.batchLimit}</p>
+                  <p><strong>Time:</strong> {batch.batchOpenTime} - {batch.batchCloseTime}</p>
+                </div>
+              </div>
+
+              {/* Delete Button (Far Right) */}
+              <button
+                onClick={() => handleDelete(batch._id)}
+                className="text-red-600 font-bold text-lg ml-4"
+              >
+                ❌
+              </button>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
-
-
     </div>
   );
 };
