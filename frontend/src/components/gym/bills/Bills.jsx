@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { motion } from "framer-motion";
 import { FiDroplet, FiWifi, FiZap, FiHome, FiTool } from "react-icons/fi";
-import Profiles from "../../library/profile/libmgtprofile/Profiles";
+import Profiles from "../..//library/profile/libmgtprofile/Profiles";
 import WaterBill from "./WaterBill";
 import WifiBill from "./WifiBill";
 import ElectricityBill from "./ElectricityBill";
@@ -31,7 +31,7 @@ const Bills = () => {
   );
 
   return (
-    <div className="w-full h-screen fixed left-0 top-0 bg-gray-100 flex">
+    <div className="w-full h-screen fixed left-0 top-4 bg-gray-100 flex ">
       {/* Sidebar */}
       <motion.div
         animate={{ width: isSidebarOpen ? 250 : 74 }}

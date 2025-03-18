@@ -69,7 +69,7 @@ import BarbarDashboard from "./components/barber/barbardashboard/BarbarDashboard
 import BarberAttendence from "./components/barber/baberattendence/attendence/Barber/BarberAttendence";
 import AharDashboard from "./components/ahar/barber/AharDashboard/AharDashboard";
 import AharBills from "./components/ahar/barber/aharaccount/bills/Bills";
-import AharAttendance from "./components/ahar/barber/member/AharAttendance";
+
 import AharAttendence from "./components/ahar/barber/attendence/AharAttendence";
 
 // import EnquiryCard from './components/library/enquiry/Enquiry'

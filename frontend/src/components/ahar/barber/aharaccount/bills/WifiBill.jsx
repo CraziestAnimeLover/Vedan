@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { DollarSign, Euro, PoundSterling, IndianRupee, JapaneseYen } from "lucide-react";
 
-const API_URL = "http://localhost:8000/api/wifibills";
+const API_URL = "http://localhost:8000/api/gym/wifibills";
 
 const currencies = {
   USD: { rate: 1, icon: <DollarSign size={16} /> },
@@ -70,15 +70,23 @@ const WifiBill = () => {
       console.error("Error updating WiFi bill", error);
     }
   };
+  
   const submitAllBills = async () => {
     try {
-      const payload = { bills: wifiBills };
-      const response = await axios.post(`${API_URL}/bulk`, payload);
+      const payload = { bills: wifiBills.map(({ id, ...bill }) => bill) }; // ✅ Remove frontend `id`
+      console.log("Submitting bills:", payload);
+  
+      const response = await axios.post(`${API_URL}/bulk`, payload, {
+        headers: { "Content-Type": "application/json" }, // ✅ Ensure JSON format
+      });
+  
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error submitting all bills:", error.response?.data || error);
     }
   };
+  
+  
   
   
   

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { LucideCoins } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { DollarSign, Euro, PoundSterling, IndianRupee, JapaneseYen } from "lucide-react";
 
+const API_BASE_URL = "http://localhost:8000/api/gymequipmentbills";
 
 const currencies = {
   USD: { rate: 1, icon: <DollarSign size={16} /> },
@@ -12,49 +12,106 @@ const currencies = {
 };
 
 const EquipmentsBill = () => {
-  const [equipments, setEquipments] = useState([
-    { id: 1, description: "", quantity: "", price: "", currency: "USD", convertedPrice: "" },
-  ]);
+  const [equipments, setEquipments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [showCurrencyList, setShowCurrencyList] = useState(null);
+  // ✅ Fetch Bills from Backend
+  useEffect(() => {
+    const fetchBills = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}`);
+        const data = await response.json();
+        setEquipments(data.map((bill) => ({ ...bill, isEditing: false })));
+        setLoading(false);
+      } catch (error) {
+        console.error("❗ Error fetching bills:", error);
+        setLoading(false);
+      }
+    };
+    fetchBills();
+  }, []);
 
-  const handleCurrencyChange = (index, newCurrency) => {
-    setEquipments((prev) =>
-      prev.map((row, i) => {
-        if (i === index) {
-          const convertedAmount = (parseFloat(row.price || 0) / currencies[row.currency].rate) * currencies[newCurrency].rate;
-          return { ...row, currency: newCurrency, convertedPrice: convertedAmount.toFixed(2) };
-        }
-        return row;
-      })
-    );
-    setTimeout(() => setShowCurrencyList(null), 100); // Prevent immediate dropdown close
-  };
-
+  // ✅ Handle Input Changes
   const handleEquipmentChange = (index, field, value) => {
     setEquipments((prev) =>
-      prev.map((row, i) => {
-        if (i === index) {
-          let newValue = value;
-          if (field === "quantity" || field === "price") {
-            newValue = value === "" ? "" : Math.max(0, parseFloat(value)); // Prevent negative values
-          }
-          return { ...row, [field]: newValue };
-        }
-        return row;
-      })
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
     );
   };
 
+  // ✅ Toggle Edit Mode
+  const toggleEdit = (index) => {
+    setEquipments((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, isEditing: !row.isEditing } : row))
+    );
+  };
+
+  // ✅ Submit Updated Bill
+  const handleUpdate = async (index) => {
+    const updatedBill = equipments[index];
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/${updatedBill._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedBill),
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+      setEquipments((prev) =>
+        prev.map((row, i) => (i === index ? { ...row, isEditing: false } : row))
+      );
+      alert("✅ Bill updated successfully!");
+    } catch (error) {
+      console.error("❗ Error updating bill:", error);
+    }
+  };
+
+  // ✅ Submit New Bills
+  const handleSubmit = async () => {
+    const newBills = equipments.filter((e) => !e._id);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bills: newBills }),
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+      alert("✅ New bills submitted successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("❗ Error submitting bills:", error);
+    }
+  };
+
+  // ✅ Add New Row
   const addEquipment = () => {
     setEquipments([
       ...equipments,
-      { id: equipments.length + 1, description: "", quantity: "", price: "", currency: "USD", convertedPrice: "" },
+      { description: "", quantity: "", price: "", currency: "USD", convertedPrice: "", isEditing: true },
     ]);
   };
 
-  const removeEquipment = (index) => {
-    setEquipments(equipments.filter((_, i) => i !== index));
+  // ✅ Delete Bill
+  const deleteBill = async (id, index) => {
+    if (!id) {
+      setEquipments(equipments.filter((_, i) => i !== index));
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+      setEquipments(equipments.filter((_, i) => i !== index));
+      alert("✅ Bill deleted successfully!");
+    } catch (error) {
+      console.error("❗ Error deleting bill:", error);
+    }
   };
 
   return (
@@ -62,84 +119,72 @@ const EquipmentsBill = () => {
       <div className="w-full max-w-4xl">
         <h2 className="text-lg font-semibold mb-2 text-center">Equipments Bill</h2>
 
-        <div className="overflow-x-auto max-h-96">
-          <table className="w-full table-fixed border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2 w-1/12">Sr. No</th>
-                <th className="border p-2 w-1/3">Description</th>
-                <th className="border p-2 w-1/4">Quantity</th>
-                <th className="border p-2 w-1/4">Price</th>
-                <th className="border p-2 w-1/12">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {equipments.map((row, index) => (
-                <tr key={row.id}>
-                  <td className="border p-2 text-center">{index + 1}</td>
-                  <td className="border p-2">
-                    <input
-                      type="text"
-                      value={row.description}
-                      onChange={(e) => handleEquipmentChange(index, "description", e.target.value)}
-                      className="border p-1 w-full"
-                    />
-                  </td>
-                  <td className="border p-2">
-                    <input
-                      type="number"
-                      value={row.quantity}
-                      onChange={(e) => handleEquipmentChange(index, "quantity", e.target.value)}
-                      className="border p-1 w-full"
-                      min="0"
-                    />
-                  </td>
-                  <td className="border p-2">
-                    <input
-                      type="number"
-                      value={row.price}
-                      onChange={(e) => handleEquipmentChange(index, "price", e.target.value)}
-                      className="border p-1 w-full"
-                      min="0"
-                    />
-                    <div className="relative">
-                      <button onClick={() => setShowCurrencyList(index)} className="p-1 border rounded">
-                        {currencies[row.currency].icon}
-                      </button>
-                      {showCurrencyList === index && (
-                        <div className="absolute bg-white border rounded shadow-lg p-2 mt-2 z-10">
-                          {Object.keys(currencies).map((currency) => (
-                            <button
-                              key={currency}
-                              onClick={() => handleCurrencyChange(index, currency)}
-                              className="block w-full text-left px-2 py-1 hover:bg-gray-100"
-                            >
-                              {currencies[currency].icon} {currency}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {row.convertedPrice && (
-                      <div className="text-sm text-gray-600 mt-1">
-                        ≈ {row.convertedPrice} {row.currency}
-                      </div>
-                    )}
-                  </td>
-                  <td className="border p-2 text-center">
-                    <button onClick={() => removeEquipment(index)} className="text-red-600 font-bold">
-                      ✖
-                    </button>
-                  </td>
+        {loading ? (
+          <p className="text-center">⏳ Loading...</p>
+        ) : (
+          <div className="overflow-x-auto max-h-96">
+            <table className="w-full table-fixed border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border p-2 w-1/12">Sr. No</th>
+                  <th className="border p-2 w-1/3">Description</th>
+                  <th className="border p-2 w-1/4">Quantity</th>
+                  <th className="border p-2 w-1/4">Price</th>
+                  <th className="border p-2 w-1/6">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {equipments.map((row, index) => (
+                  <tr key={row._id || index}>
+                    <td className="border p-2 text-center">{index + 1}</td>
+                    <td className="border p-2">
+                      <input
+                        type="text"
+                        value={row.description}
+                        onChange={(e) => handleEquipmentChange(index, "description", e.target.value)}
+                        className="border p-1 w-full"
+                        disabled={!row.isEditing}
+                      />
+                    </td>
+                    <td className="border p-2">
+                      <input
+                        type="number"
+                        value={row.quantity}
+                        onChange={(e) => handleEquipmentChange(index, "quantity", e.target.value)}
+                        className="border p-1 w-full"
+                        min="0"
+                        disabled={!row.isEditing}
+                      />
+                    </td>
+                    <td className="border p-2">
+                      <input
+                        type="number"
+                        value={row.price}
+                        onChange={(e) => handleEquipmentChange(index, "price", e.target.value)}
+                        className="border p-1 w-full"
+                        min="0"
+                        disabled={!row.isEditing}
+                      />
+                    </td>
+                    <td className="border p-2 text-center">
+                      {row.isEditing ? (
+                        <button onClick={() => handleUpdate(index)} className="text-green-600 font-bold">✔</button>
+                      ) : (
+                        <button onClick={() => toggleEdit(index)} className="text-blue-600 font-bold">✏</button>
+                      )}
+                      <button onClick={() => deleteBill(row._id, index)} className="text-red-600 font-bold ml-2">✖</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        <button onClick={addEquipment} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded">
-          ➕ Add Row
-        </button>
+        <div className="mt-4 flex gap-4">
+          <button onClick={addEquipment} className="px-3 py-1 bg-blue-500 text-white rounded">➕ Add Row</button>
+          <button onClick={handleSubmit} className="px-3 py-1 bg-green-500 text-white rounded">✅ Submit</button>
+        </div>
       </div>
     </div>
   );
