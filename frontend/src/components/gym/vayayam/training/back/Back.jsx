@@ -64,59 +64,69 @@ const ExerciseCard = ({ index, exercise, onDelete, onUpdate }) => {
         <label className="cursor-pointer w-full flex">
           <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
           <img 
-  src={tempExercise.imageFile ? URL.createObjectURL(tempExercise.imageFile) : `${API_URL}/uploads/${tempExercise.image}`} 
+  src={
+    tempExercise.imageFile 
+      ? URL.createObjectURL(tempExercise.imageFile) 
+      : tempExercise.image 
+        ? `${API_URL}/uploads/${tempExercise.image}` 
+        : "/default-placeholder.png" // Use a placeholder if no image exists
+  } 
   alt="Exercise"
   className="w-32 h-32 mx-14 mt-4 object-cover rounded border-2 border-gray-300"
 />
 
+
         </label>
 
         <div className="mt-3 flex flex-col gap-2 me-14">
-          <input
-            type="text"
-            value={tempExercise.name}
-            onChange={(e) => setTempExercise({ ...tempExercise, name: e.target.value })}
-            placeholder="Exercise Name"
-            className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-            disabled={!isEditing}
-          />
+        <input
+  type="text"
+  value={tempExercise.name || ""}
+  onChange={(e) => setTempExercise({ ...tempExercise, name: e.target.value })}
+  placeholder="Exercise Name"
+  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
+  disabled={!isEditing}
+/>
+
 
           <div className="flex gap-4 mt-2">
             <label className="flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={tempExercise.set}
-                onChange={() => isEditing && setTempExercise({ ...tempExercise, set: !tempExercise.set })}
-              />
+            <input
+  type="checkbox"
+  checked={Boolean(tempExercise.set)}
+  onChange={() => isEditing && setTempExercise({ ...tempExercise, set: !tempExercise.set })}
+/>
               Sets
             </label>
             X
             <label className="flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={tempExercise.rep}
-                onChange={() => isEditing && setTempExercise({ ...tempExercise, rep: !tempExercise.rep })}
-              />
+            <input
+  type="checkbox"
+  checked={Boolean(tempExercise.rep)}
+  onChange={() => isEditing && setTempExercise({ ...tempExercise, rep: !tempExercise.rep })}
+/>
               Reps
             </label>
           </div>
 
           <input
-            type="text"
-            value={tempExercise.focusArea}
-            onChange={(e) => setTempExercise({ ...tempExercise, focusArea: e.target.value })}
-            placeholder="Focus Area"
-            className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-            disabled={!isEditing}
-          />
-          <input
-            type="text"
-            value={tempExercise.equipment}
-            onChange={(e) => setTempExercise({ ...tempExercise, equipment: e.target.value })}
-            placeholder="Equipment"
-            className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-            disabled={!isEditing}
-          />
+  type="text"
+  value={tempExercise.focusArea || ""}
+  onChange={(e) => setTempExercise({ ...tempExercise, focusArea: e.target.value })}
+  placeholder="Focus Area"
+  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
+  disabled={!isEditing}
+/>
+
+<input
+  type="text"
+  value={tempExercise.equipment || ""}
+  onChange={(e) => setTempExercise({ ...tempExercise, equipment: e.target.value })}
+  placeholder="Equipment"
+  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
+  disabled={!isEditing}
+/>
+
           {/* {isEditing && (
             <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded mt-2 w-full">
               <FiSave className="inline-block mr-2" /> Save

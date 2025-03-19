@@ -205,7 +205,7 @@ const Gymdashboard = () => {
         url: "/gym/vayayam/training",
         icon: <LucideBox size={20} />,
       },
-      { title: "User", component: <User />, icon: <LucideBox size={20} /> },
+      
     ],
   };
 
