@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
+import axios from "axios"
+const API_BASE_URL = "http://localhost:8000/api/gym/products";
+
+
+
 
 const ProductView = () => {
   const [showForm, setShowForm] = useState(false);
@@ -14,6 +19,17 @@ const ProductView = () => {
     description: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
+
+    // Fetch products from backend
+    useEffect(() => {
+      axios.get(API_BASE_URL)
+        .then((res) => {
+          console.log("Fetched Products:", res.data); // Debug response
+          setProducts(res.data);
+        })
+        .catch((err) => console.error("Error fetching products:", err));
+    }, []);
+    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,40 +56,75 @@ const ProductView = () => {
     }
   };
   
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingIndex !== null) {
-      const updatedProducts = [...products];
-      updatedProducts[editingIndex] = formData;
-      setProducts(updatedProducts);
-      setEditingIndex(null);
-    } else {
-      setProducts([...products, formData]);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("category", formData.category);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("manufacturingBy", formData.manufacturingBy);
+
+    if (formData.image) formDataToSend.append("image", formData.image);
+    if (formData.description) formDataToSend.append("description", formData.description);
+
+    console.log("FormData values:");
+    for (let pair of formDataToSend.entries()) {
+        console.log(pair[0], pair[1]);
     }
+
+    try {
+        const response = editingIndex !== null
+            ? await axios.put(`${API_BASE_URL}/${products[editingIndex]._id}`, formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
+            : await axios.post(API_BASE_URL, formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+        console.log("Server response:", response.data);
+        
+        const { data } = await axios.get(API_BASE_URL);
+        setProducts(data);
+    } catch (error) {
+        console.error("Error submitting product:", error);
+    }
+
     setShowForm(false);
     setFormData({
-      image: null,
-      imagePreview: null,
-      name: "",
-      category: "",
-      price: "",
-      manufacturingBy: "",
-      description: null,
+        image: null,
+        imagePreview: null,
+        name: "",
+        category: "",
+        price: "",
+        manufacturingBy: "",
+        description: null,
     });
     setImagePreview(null);
-  };
+    setEditingIndex(null);
+};
+
+
 
   const handleEdit = (index) => {
     const product = products[index];
-    setFormData(product);
+    setFormData({
+      ...product,
+      description: product.description ? `http://localhost:8000/${product.description}` : null, 
+      imagePreview: product.image ? `http://localhost:8000/uploads/${product.image}` : null, 
+    });
     setEditingIndex(index);
     setShowForm(true);
-    setImagePreview(product.imagePreview); // ✅ Set preview for editing
   };
+  
 
-  const handleDelete = (index) => {
-    setProducts(products.filter((_, i) => i !== index));
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/${id}`);
+      setProducts(products.filter((product) => product._id !== id));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   return (
@@ -212,13 +263,17 @@ const ProductView = () => {
               className="grid grid-cols-2 gap-4 p-4 border rounded-lg shadow-md bg-gray-100"
             >
               {/* ✅ Use stored imagePreview instead of recreating URL */}
-              {product.imagePreview && (
-                <img
-                  src={product.imagePreview}
-                  alt={product.name}
-                  className="w-40 h-40 mx-14 object-cover rounded"
-                />
-              )}
+              {product.image && (
+ <img
+ src={`http://localhost:8000/uploads/${product.image}`}
+ alt={product.name}
+ className="w-40 h-40 mx-14 object-cover rounded"
+ onError={(e) => e.target.style.display = "none"} // Hides broken images
+/>
+
+)}
+
+
               <div className="mt-4">
                 <h3 className="font-bold text-lg mt-2">{product.name}</h3>
                 <p>
@@ -232,8 +287,21 @@ const ProductView = () => {
                 </p>
               </div>
               <p className="mx-14">
-                <strong>Description:</strong> {product.description?.name}
-              </p>
+  <strong>Description:</strong>{" "}
+  {product.description ? (
+    <a
+      href={typeof product.description === "string" ? product.description : URL.createObjectURL(product.description)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-500 underline"
+    >
+      View PDF
+    </a>
+  ) : (
+    "No description available"
+  )}
+</p>
+
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleEdit(index)}
@@ -242,11 +310,12 @@ const ProductView = () => {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(index)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                >
-                  Delete
-                </button>
+  onClick={() => handleDelete(product._id)}
+  className="bg-red-500 text-white px-3 py-1 rounded"
+>
+  Delete
+</button>
+
               </div>
             </div>
           ))}
