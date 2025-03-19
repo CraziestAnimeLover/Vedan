@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "../../../../ui/Card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ const Multiple = () => {
   const [cards, setCards] = useState([]);
   const [formData, setFormData] = useState({
     orgName: "",
-    display: "",
+    opendate: "",
     vedannId: "",
     address: "",
     phone: "",
@@ -16,6 +16,25 @@ const Multiple = () => {
   });
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+
+  // Fetch data from backend when component mounts
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/gym/organizations');
+        if (response.ok) {
+          const data = await response.json();
+          setCards(data);
+        } else {
+          console.error('Error fetching organizations');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchOrganizations();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,29 +55,74 @@ const Multiple = () => {
     setFormData({ ...formData, founders: updatedFounders });
   };
 
-  const handleAddCard = () => {
-    if (editIndex !== null) {
-      const updatedCards = [...cards];
-      updatedCards[editIndex] = formData;
-      setCards(updatedCards);
-      setEditIndex(null);
-    } else {
-      setCards([...cards, formData]);
+  const handleAddCard = async () => {
+    try {
+      if (editIndex === null) {
+        // Add new card
+        const response = await fetch('http://localhost:8000/api/gym/organizations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          const newOrg = await response.json();
+          setCards([...cards, newOrg]);
+        } else {
+          console.error('Error creating organization');
+        }
+      } else {
+        // Update existing card
+        const response = await fetch(`http://localhost:8000/api/gym/organizations/${cards[editIndex]._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          const updatedOrg = await response.json();
+          const updatedCards = [...cards];
+          updatedCards[editIndex] = updatedOrg;
+          setCards(updatedCards);
+        } else {
+          console.error('Error updating organization');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
+
+    // Reset form after adding or updating
     setFormData({
-      orgName: "",
-      display: "",
-      vedannId: "",
-      address: "",
-      phone: "",
-      email: "",
-      founders: [{ name: "" }],
+      orgName: '',
+      opendate: '',
+      vedannId: '',
+      address: '',
+      phone: '',
+      email: '',
+      founders: [{ name: '' }],
     });
     setShowForm(false);
+    setEditIndex(null); // Reset edit index
   };
 
-  const handleDeleteCard = (index) => {
-    setCards(cards.filter((_, i) => i !== index));
+  const handleDeleteCard = async (index) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/gym/organizations/${cards[index]._id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setCards(cards.filter((_, i) => i !== index));
+      } else {
+        console.error('Error deleting organization');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const handleEditCard = (index) => {
@@ -78,12 +142,54 @@ const Multiple = () => {
           <div className="grid grid-cols-2 gap-4">
             {/* Left Side - Organization Details */}
             <div>
-              <Input name="orgName" placeholder="Organization Name" value={formData.orgName} onChange={handleChange} className="mb-2" />
-              <Input name="display" placeholder="Display Name" value={formData.display} onChange={handleChange} className="mb-2" />
-              <Input name="vedannId" placeholder="Vedann ID" value={formData.vedannId} onChange={handleChange} className="mb-2" />
-              <Input name="address" placeholder="Address" value={formData.address} onChange={handleChange} className="mb-2" />
-              <Input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} className="mb-2" />
-              <Input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="mb-2" />
+              <Input
+                type="text"
+                name="orgName"
+                placeholder="Organization Name"
+                value={formData.orgName}
+                onChange={handleChange}
+                className="mb-2"
+              />
+              <Input
+                type="text"
+                name="vedannId"
+                placeholder="Vedann ID"
+                value={formData.vedannId}
+                onChange={handleChange}
+                className="mb-2"
+              />
+              <Input
+                type="text"
+                name="address"
+                placeholder="Address"
+                value={formData.address}
+                onChange={handleChange}
+                className="mb-2"
+              />
+              <Input
+                type="tel"
+                name="phone"
+                placeholder="Phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="mb-2"
+              />
+              <Input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="mb-2"
+              />
+              <Input
+                type="date"
+                name="opendate"
+                placeholder="Open Date"
+                value={formData.opendate}
+                onChange={handleChange}
+                className="mb-2"
+              />
             </div>
 
             {/* Right Side - Founders */}
@@ -118,22 +224,19 @@ const Multiple = () => {
                 <div className="grid grid-cols-2 gap-4">
                   {/* Left - Organization Info */}
                   <div>
-                    
-                    <p><strong>Display Name:</strong> {card.display} ( {card.vedannId})</p>
-                    
+                    <p><strong>{card.orgName} ({card.vedannId})</strong></p>
                     <p><strong>Address:</strong> {card.address}</p>
-                   
                   </div>
 
                   {/* Right - Founders */}
-                  {/* <div>
+                  <div>
                     <h3 className="font-semibold">Founders:</h3>
                     <ul>
                       {card.founders.map((founder, i) => (
                         <li key={i} className="ml-4">- {founder.name}</li>
                       ))}
                     </ul>
-                  </div> */}
+                  </div>
                 </div>
 
                 {/* Actions */}

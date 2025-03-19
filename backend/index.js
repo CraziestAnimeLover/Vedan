@@ -25,7 +25,7 @@ import studyCenterRoutes from "./routes/studyCenterRoutes.js";
 import searchRoutes from './routes/searchRoutes.js';
 import animalRoutes from "./routes/animal.route.js";
 import humanRoutes from "./routes/humanBeingRoutes.js";
-import  consultationRoutes from "./routes/consultationRoutes.js"
+import consultationRoutes from "./routes/consultationRoutes.js"
 import materialRoutes from "./routes/materialRoutes.js";
 import joinedRoutes from './routes/joinedRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
@@ -40,14 +40,16 @@ import productMaintenanceRoutes from './routes/aharproductMaintenanceRoutes.js'
 import staffAttendanceRoutes from './routes/staffAttendanceRoutes.js'
 import aharsmpurnattendanceRoutes from './routes/aharsmpurnattendanceRoutes.js';
 import inventoryRoutes from './routes/aharinventoryRoutes.js'
-import  demandinventoryRoutes from './routes/DemandinventoryRoutes.js'
+import demandinventoryRoutes from './routes/DemandinventoryRoutes.js'
 import reuseinventoryRoutes from './routes/ReuseinventoryRoutes.js'
 import organizationRoutes from './routes/aharorganizationRoutes.js';
+import gymmultipleorganizationRoutes from './routes/gymorganizationmultiple.js';
 import noticeRoutes from "./routes/aharnoticeRoutes.js";
 import gymnoticeRoutes from "./routes/gymnoticeRoutes.js";
 import aharuserRoutes from "./routes/aharuserRoutes.js";
 import aharstaffRoutes from "./routes/aharstaffRoutes.js";
 import AharMemberRoutes from "./routes/aharMemberRoutes.js";
+import GymMemberRoutes from "./routes/gymMemberroutes.js";
 import aharratingRoutes from "./routes/aharratingRoutes.js";
 import aharShowroomRoutes from "./routes/aharshowroomRoutes.js";
 import suchiGodownRoutes from "./routes/suchigodown.routes.js";
@@ -64,6 +66,7 @@ import aharfinancialRoutes from "./routes/aharfinancialRoutes.js";
 import gymbatchRoutes from "./routes/gymbatchRoutes.js"; 
 import gympackageRoutes from "./routes/gympackageRoutes.js"; 
 import gyminventoryRoutes from "./routes/gyminventoryRoutes.js"; 
+import gymtrainerRoutes from "./routes/gymtrainerRoutes.js";
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -138,6 +141,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
+app.use("/api/gym/trainers", gymtrainerRoutes);
 app.use("/api/gym/packages", gympackageRoutes);
 app.use("/api/gym/batches", gymbatchRoutes);
 app.use("/api/financial-data", aharfinancialRoutes);
@@ -152,12 +156,14 @@ app.use("/api/suchigodown", suchiGodownRoutes);
 app.use('/api/aharshowroom', aharShowroomRoutes);
 app.use("/ratings", aharratingRoutes);
 app.use("/api/members", AharMemberRoutes);
+app.use("/api/gym/members", GymMemberRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use("/api/ahar/staff", aharstaffRoutes);
 app.use("/api/ahar", aharuserRoutes);
 app.use('/api/notices', noticeRoutes); 
 app.use('/api/gym/notices', gymnoticeRoutes); 
 app.use('/api', organizationRoutes);
+app.use('/api/gym', gymmultipleorganizationRoutes);
 app.use("/api/demandinventory", demandinventoryRoutes);
 app.use('/api/reuse', reuseinventoryRoutes);
 app.use('/api', inventoryRoutes);

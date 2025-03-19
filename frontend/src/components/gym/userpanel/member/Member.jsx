@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ProfileMem from "./ProfileMem";
 import IDCard from "./IDCard";
 import Attendance from "./Attendance";
-const Member = () => {
 
+const API_BASE_URL = "http://localhost:8000/api/gym/members"; // Change to your backend URL
+
+const Member = () => {
   const [showForm, setShowForm] = useState(false);
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-
+  const [selectedComponent, setSelectedComponent] = useState(null);
 
   const [formData, setFormData] = useState({
     memberId: "",
@@ -17,22 +20,27 @@ const Member = () => {
     mobile: "",
     email: "",
     dateOfBirth: "",
-    batch: "",
+    
     caseOf: "",
     remarks: "",
-    plan: "today plan",
-    planamount:"",
-    startDate: "",
-    expiredDate: "",
-    enrollmentFee: "",
-    discount: "",
-    taxApplication: "Name 1",
-    taxAmount: "",
-    billDate: "",
-    document: null,
+    document: "today plan",
+ 
+    joinDate: "",
+ 
+    
     profileImage: null,
   });
-  const [selectedComponent, setSelectedComponent] = useState(null);
+
+  const handleComponentSelection = (component, member) => {
+    if (selectedComponent === component && selectedMember === member) {
+      setSelectedComponent(null);
+      setSelectedMember(null);
+    } else {
+      setSelectedComponent(component);
+      setSelectedMember(member);
+    }
+  };
+  
   const renderComponent = () => {
     if (!selectedComponent || !selectedMember) return null;
   
@@ -48,26 +56,20 @@ const Member = () => {
     }
   };
   
-  
-  const handleComponentSelection = (component, member) => {
-    if (selectedComponent === component && selectedMember === member) {
-      setSelectedComponent(null);
-      setSelectedMember(null);
-    } else {
-      setSelectedComponent(component);
-      setSelectedMember(member);
-    }
-  };
-  
-  
+
+  // 🔄 Fetch members from backend
+  useEffect(() => {
+    axios.get(API_BASE_URL)
+      .then(response => setMembers(response.data))
+      .catch(error => console.error("Error fetching members:", error));
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, document: e.target.files[0] });
-  };
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -80,51 +82,51 @@ const Member = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  // 🚀 Submit form to backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMembers([...members, formData]); // Correctly adding formData to members array
+    try {
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
   
-    setFormData({  // Reset form data instead of members
-      memberId: "",
-      name: "",
-      address: "",
-      gender: "male",
-      mobile: "",
-      email: "",
-      dateOfBirth: "",
-      batch: "",
-      caseOf: "",
-      remarks: "",
-      plan: "today plan",
-      planamount: "",
-      startDate: "",
-      expiredDate: "",
-      enrollmentFee: "",
-      discount: "",
-      taxApplication: [],
-      taxAmount: "",
-      billDate: "",
-      document: null,
-      profileImage: null,
-    });
+      const response = await axios.post(API_BASE_URL, formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
   
-    setShowForm(false);
+      setMembers([...members, response.data]);
+      setShowForm(false);
+      setFormData({
+        memberId: "",
+        name: "",
+        address: "",
+        gender: "male",
+        mobile: "",
+        email: "",
+        dateOfBirth: "",
+        caseOf: "",
+        remarks: "",
+        document: "today plan",
+        joinDate: "",
+        profileImage: null,
+      });
+    } catch (error) {
+      console.error("Error adding member:", error);
+    }
   };
   
-  // Update handleChange for checkboxes
-const handleCheckboxChange = (e) => {
-  const { name, value, checked } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: checked
-      ? [...prev[name], value] // Add to array if checked
-      : prev[name].filter((item) => item !== value), // Remove if unchecked
-  }));
-};
 
-  const removeMember = (index) => {
-    setMembers(members.filter((_, i) => i !== index));
+  // ❌ Remove member from backend
+  const removeMember = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/${id}`);
+      setMembers(members.filter((member) => member._id !== id));
+    } catch (error) {
+      console.error("Error deleting member:", error);
+    }
   };
+  
 
   return (
     <div className="p-4 max-w-lg mx-auto bg-white shadow-md rounded-lg relative">
@@ -214,89 +216,39 @@ const handleCheckboxChange = (e) => {
         </div>
        
         
-        {/* Plan Details */}
-        <h3 className="text-md font-semibold">Plan Details</h3>
+        {/* document Details */}
+     
         <div>
-          <label className="block font-medium">Select Plan</label>
-          <select name="plan" value={formData.plan} onChange={handleChange} className="w-full p-2 border rounded">
+          <label className="block font-medium">Document</label>
+          <select name="document" value={formData.plan} onChange={handleChange} className="w-full p-2 border rounded">
             <option value="today plan">Today Plan</option>
             <option value="tomorrow plan">Tomorrow Plan</option>
           </select>
         </div>
+       
         <div>
-          <label className="block font-medium">Plan Amount</label>
-          <input type="number" name="planamount" value={formData.planamount} onChange={handleChange} className="w-full p-2 border rounded" />
+          <label className="block font-medium">Joining Date</label>
+          <input type="date" name="joinDate" value={formData.startDate} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
-        <div>
-          <label className="block font-medium">Start Date</label>
-          <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-          <label className="block font-medium">Expired Date</label>
-          <input type="date" name="expiredDate" value={formData.expiredDate} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-          <label className="block font-medium">Enrollment Fee</label>
-          <input type="number" name="enrollmentFee" value={formData.enrollmentFee} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-          <label className="block font-medium">Discount</label>
-          <input type="number" name="discount" value={formData.discount} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-        <div>
-  <label className="block font-medium">Tax Application</label>
-  <div className="space-y-2">
-    {["Name 1", "Name 2", "Name 3"].map((name) => (
-      <div key={name} className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          name="taxApplication"
-          value={name}
-          checked={formData.taxApplication.includes(name)}
-          onChange={handleCheckboxChange}
-          className="mr-2"
-        />
-        <label>{name}</label>
-        <input
-          type="text"
-          name={`taxAmount_${name}`}
-          placeholder="Enter amount"
-          onChange={handleChange}
-          className="p-2 border rounded w-24"
-        />
-      </div>
-    ))}
-  </div>
-</div>;
-</div>
+      
+       
+        
+ 
 
-        <div>
-          <label className="block font-medium">Tax Amount</label>
-          <input type="number" name="taxAmount" value={formData.taxAmount} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-          <label className="block font-medium">Bill Date</label>
-          <input type="date" name="billDate" value={formData.billDate} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
-        <div>
-          <label className="block font-medium">Upload Document</label>
-          <input type="file" onChange={handleFileChange} className="w-full p-2 border rounded" />
-        </div>
+        
+        
+        
         <div>
           <label className="block font-medium">Date of Birth</label>
           <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
-        <div>
-          <label className="block font-medium">Batch</label>
-          <input type="text" name="batch" value={formData.batch} onChange={handleChange} className="w-full p-2 border rounded" />
-        </div>
+        
         <div>
           <label className="block font-medium">Email</label>
           <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
         <div>
-          <label className="block font-medium">Case Of</label>
+          <label className="block font-medium">Care Of</label>
           <input type="text" name="caseOf" value={formData.caseOf} onChange={handleChange} className="w-full p-2 border rounded" />
         </div>
         <div>

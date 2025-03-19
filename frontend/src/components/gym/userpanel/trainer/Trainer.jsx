@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 
 const Trainer = () => {
   const [showForm, setShowForm] = useState(false);
@@ -20,36 +20,78 @@ const Trainer = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, image: imageUrl });
+      setFormData({ ...formData, image: file }); // ✅ Store file instead of preview URL
     }
   };
+  
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetch("http://localhost:8000/api/gym/trainers")
+      .then((res) => res.json())
+      .then((data) => setTrainers(data))
+      .catch((err) => console.error("Error fetching trainers:", err));
+  }, []);
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setTrainers([...trainers, formData]);
-    setFormData({
-      name: "",
-      address: "",
-      dob: "",
-      gender: "",
-      mobile: "",
-      joindate:"",
-      email: "",
-      experience: "",
-      description: "",
-      image: null,
+  
+    const formDataToSend = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
     });
-    setShowForm(false);
+  
+    try {
+      const response = await fetch("http://localhost:8000/api/gym/trainers", {
+        method: "POST",
+        body: formDataToSend,
+      });
+  
+      if (response.ok) {
+        const newTrainer = await response.json();
+        setTrainers([...trainers, newTrainer.trainer]);
+  
+        // ✅ Reset form after successful submission
+        setFormData({
+          name: "",
+          address: "",
+          dob: "",
+          gender: "",
+          mobile: "",
+          joindate: "",
+          email: "",
+          experience: "",
+          description: "",
+          image: null,
+        });
+  
+        setShowForm(false);
+      }
+    } catch (error) {
+      console.error("Error adding trainer:", error);
+    }
   };
+  
+  
 
-  const removeTrainer = (index) => {
-    setTrainers(trainers.filter((_, i) => i !== index));
+  const removeTrainer = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/gym/trainers/${id}`, {
+        method: "DELETE",
+      });
+  
+      if (response.ok) {
+        setTrainers(trainers.filter((trainer) => trainer._id !== id));
+      } else {
+        console.error("Failed to delete trainer.");
+      }
+    } catch (error) {
+      console.error("Error deleting trainer:", error);
+    }
   };
+  
 
   return (
     <div className="p-4 flex flex-col items-center w-full relative">
@@ -71,25 +113,25 @@ const Trainer = () => {
             <div>
               <label className="block font-medium">Profile Image</label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full p-2 border rounded"
-              />
+  type="file"
+  accept="image/*"
+  onChange={handleImageChange}
+  className="w-full p-2 border rounded"
+/>
             </div>
 
             {/* Name */}
             <div>
               <label className="block font-medium">Name</label>
               <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                placeholder="Enter Name"
-                required
-              />
+  type="text"
+  name="name"
+  value={formData.name}
+  onChange={handleChange}
+  className="w-full p-2 border rounded"
+  placeholder="Enter Name"
+  required
+/>
             </div>
 
             {/* Address */}
@@ -240,7 +282,7 @@ const Trainer = () => {
           {/* Round Image */}
           {trainer.image && (
             <img
-              src={trainer.image}
+            src={`http://localhost:8000${trainer.image}`}
               alt="Trainer"
               className="w-24 h-24 rounded-full object-cover border border-gray-300"
             />
@@ -271,11 +313,12 @@ const Trainer = () => {
 
         {/* Remove Button */}
         <button
-          onClick={() => removeTrainer(index)}
-          className="mt-2 text-red-600 font-bold text-sm"
-        >
-          Remove Trainer
-        </button>
+  onClick={() => removeTrainer(trainer._id)}
+  className="mt-2 text-red-600 font-bold text-sm"
+>
+  Remove Trainer
+</button>
+
       </div>
     ))
   )}
