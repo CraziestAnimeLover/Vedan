@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import { LucideCoins } from "lucide-react";
 import {
   DollarSign,
@@ -7,7 +7,7 @@ import {
   IndianRupee,
   JapaneseYen,
 } from "lucide-react";
-const API_BASE_URL = "http://localhost:8000/api/water";
+const API_BASE_URL = "http://localhost:8000/api/gym/water";
 
 const currencies = {
   USD: { rate: 1, icon: <DollarSign size={16} /> },
@@ -17,21 +17,12 @@ const currencies = {
   JPY: { rate: 150, icon: <JapaneseYen size={16} /> },
 };
 
+
+
 const WaterBill = () => {
-  const [waterBottles, setWaterBottles] = useState([
-    { id: 1, date: "", quantity: "" },
-  ]);
-  const [waterBills, setWaterBills] = useState([
-    {
-      id: 1,
-      billingDate: "",
-      amount: "",
-      fromTime: "",
-      toTime: "",
-      remarks: "",
-      currency: "USD",
-    },
-  ]);
+  const [waterBottles, setWaterBottles] = useState([]);
+  const [waterBills, setWaterBills] = useState([]);
+  
 
   const [showCurrencyList, setShowCurrencyList] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -39,6 +30,35 @@ const WaterBill = () => {
   const handleEditBottle = (index) => {
     setEditingIndex(index);
   };
+
+
+ // Fetch Data Function
+ const fetchWaterData = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/entries`);
+    if (!response.ok) throw new Error("Failed to fetch data");
+
+    const data = await response.json();
+    console.log("Fetched Data:", data);
+
+    setWaterBottles(data.bottles || []);
+    setWaterBills(data.bills || []);
+  } catch (error) {
+    console.error("Error fetching water data:", error);
+    alert("Failed to fetch water data.");
+  }
+};
+
+// Fetch data on mount
+useEffect(() => {
+  fetchWaterData();
+}, []);
+
+useEffect(() => {
+  console.log("Updated waterBottles:", waterBottles);
+  console.log("Updated waterBills:", waterBills);
+}, [waterBottles, waterBills]);
+
 
   const handleUpdateBottle = async (index) => {
     const updatedBottle = waterBottles[index];
@@ -227,6 +247,7 @@ const WaterBill = () => {
 
   return (
     <div className="p-4 flex flex-col items-center w-full">
+     
       <div className="w-full max-w-4xl">
         {/* Water Bottles Table */}
         <h2 className="text-lg font-semibold mb-2 text-center">
