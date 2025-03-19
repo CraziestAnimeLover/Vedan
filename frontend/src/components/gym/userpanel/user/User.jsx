@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 
 const User = () => {
   const [formData, setFormData] = useState({
@@ -13,10 +13,22 @@ const User = () => {
 
   const [users, setUsers] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/gym/users");
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
   };
 
   const handleCheckboxChange = (e) => {
@@ -29,9 +41,57 @@ const User = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setUsers([...users, formData]); // Add new user
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/gym/users");
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+  
+    fetchUsers();
+  }, []);
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  try {
+    const url = editingUserId
+      ? `http://localhost:8000/api/gym/users/${editingUserId}`
+      : "http://localhost:8000/api/gym/users";
+
+    const method = editingUserId ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      throw new Error("Invalid JSON response from server: " + text);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to save user");
+    }
+
+    // ✅ Refresh user list
+    fetchUsers();
+
+    // ✅ Reset the form
     setFormData({
       selectedPlan: "",
       name: "",
@@ -41,13 +101,51 @@ const User = () => {
       confirmPassword: "",
       permissions: [],
     });
-    setShowForm(false);
-  };
 
-  const handleDelete = (index) => {
-    const updatedUsers = users.filter((_, i) => i !== index);
-    setUsers(updatedUsers);
-  };
+    setShowForm(false);
+    setEditingUserId(null);
+  } catch (error) {
+    console.error("Error saving user:", error);
+    alert(error.message);
+  }
+};
+
+  
+ 
+  
+  const handleEdit = (user) => {
+    setFormData({
+       selectedPlan: user.selectedPlan,
+       name: user.name,
+       phone: user.phone,
+       email: user.email,
+       password: "",
+       confirmPassword: "",
+       permissions: user.permissions || [],
+    });
+    setEditingUserId(user._id);
+    setShowForm(true);
+ };
+ 
+  
+
+ const handleDelete = async (id) => {
+  try {
+     const response = await fetch(`http://localhost:8000/api/gym/users/${id}`, {
+        method: "DELETE",
+     });
+
+     if (!response.ok) {
+        throw new Error("Failed to delete user");
+     }
+
+     setUsers(users.filter((user) => user._id !== id));
+  } catch (error) {
+     console.error("Error deleting user:", error);
+  }
+};
+
+  
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md relative">
@@ -175,11 +273,12 @@ const User = () => {
             </div>
 
             <button
-              type="submit"
-              className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-            >
-              Submit
-            </button>
+   type="submit"
+   className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+>
+   {editingUserId ? "Update" : "Submit"}
+</button>
+
           </form>
         </div>
       ) : (
@@ -244,13 +343,14 @@ const User = () => {
                 {/* Edit & Delete Buttons */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => console.log("Edit User", index)}
+                    onClick={()=>handleEdit(user)}
                     className="text-blue-600 font-bold text-lg"
                   >
                     ✏️
                   </button>
                   <button
-                    onClick={() => handleDelete(index)}
+                    onClick={() => handleDelete(user._id)}
+
                     className="text-red-600 font-bold text-lg"
                   >
                     ❌
