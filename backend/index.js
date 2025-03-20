@@ -73,18 +73,15 @@ import gymFeesRoutes from "./routes/gymfeeRoutes.js";
 import dietPlanRoutes from "./routes/dietPlanRoutes.js";
 import gymproductRoutes from "./routes/gymproductRoutes.js";
 import workoutRoutes from "./routes/workoutRoutes.js";
-
+import chestexerciseRoutes from './routes/gymchestRoutes.js';
+import gymArmRoutes from './routes/gymarmRoutes.js';
+import gymAbsRoutes from './routes/gymabsRoutes.js';
+import gymBackRoutes from './routes/gymbackRoutes.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
-
 import path from 'path';
-import {
-  isAuthenticated,
-  isLibrarian,
-  isStudent,
-} from "./middlewares/isAuthenticated.js";
-import AharWaterBill from "./models/AharWaterBill.js";
+
 
 dotenv.config();
 
@@ -93,14 +90,16 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const upload = multer({ dest: "uploads/" });
+
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" })); 
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(bodyParser.json({ limit: "50mb" })); 
+app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
-app.use(bodyParser.json());
+
 // CORS Configuration
 const allowedOrigins = ["http://localhost:5173", "https://www.vedann.com"];
-
 const corsOptions = {
   origin: (origin, callback) => {
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
@@ -110,28 +109,11 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Serve uploaded images statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -139,7 +121,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Routes
 app.get("/home", (req, res) => {
   return res.status(200).json({
-    message: "Welcome",
+    message: "Welcome Sunny",
     success: true,
   });
 });
@@ -148,6 +130,10 @@ app.get("/home", (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
 app.use("/api/workouts", workoutRoutes);
+app.use('/api/chest/exercises', chestexerciseRoutes);
+app.use("/api/arm/exercises", gymArmRoutes);
+app.use("/api/abs/exercises", gymAbsRoutes);
+app.use("/api/back/exercises", gymBackRoutes);
 app.use("/api/gym/products", gymproductRoutes);
 app.use("/api/diet-plans", dietPlanRoutes);
 app.use("/api/gym/trainers", gymtrainerRoutes);

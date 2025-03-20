@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit, FiCheck, FiSave, FiTrash } from "react-icons/fi";
 
-const API_URL = "http://localhost:8000/api/exercises";
+const API_URL = "http://localhost:8000/api/back/exercises";
 
 const ExerciseCard = ({ index, exercise, onDelete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -9,48 +9,70 @@ const ExerciseCard = ({ index, exercise, onDelete, onUpdate }) => {
 
   const handleUpdate = async () => {
     try {
-      const formData = new FormData();
-      formData.append("name", tempExercise.name);
-      formData.append("set", tempExercise.set);
-      formData.append("rep", tempExercise.rep);
-      formData.append("focusArea", tempExercise.focusArea);
-      formData.append("equipment", tempExercise.equipment);
-
+      let body;
+      let headers = {};
+  
       if (tempExercise.imageFile) {
-        formData.append("image", tempExercise.imageFile);
+        body = new FormData();
+        body.append("name", tempExercise.name);
+        body.append("set", tempExercise.set);
+        body.append("rep", tempExercise.rep);
+        body.append("focusArea", tempExercise.focusArea);
+        body.append("equipment", tempExercise.equipment);
+
+        
+        body.append("image", tempExercise.imageFile);
+      } else {
+        body = JSON.stringify({
+          name: tempExercise.name,
+          set: tempExercise.set,
+          rep: tempExercise.rep,
+          focusArea: tempExercise.focusArea,
+          equipment: tempExercise.equipment,
+        });
+        headers["Content-Type"] = "application/json"; // JSON requires headers
       }
-
-      console.log("Sending Data:", Object.fromEntries(formData.entries()));
-
+  
       const response = await fetch(`${API_URL}/${exercise._id}`, {
-        method: "PUT",
-        body: formData,
+        method: "PATCH", // ✅ Match backend method
+        headers,
+        body,
       });
-
+      
+  
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Backend Error Response:", errorText);
         throw new Error(`Failed to update: ${errorText}`);
       }
-
+  
       const updatedExercise = await response.json();
-      console.log("Updated Exercise:", updatedExercise);
-
-      onUpdate({ ...exercise, ...updatedExercise });
+      onUpdate(updatedExercise); // Ensure updated data is passed
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating exercise:", error);
     }
   };
+  
+  useEffect(() => {
+    if (tempExercise.imageFile) {
+      const objectUrl = URL.createObjectURL(tempExercise.imageFile);
+      setTempExercise((prev) => ({ ...prev, imageUrl: objectUrl }));
+  
+      return () => URL.revokeObjectURL(objectUrl); // Cleanup to prevent memory leaks
+    }
+  }, [tempExercise.imageFile]);
+  
+  
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setTempExercise({ 
-        ...tempExercise, 
-        imageFile: file, 
-        image: URL.createObjectURL(file) // Temporary preview before upload
-      });
+      setTempExercise((prev) => ({
+        ...prev,
+        imageFile: file,
+        image: URL.createObjectURL(file),
+      }));
     }
   };
 
@@ -62,84 +84,110 @@ const ExerciseCard = ({ index, exercise, onDelete, onUpdate }) => {
 
       <div className="flex">
         <label className="cursor-pointer w-full flex">
-          <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          <img 
-  src={
-    tempExercise.imageFile 
-      ? URL.createObjectURL(tempExercise.imageFile) 
-      : tempExercise.image 
-        ? `${API_URL}/uploads/${tempExercise.image}` 
-        : "/default-placeholder.png" // Use a placeholder if no image exists
-  } 
-  alt="Exercise"
-  className="w-32 h-32 mx-14 mt-4 object-cover rounded border-2 border-gray-300"
-/>
-
-
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <img
+            src={
+              tempExercise.imageFile
+                ? URL.createObjectURL(tempExercise.imageFile)
+                : tempExercise.image
+                ? `${API_URL}/uploads/${tempExercise.image}`
+                : "/default-placeholder.png"
+            }
+            alt="Exercise"
+            className="w-32 h-32 mx-14 mt-4 object-cover rounded border-2 border-gray-300"
+          />
         </label>
 
         <div className="mt-3 flex flex-col gap-2 me-14">
-        <input
-  type="text"
-  value={tempExercise.name || ""}
-  onChange={(e) => setTempExercise({ ...tempExercise, name: e.target.value })}
-  placeholder="Exercise Name"
-  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-  disabled={!isEditing}
-/>
-
+          <input
+            type="text"
+            value={tempExercise.name || ""}
+            onChange={(e) =>
+              setTempExercise({ ...tempExercise, name: e.target.value })
+            }
+            placeholder="Exercise Name"
+            className={`border p-1 rounded w-full ${
+              isEditing ? "" : "border-transparent"
+            }`}
+            disabled={!isEditing}
+          />
 
           <div className="flex gap-4 mt-2">
-            <label className="flex items-center gap-1">
-            <input
-  type="checkbox"
-  checked={Boolean(tempExercise.set)}
-  onChange={() => isEditing && setTempExercise({ ...tempExercise, set: !tempExercise.set })}
-/>
-              Sets
-            </label>
-            X
-            <label className="flex items-center gap-1">
-            <input
-  type="checkbox"
-  checked={Boolean(tempExercise.rep)}
-  onChange={() => isEditing && setTempExercise({ ...tempExercise, rep: !tempExercise.rep })}
-/>
-              Reps
-            </label>
+          <label className="flex items-center gap-1">
+  <input
+    type="checkbox"
+    checked={tempExercise.set || false}
+    onChange={(e) =>
+      isEditing && setTempExercise({ ...tempExercise, set: e.target.checked })
+    }
+  />
+  Sets
+</label>
+X
+<label className="flex items-center gap-1">
+  <input
+    type="checkbox"
+    checked={tempExercise.rep || false}
+    onChange={(e) =>
+      isEditing && setTempExercise({ ...tempExercise, rep: e.target.checked })
+    }
+  />
+  Reps
+</label>
+
+
           </div>
 
           <input
-  type="text"
-  value={tempExercise.focusArea || ""}
-  onChange={(e) => setTempExercise({ ...tempExercise, focusArea: e.target.value })}
-  placeholder="Focus Area"
-  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-  disabled={!isEditing}
-/>
+            type="text"
+            value={tempExercise.focusArea || ""}
+            onChange={(e) =>
+              setTempExercise({ ...tempExercise, focusArea: e.target.value })
+            }
+            placeholder="Focus Area"
+            className={`border p-1 rounded w-full ${
+              isEditing ? "" : "border-transparent"
+            }`}
+            disabled={!isEditing}
+          />
 
-<input
-  type="text"
-  value={tempExercise.equipment || ""}
-  onChange={(e) => setTempExercise({ ...tempExercise, equipment: e.target.value })}
-  placeholder="Equipment"
-  className={`border p-1 rounded w-full ${isEditing ? '' : 'border-transparent'}`}
-  disabled={!isEditing}
-/>
+          <input
+            type="text"
+            value={tempExercise.equipment || ""}
+            onChange={(e) =>
+              setTempExercise({ ...tempExercise, equipment: e.target.value })
+            }
+            placeholder="Equipment"
+            className={`border p-1 rounded w-full ${
+              isEditing ? "" : "border-transparent"
+            }`}
+            disabled={!isEditing}
+          />
 
-          {/* {isEditing && (
+          {isEditing && (
             <button onClick={handleUpdate} className="bg-green-500 text-white px-4 py-2 rounded mt-2 w-full">
               <FiSave className="inline-block mr-2" /> Save
             </button>
-          )} */}
+          )}
         </div>
       </div>
-      
+
       <div className="flex justify-between mt-2">
-        <button onClick={() => setIsEditing(!isEditing)} className="text-blue-500 flex items-center">
+        <button
+          onClick={() => setIsEditing(!isEditing)}
+          className="text-blue-500 flex items-center"
+        >
           {isEditing ? <FiCheck /> : <FiEdit />}
         </button>
-        <button onClick={() => onDelete(exercise._id)} className="text-red-500 flex items-center">
+        <button
+          onClick={() => onDelete(exercise._id)}
+          className="text-red-500 flex items-center"
+        >
           <FiTrash />
         </button>
       </div>
@@ -172,7 +220,7 @@ const Back = () => {
       focusArea: "General",
       equipment: "None",
     };
-  
+
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -192,7 +240,9 @@ const Back = () => {
     try {
       const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete exercise");
-      setExercises((prevExercises) => prevExercises.filter((ex) => ex._id !== id));
+      setExercises((prevExercises) =>
+        prevExercises.filter((ex) => ex._id !== id)
+      );
     } catch (error) {
       console.error("Error deleting exercise:", error);
     }
@@ -200,21 +250,33 @@ const Back = () => {
 
   const updateExercise = (updatedExercise) => {
     setExercises((prevExercises) =>
-      prevExercises.map((ex) => (ex._id === updatedExercise._id ? updatedExercise : ex))
+      prevExercises.map((ex) =>
+        ex._id === updatedExercise._id ? updatedExercise : ex
+      )
     );
   };
+  
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Exercises ({exercises.length})</h2>
-        <button onClick={addExercise} className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2">
+        <button
+          onClick={addExercise}
+          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2"
+        >
           <FiEdit /> Add Exercise
         </button>
       </div>
       <div className="grid gap-4">
         {exercises.map((ex, index) => (
-          <ExerciseCard key={ex._id} index={index} exercise={ex} onDelete={deleteExercise} onUpdate={updateExercise} />
+          <ExerciseCard
+            key={ex._id}
+            index={index}
+            exercise={ex}
+            onDelete={deleteExercise}
+            onUpdate={updateExercise}
+          />
         ))}
       </div>
     </div>
