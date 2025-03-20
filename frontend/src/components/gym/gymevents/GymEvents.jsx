@@ -1,75 +1,154 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const GymEvents = () => {
   const [events, setEvents] = useState([]);
-  const [updatedEvents, setUpdatedEvents] = useState({});
   const [showTable, setShowTable] = useState(true);
 
-  const handleChange = (id, field, value) => {
-    setEvents(events.map(event => (event.id === id ? { ...event, [field]: value } : event)));
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  // Fetch events from backend
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/gym-events");
+      const data = await response.json();
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
   };
 
+  // Handle form field changes
+  const handleChange = (id, field, value) => {
+    setEvents(
+      events.map((event) =>
+        event._id === id ? { ...event, [field]: value } : event
+      )
+    );
+  };
+
+  // Handle file uploads
   const handleFileUpload = (id, field, file) => {
     if (!file) return;
 
-    if (field === "Description" && file.type !== "application/pdf") {
+    if (field === "description" && file.type !== "application/pdf") {
       alert("Only PDF files are allowed for Description.");
       return;
     }
 
-    if (field === "Pic" && !file.type.startsWith("image/")) {
+    if (field === "pic" && !file.type.startsWith("image/")) {
       alert("Only image files are allowed for Pic.");
       return;
     }
 
-    handleChange(id, field, URL.createObjectURL(file));
+    handleChange(id, field, file);
   };
 
-  const handleUpdate = (event) => {
-    setUpdatedEvents(prev => ({
-      ...prev,
-      [event.id]: event
-    }));
-    setShowTable(false); // Hide the table after clicking update
-  };
-
+  // Add a new row (Frontend only)
   const handleAddRow = () => {
     const newEvent = {
-      id: Date.now(),
-      SrNo: events.length + 1,
-      Events: "",
-      Goal: "",
-      MusclePrimary: "",
-      MuscleSecondary: "",
-      Place: "",
-      Duration: "",
-      Description: "",
-      Pic: ""
+      _id: Date.now(),
+      srNo: events.length + 1,
+      eventName: "", // 👈 Ensure not empty
+      goal: "",
+      musclePrimary: "",
+      muscleSecondary: "",
+      place: "",
+      duration: "",
+      description: null,
+      pic: null,
     };
     setEvents([...events, newEvent]);
   };
 
-  return (
-    <div className="p-6 relative">
-      {/* Toggle Button */}
-      {!showTable && (
-        <button
-          className="absolute top-2 right-2 bg-gray-800 text-white px-4 py-2 rounded-lg"
-          onClick={() => setShowTable(true)}
-        >
-          Show Table
-        </button>
-      )}
+  // Submit event to backend
+  const handleSubmit = async (event) => {
+    const formData = new FormData();
+    formData.append("srNo", event.srNo);
+    formData.append("eventName", event.eventName);
+    formData.append("goal", event.goal);
+    formData.append("musclePrimary", event.musclePrimary);
+    formData.append("muscleSecondary", event.muscleSecondary);
+    formData.append("place", event.place);
+    formData.append("duration", event.duration);
 
-      {/* Table View */}
-      {showTable && (
+    if (event.description) {
+      formData.append("description", event.description);
+    }
+    if (event.pic) {
+      formData.append("pic", event.pic);
+    }
+
+    try {
+      let response;
+      if (String(event._id).includes("temp")) {
+        // If it's a new event (frontend-generated ID), use POST
+        response = await fetch("http://localhost:8000/api/gym-events", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // If it's an existing event, use PUT (update)
+        response = await fetch(
+          `http://localhost:8000/api/gym-events/${event._id}`,
+          {
+            method: "PUT",
+            body: formData,
+          }
+        );
+      }
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to save event");
+      }
+
+      console.log("✅ Event saved successfully", data);
+
+      // Update only the specific event in state without re-fetching all
+      setEvents((prevEvents) =>
+        prevEvents.map((ev) => (ev._id === event._id ? { ...ev, ...data } : ev))
+      );
+    } catch (error) {
+      console.error("❌ Error saving event:", error);
+    }
+  };
+
+  // Delete event from backend
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`http://localhost:8000/api/gym-events/${id}`, {
+        method: "DELETE",
+      });
+      setEvents(events.filter((event) => event._id !== id));
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">
+          {showTable ? "Gym Events (Table View)" : "Gym Events (Card View)"}
+        </h2>
+        <button
+          className="bg-gray-800 text-white px-4 py-2 rounded-lg"
+          onClick={() => setShowTable(!showTable)}
+        >
+          {showTable ? "Show Cards" : "Show Table"}
+        </button>
+      </div>
+
+      {showTable ? (
+        // ✅ Existing Table View
         <div>
-          <h2 className="text-xl font-semibold mb-4">Gym Events (Table View)</h2>
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
                 <th className="border px-3 py-2">SrNo</th>
-                <th className="border px-3 py-2">Events</th>
+                <th className="border px-3 py-2">Event Name</th>
                 <th className="border px-3 py-2">Goal</th>
                 <th className="border px-3 py-2">Muscle Used</th>
                 <th className="border px-3 py-2">Place</th>
@@ -81,36 +160,48 @@ const GymEvents = () => {
             </thead>
             <tbody>
               {events.map((event) => (
-                <tr key={event.id} className="border-b">
-                  <td className="border px-3 py-2">{event.SrNo}</td>
+                <tr key={event._id} className="border-b">
+                  <td className="border px-3 py-2">{event.srNo}</td>
                   <td className="border px-3 py-2">
                     <input
                       type="text"
-                      value={event.Events}
-                      onChange={(e) => handleChange(event.id, "Events", e.target.value)}
+                      value={event.eventName}
+                      onChange={(e) =>
+                        handleChange(event._id, "eventName", e.target.value)
+                      }
                       className="border px-2 py-1 w-full"
                     />
                   </td>
                   <td className="border px-3 py-2">
                     <input
                       type="text"
-                      value={event.Goal}
-                      onChange={(e) => handleChange(event.id, "Goal", e.target.value)}
+                      value={event.goal}
+                      onChange={(e) =>
+                        handleChange(event._id, "goal", e.target.value)
+                      }
                       className="border px-2 py-1 w-full"
                     />
                   </td>
                   <td className="border px-3 py-2">
                     <input
                       type="text"
-                      value={event.MusclePrimary}
-                      onChange={(e) => handleChange(event.id, "MusclePrimary", e.target.value)}
+                      value={event.musclePrimary}
+                      onChange={(e) =>
+                        handleChange(event._id, "musclePrimary", e.target.value)
+                      }
                       className="border px-2 py-1 w-full"
                       placeholder="Primary Muscle"
                     />
                     <input
                       type="text"
-                      value={event.MuscleSecondary}
-                      onChange={(e) => handleChange(event.id, "MuscleSecondary", e.target.value)}
+                      value={event.muscleSecondary}
+                      onChange={(e) =>
+                        handleChange(
+                          event._id,
+                          "muscleSecondary",
+                          e.target.value
+                        )
+                      }
                       className="border px-2 py-1 w-full mt-1"
                       placeholder="Secondary Muscle"
                     />
@@ -118,32 +209,58 @@ const GymEvents = () => {
                   <td className="border px-3 py-2">
                     <input
                       type="text"
-                      value={event.Place}
-                      onChange={(e) => handleChange(event.id, "Place", e.target.value)}
+                      value={event.place}
+                      onChange={(e) =>
+                        handleChange(event._id, "place", e.target.value)
+                      }
                       className="border px-2 py-1 w-full"
                     />
                   </td>
                   <td className="border px-3 py-2">
                     <input
                       type="number"
-                      value={event.Duration}
-                      onChange={(e) => handleChange(event.id, "Duration", e.target.value)}
+                      value={event.duration}
+                      onChange={(e) =>
+                        handleChange(event._id, "duration", e.target.value)
+                      }
                       className="border px-2 py-1 w-full"
                     />
                   </td>
                   <td className="border px-3 py-2">
-                    <input type="file" accept=".pdf" onChange={(e) => handleFileUpload(event.id, "Description", e.target.files[0])} />
-                    {event.Description && <a href={event.Description} target="_blank" className="text-blue-600">View PDF</a>}
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) =>
+                        handleFileUpload(
+                          event._id,
+                          "description",
+                          e.target.files[0]
+                        )
+                      }
+                    />
                   </td>
                   <td className="border px-3 py-2">
-                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(event.id, "Pic", e.target.files[0])} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleFileUpload(event._id, "pic", e.target.files[0])
+                      }
+                    />
                   </td>
                   <td className="border px-3 py-2">
                     <button
-                      className="bg-green-500 text-white px-2 py-1 rounded"
-                      onClick={() => handleUpdate(event)}
+                      className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+                      onClick={() => handleSubmit(event)}
                     >
-                      Update
+                      Save
+                    </button>
+
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                      onClick={() => handleDelete(event._id)}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -151,7 +268,6 @@ const GymEvents = () => {
             </tbody>
           </table>
 
-          {/* Add Row Button */}
           <div className="mt-4 text-center">
             <button
               onClick={handleAddRow}
@@ -161,31 +277,27 @@ const GymEvents = () => {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Card View (Appears When Update is Clicked) */}
-      {!showTable && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Updated Gym Events (Card View)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.values(updatedEvents).map((event) => (
-              <div
-                key={event.id}
-                className="relative h-60 rounded-lg shadow-lg flex items-center justify-center text-white"
-                style={{
-                  backgroundImage: `url(${event.Pic || "https://via.placeholder.com/300"})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
-                <div className="bg-black bg-opacity-50 p-4 rounded-lg text-center w-full">
-                  <h4 className="text-lg font-bold">{event.Events}</h4>
-                  <p><strong>Duration:</strong> {event.Duration} mins</p>
-                 
-                </div>
+      ) : (
+        // ✅ New Card View
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {events.map((event) => (
+            <div
+              key={event._id}
+              className="relative h-48 rounded-lg shadow-lg overflow-hidden bg-gray-800"
+              style={{
+                backgroundImage: event.pic
+                  ? `url(http://localhost:8000/${event.pic})`
+                  : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <div className="absolute inset-0 bg-opacity-50 flex flex-col justify-center items-center text-white">
+                <h3 className="text-lg font-bold">{event.eventName}</h3>
+                <p className="text-sm">{event.duration} mins</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

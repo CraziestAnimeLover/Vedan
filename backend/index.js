@@ -84,6 +84,7 @@ import gymShoulderRoutes from './routes/gymshoulderRoutes.js';
 import gymStrongLiftRoutes from './routes/gymstrongliftRoutes.js';
 import gymUpperBodyRoutes from './routes/gymuppebodyRoutes.js';
 import gymVTaperRoutes from './routes/gymvtaperRoutes.js';
+import gymEventRoutes from "./routes/gymEventRoutes.js";
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -138,6 +139,7 @@ app.get("/home", (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
 app.use("/api/workouts", workoutRoutes);
+app.use("/api/gym-events", gymEventRoutes);
 app.use('/api/chest/exercises', chestexerciseRoutes);
 app.use("/api/arm/exercises", gymArmRoutes);
 app.use("/api/abs/exercises", gymAbsRoutes);
