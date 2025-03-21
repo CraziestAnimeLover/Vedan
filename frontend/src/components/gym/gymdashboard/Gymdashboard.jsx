@@ -63,11 +63,7 @@ const Gymdashboard = () => {
         component: <Gymprofile />,
         icon: <LucideUser size={20} />,
       },
-      {
-        title: "Edit Profile",
-        url: "/profiles/edit",
-        icon: <LucideUser size={20} />,
-      },
+     
     ],
     Accounts: [
       {
