@@ -19,7 +19,6 @@ import LostItem from "./components/lostnfound/LostItem";
 import PreviewPage from "./components/auth/resume/PreviewPage";
 import PreviewPageAts from "./components/auth/resume/PreviewPageAts";
 import Select from "./components/auth/Select";
-
 import AddLibraryForm from "./components/auth/AddLibraryForm";
 import MgtLibServicePage from "./components/Pages/MgtLibServicePage";
 import MgtSidebarLayout from "./components/library/libraryadmin/MgtSidebarLayout";
@@ -69,7 +68,7 @@ import BarbarDashboard from "./components/barber/barbardashboard/BarbarDashboard
 import BarberAttendence from "./components/barber/baberattendence/attendence/Barber/BarberAttendence";
 import AharDashboard from "./components/ahar/barber/AharDashboard/AharDashboard";
 import AharBills from "./components/ahar/barber/aharaccount/bills/Bills";
-
+import GymBalancesheet from "./components/gym/gymaccounts/GymBalancesheet";
 import AharAttendence from "./components/ahar/barber/attendence/AharAttendence";
 
 // import EnquiryCard from './components/library/enquiry/Enquiry'
@@ -84,12 +83,15 @@ const approuter = createBrowserRouter([
     path: "/reset-password/:token",
     element: <ResetPassword />,
   },
+  {
+    path: "/gym/balancesheet",
+    element: <GymBalancesheet />,
+  },
 
   { path: "/register", element: <Signup /> },
   { path: "/select", element: <Select /> },
   { path: "/mgtservice", element: <MgtLibServicePage /> },
   { path: "/mgtservice/selects", element: <Selects /> },
-
   { path: "/mgtservice/mgtlibrary", element: <MgtSidebarLayout /> },
   { path: "/mgtservice/mgtlibrary/profile", element: <LibraryProfile /> },
   { path: "/mgtservice/mgtlibrary/billing", element: <Billing /> },

@@ -35,6 +35,8 @@ import Gymprofile from "../gymprofile/Gymprofile";
 import IDMem from "../lekh(record)/IDMem";
 import GymFees from "../attendence/fees/GymFees";
 import GymEvents from "../gymevents/GymEvents";
+import GymBalancesheet from "../gymaccounts/GymBalancesheet";
+import GymAccounts from "../gymaccounts/GymAccounts";
 
 
 
@@ -75,7 +77,7 @@ const Gymdashboard = () => {
       },
       {
         title: "Financial Report",
-        url: "/placement/resume/saved",
+        component: <GymAccounts />,
         icon: <LucideFileText size={20} />,
       },
       {
@@ -85,7 +87,7 @@ const Gymdashboard = () => {
       },
       {
         title: "Balance Sheet",
-        component: <Fees />,
+        url: "/gym/balancesheet",
         icon: <LucideFileText size={20} />,
       },
     ],
