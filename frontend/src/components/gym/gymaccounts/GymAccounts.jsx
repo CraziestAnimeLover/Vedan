@@ -1,34 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
+
+const API_URL = "http://localhost:8000/api/gym-accounts";
 
 const months = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
 
-const Table = ({ title, data, setData }) => {
-  const addRow = () => {
-    setData([...data, { time: "January", value: 0 }]);
-  };
-
-  const deleteRow = (index) => {
-    if (data.length > 1) {
-      setData(data.filter((_, i) => i !== index));
+const Table = ({ title, type, data, setData, fetchData }) => {
+  const addRow = async () => {
+    try {
+      const newRecord = { type, time: "January", value: 0 };
+      const res = await axios.post(API_URL, newRecord);
+      setData([...data, res.data]);
+    } catch (error) {
+      console.error("Error adding row:", error);
     }
   };
 
-  const updateTime = (index, newTime) => {
-    const updatedData = [...data];
-    updatedData[index].time = newTime;
-    setData(updatedData);
+  const deleteRow = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setData(data.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error("Error deleting row:", error);
+    }
   };
 
-  const updateValue = (index, newValue) => {
-    const updatedData = [...data];
-    updatedData[index].value = newValue;
-    setData(updatedData);
+  const updateRow = async (id, updatedField) => {
+    try {
+      const updatedItem = { ...data.find((item) => item._id === id), ...updatedField };
+      const res = await axios.put(`${API_URL}/${id}`, updatedItem);
+      setData(data.map((item) => (item._id === id ? res.data : item)));
+    } catch (error) {
+      console.error("Error updating row:", error);
+    }
   };
 
   return (
@@ -45,13 +55,13 @@ const Table = ({ title, data, setData }) => {
         </thead>
         <tbody>
           {data.map((item, index) => (
-            <tr key={index} className="bg-white hover:bg-gray-100 transition">
+            <tr key={item._id} className="bg-white hover:bg-gray-100 transition">
               <td className="border border-gray-800 p-2">{index + 1}</td>
               <td className="border border-gray-800 p-2">
                 <select
                   className="w-full p-1 border border-gray-400 rounded"
                   value={item.time}
-                  onChange={(e) => updateTime(index, e.target.value)}
+                  onChange={(e) => updateRow(item._id, { time: e.target.value })}
                 >
                   {months.map((month) => (
                     <option key={month} value={month}>
@@ -65,13 +75,13 @@ const Table = ({ title, data, setData }) => {
                   type="number"
                   className="w-full p-1 border border-gray-400 rounded"
                   value={item.value}
-                  onChange={(e) => updateValue(index, parseFloat(e.target.value) || 0)}
+                  onChange={(e) => updateRow(item._id, { value: parseFloat(e.target.value) || 0 })}
                 /> Cr
               </td>
               <td className="border border-gray-800 p-2 text-center">
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  onClick={() => deleteRow(index)}
+                  onClick={() => deleteRow(item._id)}
                 >
                   ❌
                 </button>
@@ -107,40 +117,35 @@ const Chart = ({ title, data, color }) => (
 );
 
 const GymAccounts = () => {
-  const [revenueData, setRevenueData] = useState([
-    { time: "January", value: 5 },
-    { time: "February", value: 7 },
-    { time: "March", value: 6.5 },
-    { time: "April", value: 8 },
-  ]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [profitData, setProfitData] = useState([]);
+  const [networthData, setNetworthData] = useState([]);
 
-  const [profitData, setProfitData] = useState([
-    { time: "January", value: 1.2 },
-    { time: "February", value: 1.5 },
-    { time: "March", value: 1.4 },
-    { time: "April", value: 1.8 },
-  ]);
+  const fetchData = async (type, setData) => {
+    try {
+      const res = await axios.get(`${API_URL}/${type}`);
+      setData(res.data);
+    } catch (error) {
+      console.error(`Error fetching ${type} data:`, error);
+    }
+  };
 
-  const [networthData, setNetworthData] = useState([
-    { time: "January", value: 20 },
-    { time: "February", value: 23 },
-    { time: "March", value: 22 },
-    { time: "April", value: 25 },
-  ]);
+  useEffect(() => {
+    fetchData("Revenue", setRevenueData);
+    fetchData("Profit", setProfitData);
+    fetchData("NetWorth", setNetworthData);
+  }, []);
 
   return (
     <div className="flex flex-wrap">
-      {/* Revenue Section */}
-      <Table title="(1) Revenue " data={revenueData} setData={setRevenueData} />
-      <Chart title="Revenue " data={revenueData} color="#4A90E2" />
+      <Table title="(1) Revenue" type="Revenue" data={revenueData} setData={setRevenueData} fetchData={fetchData} />
+      <Chart title="Revenue" data={revenueData} color="#4A90E2" />
 
-      {/* Profit Section */}
-      <Table title="(2) Profit " data={profitData} setData={setProfitData} />
-      <Chart title="Profit " data={profitData} color="#50C878" />
+      <Table title="(2) Profit" type="Profit" data={profitData} setData={setProfitData} fetchData={fetchData} />
+      <Chart title="Profit" data={profitData} color="#50C878" />
 
-      {/* Net Worth Section */}
-      <Table title="(3) Net Worth " data={networthData} setData={setNetworthData} />
-      <Chart title="Net Worth " data={networthData} color="#E94E77" />
+      <Table title="(3) Net Worth" type="NetWorth" data={networthData} setData={setNetworthData} fetchData={fetchData} />
+      <Chart title="Net Worth" data={networthData} color="#E94E77" />
     </div>
   );
 };

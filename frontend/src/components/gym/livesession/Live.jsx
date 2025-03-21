@@ -1,190 +1,179 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8000/api/live';
 
 const Live = () => {
-  const [rows, setRows] = useState([
-    { srNo: 1, concept: 'Concept 1', date: '2025-03-06', time: '10:00 AM', image: null, file: null, isEditing: false }
-  ]);
+  const [rows, setRows] = useState([]);
 
-  const handleImageClick = (e, index) => {
-    const imageFile = e.target.files[0];
-    if (imageFile && imageFile.type.startsWith('image')) {
-      const newRows = [...rows];
-      newRows[index].image = URL.createObjectURL(imageFile);
-      setRows(newRows);
-    } else {
-      alert('Please select an image.');
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setRows(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
   };
-
-  const handleDocumentChange = (e, index) => {
-    const docFile = e.target.files[0];
-    if (docFile && docFile.type === 'application/pdf') {
-      const newRows = [...rows];
-      newRows[index].file = docFile;
-      setRows(newRows);
-    } else {
-      alert('Please select a PDF document.');
-    }
-  };
-
   const handleAddRow = () => {
     const newRow = {
+      _id: null, // Placeholder, backend should assign an ID
       srNo: rows.length + 1,
       concept: '',
       date: '',
       time: '',
       image: null,
       file: null,
-      isEditing: true,  // New row is in editing mode by default
+      isEditing: true,
     };
     setRows([...rows, newRow]);
   };
+  
+  
+  
 
-  const handleDeleteRow = (index) => {
-    const newRows = rows.filter((_, i) => i !== index);
-    setRows(newRows);
+  const handleDeleteRow = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setRows(rows.filter(row => row._id !== id));
+    } catch (error) {
+      console.error('Error deleting row:', error);
+    }
   };
 
-  const handleToggleEdit = (index) => {
-    const newRows = [...rows];
-    newRows[index].isEditing = !newRows[index].isEditing; // Toggle editing mode
-    setRows(newRows);
+  const handleUpdateRow = async (id, updatedData) => {
+    if (!id) {
+      console.error("Cannot update row: ID is undefined.");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append("srNo", updatedData.srNo);
+      formData.append("concept", updatedData.concept);
+      formData.append("date", updatedData.date);
+      formData.append("time", updatedData.time);
+  
+      if (updatedData.image) formData.append("image", updatedData.image);
+      if (updatedData.file) formData.append("file", updatedData.file);
+  
+      const response = await axios.put(`${API_URL}/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      console.log("Update successful:", response.data);
+    } catch (error) {
+      console.error("Error updating row:", error);
+    }
   };
+  
 
-  const handleUpdateRow = (index) => {
-    const newRows = [...rows];
-    newRows[index].isEditing = false; // Save the updated row and exit edit mode
-    setRows(newRows);
+  const handleFileUpload = async (e, index, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post(`${API_URL}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const newRows = [...rows];
+      newRows[index][type] = response.data.fileUrl;
+      setRows(newRows);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
   };
 
   return (
-    <div className=" w-full p-4">
+    <div className="w-full p-4">
       <h2 className="text-2xl font-bold mb-4">Live Data</h2>
-      <button 
-        onClick={handleAddRow}
-        className="bg-blue-500 text-white py-2 px-4 rounded mb-4"
-      >
+      <button onClick={handleAddRow} className="bg-blue-500 text-white py-2 px-4 rounded mb-4">
         Add Row
       </button>
-      <div className=' bg-slate-750 w-2/3'>
-
-      <table className=" border-separate border border-gray-300 w-2/3 ">
+      <table className="border-separate border border-gray-300 w-full">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-1 py-2 text-left border">SrNo</th>
-            <th className="px-4 py-2 text-left border">Concept</th>
-            <th className="px-4 py-2 text-left border">Date</th>
-            <th className="px-4 py-2 text-left border">Time</th>
-            <th className="px-4 py-2 text-left border">Pic</th>
-            <th className="px-4 py-2 text-left border">Document Link</th>
-            <th className="px-4 py-2 text-left border">Actions</th>
+            <th className="px-4 py-2 border">Concept</th>
+            <th className="px-4 py-2 border">Date</th>
+            <th className="px-4 py-2 border">Time</th>
+            <th className="px-4 py-2 border">Pic</th>
+            <th className="px-4 py-2 border">Document</th>
+            <th className="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index} className="bg-white hover:bg-gray-50">
-              <td className="px-4 py-2 border">{row.srNo}</td>
+            <tr key={row._id} className="bg-white hover:bg-gray-50">
               <td className="px-4 py-2 border">
-                {row.isEditing ? (
-                  <input
-                    type="text"
-                    value={row.concept}
-                    onChange={(e) => {
-                      const newRows = [...rows];
-                      newRows[index].concept = e.target.value;
-                      setRows(newRows);
-                    }}
-                    className="border border-gray-300 px-2 py-1 rounded"
-                  />
-                ) : (
-                  row.concept
-                )}
-              </td>
-              <td className="px-4 py-2 border">
-                {row.isEditing ? (
-                  <input
-                    type="date"
-                    value={row.date}
-                    onChange={(e) => {
-                      const newRows = [...rows];
-                      newRows[index].date = e.target.value;
-                      setRows(newRows);
-                    }}
-                    className="border border-gray-300 px-2 py-1 rounded"
-                  />
-                ) : (
-                  row.date
-                )}
-              </td>
-              <td className="px-4 py-2 border">
-                {row.isEditing ? (
-                  <input
-                    type="time"
-                    value={row.time}
-                    onChange={(e) => {
-                      const newRows = [...rows];
-                      newRows[index].time = e.target.value;
-                      setRows(newRows);
-                    }}
-                    className="border border-gray-300 px-2 py-1 rounded"
-                  />
-                ) : (
-                  row.time
-                )}
+                <input
+                  type="text"
+                  value={row.concept}
+                  onChange={(e) => {
+                    const newRows = [...rows];
+                    newRows[index].concept = e.target.value;
+                    setRows(newRows);
+                  }}
+                  className="border px-2 py-1 rounded"
+                />
               </td>
               <td className="px-4 py-2 border">
                 <input
-                  type="file"
-                  onChange={(e) => handleImageClick(e, index)}
-                  className="border border-gray-300 px-2 py-1 rounded"
+                  type="date"
+                  value={row.date}
+                  onChange={(e) => {
+                    const newRows = [...rows];
+                    newRows[index].date = e.target.value;
+                    setRows(newRows);
+                  }}
+                  className="border px-2 py-1 rounded"
                 />
+              </td>
+              <td className="px-4 py-2 border">
+                <input
+                  type="time"
+                  value={row.time}
+                  onChange={(e) => {
+                    const newRows = [...rows];
+                    newRows[index].time = e.target.value;
+                    setRows(newRows);
+                  }}
+                  className="border px-2 py-1 rounded"
+                />
+              </td>
+              <td className="px-4 py-2 border">
+                <input type="file" onChange={(e) => handleFileUpload(e, index, 'image')} />
                 {row.image && <img src={row.image} alt="Uploaded" width="100" className="mt-2" />}
               </td>
               <td className="px-4 py-2 border">
-                <input
-                  type="file"
-                  onChange={(e) => handleDocumentChange(e, index)}
-                  accept="application/pdf"
-                  className="border border-gray-300 px-2 py-1 rounded"
-                />
-                {row.file && (
-                  <a
-                    href={URL.createObjectURL(row.file)}
-                    download={row.file.name}
-                    className="text-blue-600 hover:underline mt-2 block"
-                  >
-                    Download PDF
-                  </a>
-                )}
+                <input type="file" onChange={(e) => handleFileUpload(e, index, 'file')} />
+                {row.file && <a href={row.file} download className="text-blue-600 hover:underline">Download</a>}
               </td>
-              <td className="px-4 gap-2  py-2 border">
-                {row.isEditing ? (
-                  <button
-                    onClick={() => handleUpdateRow(index)}
-                    className="bg-green-500 text-white py-1 px-3 rounded"
-                  >
-                    Update
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleToggleEdit(index)}
-                    className="bg-yellow-500 text-white mb-2 py-1 px-4 rounded"
-                  >
-                    Edit
-                  </button>
-                )}
-                <button
-                  onClick={() => handleDeleteRow(index)}
-                  className="bg-red-500 text-white mt-2 py-1 px-2 rounded "
-                >
-                 ×
+              <td className="px-4 py-2 border">
+              <button 
+  onClick={() => {
+    console.log("Updating row with ID:", row._id, row);
+    handleUpdateRow(row._id, row);
+  }} 
+  className="bg-green-500 text-white py-1 px-3 rounded"
+>
+  Save
+</button>
+
+
+                <button onClick={() => handleDeleteRow(row._id)} className="bg-red-500 text-white py-1 px-3 rounded ml-2">
+                  Delete
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      </div>
     </div>
   );
 };
