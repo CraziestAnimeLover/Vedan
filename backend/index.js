@@ -85,7 +85,7 @@ import gymStrongLiftRoutes from './routes/gymstrongliftRoutes.js';
 import gymUpperBodyRoutes from './routes/gymuppebodyRoutes.js';
 import gymVTaperRoutes from './routes/gymvtaperRoutes.js';
 import gymEventRoutes from "./routes/gymEventRoutes.js";
-
+import gymcorrectiveRoutes from "./routes/gymcorrectiveRoutes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from "multer";
@@ -138,6 +138,7 @@ app.get("/home", (req, res) => {
 // Book Management Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/rent-bills", aharrentBillRoutes);
+app.use("/api/correctives", gymcorrectiveRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/gym-events", gymEventRoutes);
 app.use('/api/chest/exercises', chestexerciseRoutes);
