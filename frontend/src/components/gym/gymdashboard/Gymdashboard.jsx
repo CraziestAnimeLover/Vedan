@@ -37,6 +37,7 @@ import GymFees from "../attendence/fees/GymFees";
 import GymEvents from "../gymevents/GymEvents";
 import GymBalancesheet from "../gymaccounts/GymBalancesheet";
 import GymAccounts from "../gymaccounts/GymAccounts";
+import OwnLive from "../livesession/OwnLive";
 
 
 
@@ -150,7 +151,7 @@ const Gymdashboard = () => {
       { title: "Live", component: <Live />, icon: <LucideVideo size={20} /> },
       {
         title: "Own Space",
-        url: "/placement/opportunity/apply",
+        component: <OwnLive/>,
         icon: <LucideVideo size={20} />,
       },
     ],

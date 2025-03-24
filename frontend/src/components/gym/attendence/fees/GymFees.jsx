@@ -11,7 +11,7 @@ const GymFees = () => {
   const [selectedYear, setSelectedYear] = useState(years[years.length - 1]);
   const [data, setData] = useState([
  
-    { srno: 2, name: 'Jane Doe', fees: 600, status: 'Unpaid', penalty: 'Late fee', remark: 'Pending approval' },
+    { srno: 2, name: 'Jane  Doe', fees: 600, status: 'Unpaid', penalty: 'Late fee', remark: 'Pending approval' },
   ]);
 
   const handleEdit = (index, field, value) => {
@@ -73,7 +73,7 @@ const GymFees = () => {
           <tr className="bg-gray-200">
             <th className="border p-2">Sr No</th>
             <th className="border p-2">Name</th>
-            <th className="border p-2">Fees</th>
+            <th className="border p-2">Fees </th>
             <th className="border p-2">Status</th>
             <th className="border p-2">Penalty</th>
             <th className="border p-2">Remark</th>

@@ -18,19 +18,31 @@ const Live = () => {
       console.error('Error fetching data:', error);
     }
   };
-  const handleAddRow = () => {
+  const handleAddRow = async () => {
     const newRow = {
-      _id: null, // Placeholder, backend should assign an ID
       srNo: rows.length + 1,
-      concept: '',
-      date: '',
-      time: '',
+      concept: "New Concept", // Ensure it is not empty
+      date: new Date().toISOString().split("T")[0], // Defaults to today
+      time: "12", // Default time
       image: null,
       file: null,
       isEditing: true,
     };
-    setRows([...rows, newRow]);
+  
+    try {
+      console.log("Sending new row to backend:", newRow);
+  
+      const response = await axios.post(API_URL, newRow);
+  
+      console.log("Row added successfully:", response.data);
+      setRows([...rows, response.data]);
+  
+    } catch (error) {
+      console.error("Error adding row:", error.response ? error.response.data : error.message);
+    }
   };
+  
+  
   
   
   
@@ -65,6 +77,10 @@ const Live = () => {
       });
   
       console.log("Update successful:", response.data);
+  
+      // Update local state after successful update
+      setRows(rows.map(row => (row._id === id ? response.data : row)));
+  
     } catch (error) {
       console.error("Error updating row:", error);
     }

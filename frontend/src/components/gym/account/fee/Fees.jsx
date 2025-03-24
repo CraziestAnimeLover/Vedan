@@ -29,7 +29,7 @@ const Fees = () => {
 
   const addFeeRow = () => {
     const newFee = {
-      student: "John Doe",
+      student: "John vs Doe",
       feeFrom: "10:00",
       feeTo: "12:00",
       amount: 100,
@@ -166,11 +166,13 @@ const Fees = () => {
                   </td>
                   <td className="border p-2 flex gap-2 justify-center">
                     {row.isEditing ? (
-                      <button onClick={() => updateFeeRow(index, row.id)} className="text-blue-500">💾 Save</button>
+                      <button onClick={() => updateFeeRow(index, row._id)} className="text-blue-500">💾 Save</button>
+
                     ) : (
                       <button onClick={() => toggleEditMode(index)} className="text-green-500">✏️ Edit</button>
                     )}
-                    <button onClick={() => removeFeeRow(row.id)} className="text-red-500">❌ Delete</button>
+                    <button onClick={() => removeFeeRow(row._id)} className="text-red-500">❌ Delete</button>
+
                   </td>
                 </tr>
               ))}
