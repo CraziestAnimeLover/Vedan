@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "../../ui/Card";
 import { Input } from "@/components/ui/input";
@@ -21,28 +21,61 @@ const GymProfile = () => {
   });
 
   const branchIds = ["B1001", "B1002", "B1003"]; // Example branch IDs
+  useEffect(() => {
+    const fetchGymProfile = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/gymProfiles/${formData.gymId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFormData((prevState) => ({
+            ...prevState,
+            ...data, 
+            branchname: branchIds.includes(data.branchId) ? data.branchId : prevState.branchname
+          }));
+        } else {
+          console.error("Failed to fetch gym profile");
+        }
+      } catch (error) {
+        console.error("Error fetching gym profile:", error);
+      }
+    };
+  
+    fetchGymProfile();
+  }, []);
+  
 
   const handleChange = (e, index = null, field = null) => {
     if (index !== null && field) {
-      const updatedTaxes = [...formData.taxes];
-      updatedTaxes[index][field] = e.target.value;
-      setFormData({ ...formData, taxes: updatedTaxes });
+      setFormData((prevData) => {
+        const updatedTaxes = [...prevData.taxes];
+        updatedTaxes[index] = { ...updatedTaxes[index], [field]: e.target.value };
+        return { ...prevData, taxes: updatedTaxes };
+      });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
+  
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload a valid image file.");
+        return;
+      }
+  
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result });
+        setFormData((prevData) => ({
+          ...prevData,
+          image: reader.result,
+        }));
       };
       reader.readAsDataURL(file);
     }
   };
-
+  
   const handleAddTax = () => {
     setFormData({
       ...formData,
@@ -50,10 +83,53 @@ const GymProfile = () => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted Data:", formData);
-    setShowProfile(true);
+  const handleSubmit = async () => {
+    try {
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        if (key === "image" && formData.image instanceof File) {
+          formDataToSend.append("image", formData.image);
+        } else if (key === "taxes") {
+          formDataToSend.append(key, JSON.stringify(formData[key])); // Convert array to string
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      }
+  
+      const method = formData._id ? "PUT" : "POST"; // If _id exists, update instead of create
+      const url = formData._id 
+        ? `http://localhost:8000/api/gymProfiles/${formData._id}`
+        : "http://localhost:8000/api/gymProfiles";
+  
+      const response = await fetch(url, {
+        method,
+        body: formDataToSend,
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        console.log("Success:", result);
+        setShowProfile(true);
+      } else {
+        console.error("Error:", result);
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+    }
   };
+  
+  const handleBranchChange = (e) => {
+    const selectedBranchId = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      branchId: selectedBranchId,
+      branchname: selectedBranchId, // Update branchname dynamically
+    }));
+  };
+  
+  
+  
 
   return (
     <div className="p-4 max-w-4xl mx-auto relative">
@@ -136,11 +212,12 @@ const GymProfile = () => {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold">{formData.branchname} ({formData.gymId})</label>
-                <select name="branchId" value={formData.branchId} onChange={handleChange} className="w-full p-2 border rounded">
-                  {branchIds.map((id) => (
-                    <option key={id} value={id}>{id}</option>
-                  ))}
-                </select>
+                <select name="branchId" value={formData.branchId} onChange={handleBranchChange} className="w-full p-2 border rounded">
+  {branchIds.map((id) => (
+    <option key={id} value={id}>{id}</option>
+  ))}
+</select>
+
               </div>
               <div>
                 <label className="text-sm font-semibold">Founder</label>
@@ -172,9 +249,12 @@ const GymProfile = () => {
               </div>
             ))}
 
-            <div className="mt-6 text-center">
-              <Button onClick={handleSubmit} className="w-40">Submit</Button>
-            </div>
+<div className="mt-6 text-center">
+  <Button onClick={handleSubmit} className="w-40">
+    {formData._id ? "Update" : "Submit"}
+  </Button>
+</div>
+
           </CardContent>
         </Card>
       )}
