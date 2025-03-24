@@ -95,7 +95,7 @@ const BalanceTables = ({ assets, liabilities, updateValue, calculateTotal, handl
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Submit
+            Submit fff
           </button>
         </div>
       </form>
