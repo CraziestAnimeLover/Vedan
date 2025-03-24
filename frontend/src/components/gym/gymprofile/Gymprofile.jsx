@@ -251,7 +251,7 @@ const GymProfile = () => {
 
 <div className="mt-6 text-center">
   <Button onClick={handleSubmit} className="w-40">
-    {formData._id ? "Update" : "Submit"}
+    {formData._id ? "Updated" : "Submit"}
   </Button>
 </div>
 
